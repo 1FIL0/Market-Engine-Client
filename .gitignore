@@ -1,0 +1,14 @@
+__pycache__
+*config*
+*.sh
+*.vscode
+*.cache
+compile_commands.json
+build_linux64
+build_win64
+CMakeCache*
+!clear_linux64.sh
+!clear_win64.sh
+!make_linux64.sh
+!make_win64.sh
+.clangd

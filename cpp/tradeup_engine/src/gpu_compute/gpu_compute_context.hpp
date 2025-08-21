@@ -1,0 +1,61 @@
+#pragma once
+
+#include "namespace.hpp"
+#include "tradeup.hpp"
+
+#define CL_TARGET_OPENCL_VERSION 300
+#define CL_HPP_TARGET_OPENCL_VERSION 300
+#define CL_HPP_ENABLE_EXCEPTIONS
+#include <CL/opencl.hpp>
+
+START_ENGINE_NAMESPACE_MULTI(COMPGPU)
+
+class ComputeContext {
+    private:
+        bool m_debugMode;
+        
+        cl::Platform m_platform;
+        cl::Context m_context;
+        cl::Device m_device;
+        cl::CommandQueue m_queue;
+        cl::Kernel m_kernel;
+        cl::Program m_program;
+
+        std::string m_platformName;
+        std::string m_platformVendor;
+        std::string m_deviceName;
+        cl_uint m_computeUnits;
+        cl_uint m_memorySize;
+
+        cl::Buffer m_tradeupsBuffer;
+        cl::Buffer m_batchBuffer;
+        cl::Buffer m_flatCollectionOutputsBuffer;
+        cl::Buffer m_collectionIndicesStartBuffer;
+        cl::Buffer m_collectionIndicesEndBuffer;
+
+        uint64_t m_combinationsAmount;
+        uint64_t m_tradeupsSize;
+        float m_profitabilityMargin;
+
+        std::vector<TRADEUP::TradeupGPU> m_tradeupsGPU;
+        std::vector<ITEM::MarketItem> m_batch;
+
+        void buildKernel(void);
+        void logComputeDiagnostics(const int category, const int grade, const uint64_t currentBatch);
+        void sendInfo(void);
+        void initData(void);
+        void createStaticBuffers(void);
+        void prepareBatch(const int category, const int grade);
+        void prepareBuffers(const int category, const int grade);
+        void cleanTradeups(void);
+        void setKernelArgs(void);
+        void processTradeups(void);
+
+    public:
+        ComputeContext(const cl::Device &a_device, const bool debug = false);
+
+        void startCompute(void);
+        void execKernel(void);
+};
+
+END_ENGINE_NAMESPACE
