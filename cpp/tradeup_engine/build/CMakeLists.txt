@@ -23,6 +23,7 @@ if (UNIX)
     add_custom_command(
         OUTPUT ${GPU_EMBEDDED_HEADER_FILE}
         COMMAND echo "Preprocessing and embedding GPU kernel: ${CL_KERNEL_SOURCE}"
+        COMMAND mkdir -p $GPU_KERNEL_HPP_DIR
         COMMAND cpp -P ${CL_KERNEL_SOURCE} -o ${GPU_PREPROCESSED_CL_FILE}
         COMMAND xxd -n "kernel_cl_hpp_${KERNEL_NAME_WE}" -i ${GPU_PREPROCESSED_CL_FILE} > ${GPU_EMBEDDED_HEADER_FILE}
         DEPENDS ${CL_KERNEL_SOURCE}

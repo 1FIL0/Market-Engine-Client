@@ -1,5 +1,5 @@
 __pycache__
-*config*
+*pyright*
 *.sh
 *.vscode
 *.cache
@@ -12,3 +12,6 @@ CMakeCache*
 !make_linux64.sh
 !make_win64.sh
 .clangd
+market_engine_icons_rc.py
+form_main_window.py
+gpu_kernel_embedded/
