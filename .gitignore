@@ -12,6 +12,6 @@ CMakeCache*
 !make_linux64.sh
 !make_win64.sh
 .clangd
-market_engine_icons_rc*
-form_main_window*
+form_main_window.py
+market_engine_icons_rc.py
 gpu_kernel_embedded/
