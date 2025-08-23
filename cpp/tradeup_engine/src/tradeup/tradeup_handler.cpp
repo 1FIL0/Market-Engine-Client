@@ -87,7 +87,7 @@ void TRADEUP::writeTradeup(TRADEUP::TradeupCPU &tradeupCPU, const std::string &d
     tradeupVal.AddMember("Device Used", rapidjson::Value().SetString(deviceName.c_str(), allocator), allocator);
     tradeupVal.AddMember("Tradeup Category", rapidjson::Value().SetString(DEFINITIONS::categoryToString(inputs[0].category).c_str(), allocator), allocator);
     tradeupVal.AddMember("Tradeup Grade", rapidjson::Value().SetString(DEFINITIONS::gradeToString(inputs[0].grade).c_str(), allocator), allocator);
-    for (auto &input : inputs) { // BECAUSE ALLOCATED MORE THAN ACTUAL ITEMS
+    for (auto &input : inputs) {
         rapidjson::Value inputDoc(rapidjson::kObjectType);
         auto inputItemColdData = ITEM::getColdData(input);
         inputDoc.AddMember("Perm ID", rapidjson::Value().SetUint64(input.permID), allocator);

@@ -198,32 +198,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def refreshManagerStats(self):
         tradeups = tradeup_memory.getTradeups()
-        self.totalTradeups.setText(f"Total Tradeups: {str(len(tradeups))}")
-        profs_0_100 = 0; profs_100_125 = 0; profs_125_150 = 0; profs_150_175 = 0; profs_175_200 = 0; profs_200 = 0
-        chances_0_25 = 0; chances_25_50 = 0; chances_50_75 = 0; chances_75_100 = 0; chances_100 = 0
-        for tradeup in tradeups:
-            if tradeup.profitability >= 0 and tradeup.profitability < 100: profs_0_100 += 1
-            if tradeup.profitability >= 100 and tradeup.profitability < 125: profs_100_125 += 1
-            if tradeup.profitability >= 125 and tradeup.profitability < 150: profs_125_150 += 1
-            if tradeup.profitability >= 150 and tradeup.profitability < 175: profs_150_175 += 1
-            if tradeup.profitability >= 175 and tradeup.profitability < 200: profs_175_200 += 1
-            if tradeup.profitability >= 200: profs_200 += 1
-            if tradeup.chanceToProfit >= 0 and tradeup.chanceToProfit < 25: chances_0_25 += 1
-            if tradeup.chanceToProfit >= 25 and tradeup.chanceToProfit < 50: chances_25_50 += 1
-            if tradeup.chanceToProfit >= 50 and tradeup.chanceToProfit < 75: chances_50_75 += 1
-            if tradeup.chanceToProfit >= 75 and tradeup.chanceToProfit < 100: chances_75_100 += 1
-            if tradeup.chanceToProfit >= 100: chances_100 += 1
-        self.prof0_100.setText(f"Profitability 0-100%: {profs_0_100}")
-        self.prof100_125.setText(f"Profitability 100-125%: {profs_100_125}")
-        self.prof125_150.setText(f"Profitability 125-150%: {profs_125_150}")
-        self.prof150_175.setText(f"Profitability 150-175%: {profs_150_175}")
-        self.prof175_200.setText(f"Profitability 175-200%: {profs_175_200}")
-        self.prof200.setText(f"Profitability 200%+: {profs_200}")
-        self.ch0_25.setText(f"Chance To Profit 0-25%: {chances_0_25}")
-        self.ch25_50.setText(f"Chance To Profit 25-50%: {chances_25_50}")
-        self.ch50_75.setText(f"Chance To Profit 50-75%: {chances_50_75}")
-        self.ch75_100.setText(f"Chance To Profit 75-100%: {chances_75_100}")
-        self.ch100.setText(f"Chance To Profit 100%+: {chances_100}")
+        self.totalTradeups.setText(f"{str(len(tradeups))}")
 
     def deleteTradeups(self):
         data: dict[str, Any] = file_handler.loadJson(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS)
@@ -311,7 +286,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         
     def createTradeupEntryBox(self, tradeup: Tradeup):
         color = definitions.gradeToRGBString(tradeup.tradeupGrade)
-        entryName = f"tradeup"
+        entryName = f"tradeup{tradeup.tradeupHash}"
         entrySheet = f"""#{entryName} {{
             border: 1px solid;
             border-radius: 10px;
@@ -368,16 +343,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def loadTradeupOverview(self, tradeup: Tradeup):
         self.favouriteTradeupCheckbox.setChecked(tradeup.favourite)
         self.favouriteTradeupCheckbox.stateChanged.connect(lambda: self.favouriteTradeup(tradeup))
-        self.tradeupCategory.setText(f"Tradeup Category: {tradeup.tradeupCategory}")
-        self.tradeupGrade.setText(f"Tradeup Grade: {tradeup.tradeupGrade}")
-        self.tradeupDeviceUsed.setText(f"Device Used: {tradeup.deviceUsed}")
-        self.tradeupOutputs.setText(f"Outputs: {tradeup.totalOutputs}")
-        self.tradeupDateFound.setText(f"Date Found: {tradeup.dateFound}")
-        self.tradeupProfitability.setText(f"Profitability: {round(tradeup.profitability, 2)}% - {round(tradeup.profitabilitySteamTax)}% TAX")
-        self.tradeupChanceToProfit.setText(f"Chance To Profit: {round(tradeup.chanceToProfit, 2)}% - {round(tradeup.chanceToProfitSteamTax)}% TAX")
-        self.tradeupTotalInputCost.setText(f"Total Input Cost: ${round(tradeup.totalInputCost, 3)}")
-        self.tradeupAvgInputFloat.setText(f"Average Input Float: {round(tradeup.averageInputFloat, 3)}")
-        self.tradeupHash.setText(f"Tradeup Hash: {tradeup.tradeupHash}")
+        self.tradeupCategory.setText(f"{tradeup.tradeupCategory}")
+        self.tradeupGrade.setText(f"{tradeup.tradeupGrade}")
+        self.tradeupDeviceUsed.setText(f"{tradeup.deviceUsed}")
+        self.tradeupOutputs.setText(f"{tradeup.totalOutputs}")
+        self.tradeupDateFound.setText(f"{tradeup.dateFound}")
+        self.tradeupProfitability.setText(f"{round(tradeup.profitability, 2)}% - {round(tradeup.profitabilitySteamTax)}% Steam Tax")
+        self.tradeupChanceToProfit.setText(f"{round(tradeup.chanceToProfit, 2)}% - {round(tradeup.chanceToProfitSteamTax)}% Steam Tax")
+        self.tradeupTotalInputCost.setText(f"${round(tradeup.totalInputCost, 3)}")
+        self.tradeupAvgInputFloat.setText(f"{round(tradeup.averageInputFloat, 3)}")
 
     def loadTradeupInputs(self, tradeup: Tradeup):
         for index, inputItemEntry in enumerate(tradeup.inputEntries):
@@ -657,11 +631,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         discardButton = qt_resource.createButton(f"itemDisableButton", "Discard", qt_resource.fontSystemHudBold)
         saveButton.clicked.connect(lambda: self.saveItemModificationValue(filteredItem, customPriceBox.value()))
         discardButton.clicked.connect(lambda: self.loadItemModificationValue(filteredItem, customPriceBox))
-        buttonsBox.layout().addWidget(saveButton)
-        buttonsBox.layout().addWidget(discardButton)
         rightSect.layout().addWidget(headerLabel)
         rightSect.layout().addWidget(customPriceBox)
         rightSect.layout().addWidget(buttonsBox)
+        buttonsBox.layout().addWidget(saveButton)
+        buttonsBox.layout().addWidget(discardButton)
         return rightSect
 
     def saveItemModificationValue(self, filteredItem: MarketItem, value: float):

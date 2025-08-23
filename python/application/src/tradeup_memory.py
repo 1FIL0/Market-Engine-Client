@@ -58,8 +58,8 @@ def loadTradeups() -> None:
         tradeup.profitabilitySteamTax = tradeupEntry["Profitability Steam Tax"]
         tradeup.totalInputCost = tradeupEntry["Total Input Cost"]
         tradeup.totalOutputs = tradeupEntry["Total Outputs"]
-        tradeup.tradeupCategory = tradeupEntry["Tradeup Category"]
-        tradeup.tradeupGrade = tradeupEntry["Tradeup Grade"]
+        tradeup.tradeupCategory = definitions.categoryToInt(tradeupEntry["Tradeup Category"])
+        tradeup.tradeupGrade = definitions.gradeToInt(tradeupEntry["Tradeup Grade"])
         tradeup.tradeupHash = tradeupEntry["Tradeup Hash"]
         tradeup.favourite = tradeupEntry["Favourite"]
         gTradeups.append(tradeup)
