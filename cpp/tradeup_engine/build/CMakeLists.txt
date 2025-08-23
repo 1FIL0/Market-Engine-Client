@@ -12,7 +12,7 @@ message(STATUS "OpenSSL include dirs: ${OPENSSL_INCLUDE_DIR}")
 message(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
 
 # EMBED GPU KERNEL START
-if (UNIX)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     set(GPU_KERNEL_CL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src/gpu_kernel_cl)
     set(GPU_KERNEL_HPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src/gpu_kernel_embedded)
 
@@ -51,7 +51,7 @@ file(GLOB_RECURSE SOURCES_SHARE
 
 add_executable(engine ${SOURCES_CALCULATOR} ${SOURCES_SHARE})
 
-if (UNIX)
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(engine PRIVATE OpenMP::OpenMP_CXX OpenCL OpenSSL::Crypto)
     target_compile_options(engine PRIVATE -fopenmp -O2 -Wall -Wextra)
     target_link_options(engine PRIVATE -fopenmp)
