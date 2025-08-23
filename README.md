@@ -14,6 +14,8 @@ in the client to use the official API over at https://website.com. To start find
 intervally. Then head over to the tradeup engine tab and run the engine. Make sure to configure all of your hardware in the settings.
 
 ## Building from source
+## README IN PROGRESS
+<!--
 ### First steps
 Firstly, clone the mandatory repositories:  ```mkdir MarketEngine && cd MarketEngine &&
 git clone https://github.com/1FIL0/Market-Engine-Client market_engine_client && 
@@ -42,9 +44,11 @@ The archives will be created in the zip/ directory
 Download the appimagetool from https://github.com/AppImage/appimagetool and place it in appimg/  
 ```cd market_engine_shell_network/configure && ./configure_qt_docs.sh && cd ../make && ./mk_appimg_client.sh PLATFORM=LINUX_X86_64 MAKE_BINARIES=TRUE```  
 The AppImage will be stored in the appimg/ directory
+-->
 
 ## Licence
 Market Engine is licenced under the GPL v3.0 licence
+
 
 
 
