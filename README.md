@@ -14,24 +14,36 @@ in the client to use the official API over at https://website.com. To start find
 intervally. Then head over to the tradeup engine tab and run the engine. Make sure to configure all of your hardware in the settings.
 
 ## Building from source
-### Base
-Firstly, clone the mandatory repositories: ```git clone https://github.com/1FIL0/Market-Engine-Client market_engine_client && 
+### First steps
+Firstly, clone the mandatory repositories:  ```mkdir MarketEngine && cd MarketEngine &&
+git clone https://github.com/1FIL0/Market-Engine-Client market_engine_client && 
 git clone https://github.com/1FIL0/Market-Engine-Share market_engine_share && 
 git clone https://github.com/1FIL0/Market-Engine-Assets market_engine_assets &&
 git clone https://github.com/1FIL0/Market-Engine-Shell-Network market_engine_shell_network```
 
+### Windows Build Setup
+install python from https://www.python.org/ then open powershell and navigate to the MarketEngine root directory.  
+create virtual environment and install packages:  
+```New-Item -ItemType Directory -Path venvs/windows_x86_64/client_venv -Force;source venvs/windows_x86_64/client_venv/Scripts/activate; py -m pip install pyqt5 pyopencl requests pyinstaller keyring```  
+install msys2 from https://www.msys2.org/ and open its mingw64 terminal:  
+```pacman -Syu && pacman -S mingw-w64-x86_64-openssl mingw-w64-x86_64-opencl-icd mingw-w64-x86_64-opencl-clhpp mingw-w64-x86_64-opencl-headers  mingw-w64-x86_64-rapidjson```
+
 The rest happens in the shell network, supports msys2 and linux:    
 ```cd market_engine_shell_network/configure && ./configure_qt_docs.sh && cd ../make```  
 
+### Linux Build Setup
+
 ### Make AppImage
 Download the appimagetool from https://github.com/AppImage/appimagetool and place it in appimg/
-```./mk_appimg_client.sh PLATFORM=LINUX_X86_64 MAKE_BINARIES=TRUE```  
+```cd market_engine_shell_network/configure && ./configure_qt_docs.sh && cd ../make && ./mk_appimg_client.sh PLATFORM=LINUX_X86_64 MAKE_BINARIES=TRUE```  
 The AppImage will be stored in the appimg/ directory
 
 ### Make 7Zip
-Windows: ```./mk_zip_client PLATFORM=WINDOWS_X86_64 MAKE_BINARIES=TRUE```  
-Linux: ```./mk_zip_client PLATFORM=LINUX_X86_64 MAKE_BINARIES=TRUE```  
+You must use either linux or the msys2 terminal
+Windows: ```cd market_engine_shell_network/configure && ./configure_qt_docs.sh && cd ../make && /mk_zip_client PLATFORM=WINDOWS_X86_64 MAKE_BINARIES=TRUE```  
+Linux: ```cd market_engine_shell_network/configure && ./configure_qt_docs.sh && cd ../make && ./mk_zip_client PLATFORM=LINUX_X86_64 MAKE_BINARIES=TRUE```  
 The archives will be created in the zip/ directory
 
 ## Licence
 Market Engine is licenced under the GPL v3.0 licence
+
