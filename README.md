@@ -25,7 +25,7 @@ git clone https://github.com/1FIL0/Market-Engine-Shell-Network market_engine_she
 install python from https://www.python.org/ then open powershell and navigate to the MarketEngine root directory.  
 create virtual environment and install packages:  
 ```New-Item -ItemType Directory -Path venvs/windows_x86_64/client_venv -Force;source venvs/windows_x86_64/client_venv/Scripts/activate; py -m pip install pyqt5 pyopencl requests pyinstaller keyring```  
-install msys2 from https://www.msys2.org/ and open its mingw64 terminal:  
+install msys2 from https://www.msys2.org/ and open its mingw64 terminal (Launch again if it closes after update):  
 ```pacman -Syu && pacman -S mingw-w64-x86_64-openssl mingw-w64-x86_64-opencl-icd mingw-w64-x86_64-opencl-clhpp mingw-w64-x86_64-opencl-headers  mingw-w64-x86_64-rapidjson```
 
 The rest happens in the shell network, supports msys2 and linux:    
@@ -46,4 +46,5 @@ The archives will be created in the zip/ directory
 
 ## Licence
 Market Engine is licenced under the GPL v3.0 licence
+
 
