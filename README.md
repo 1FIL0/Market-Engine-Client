@@ -33,18 +33,19 @@ create virtual environment and install packages:
 ```mkdir -p venvs/linux_x86_64/client_venv && source venvs/linux_x86_64/client_venv/bin/activate && python3 -m pip install pyqt5 pyopencl requests pyinstaller keyring && sudo apt update -y && sudo apt install opencl-headers opencl-cl-hpp-headers rapidjson-dev libssl-dev```
 
 ### Make 7Zip
-you must use the msys2 mingw64 terminal if you're using windows
+you must use the msys2 mingw64 terminal if you're using windows  
 Windows: ```cd market_engine_shell_network/configure && ./configure_qt_docs.sh && cd ../make && /mk_zip_client PLATFORM=WINDOWS_X86_64 MAKE_BINARIES=TRUE```  
 Linux: ```cd market_engine_shell_network/configure && ./configure_qt_docs.sh && cd ../make && ./mk_zip_client PLATFORM=LINUX_X86_64 MAKE_BINARIES=TRUE```  
 The archives will be created in the zip/ directory
 
 ### Make AppImage
-Download the appimagetool from https://github.com/AppImage/appimagetool and place it in appimg/
+Download the appimagetool from https://github.com/AppImage/appimagetool and place it in appimg/  
 ```cd market_engine_shell_network/configure && ./configure_qt_docs.sh && cd ../make && ./mk_appimg_client.sh PLATFORM=LINUX_X86_64 MAKE_BINARIES=TRUE```  
 The AppImage will be stored in the appimg/ directory
 
 ## Licence
 Market Engine is licenced under the GPL v3.0 licence
+
 
 
 
