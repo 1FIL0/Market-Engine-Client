@@ -1,3 +1,4 @@
+#include "compute_config.hpp"
 #include "definitions.hpp"
 #include "market_item.hpp"
 #include "market_item_memory.hpp"
@@ -10,6 +11,7 @@
 #include <vector>
 #include <omp.h>
 #include "cpu_operations.hpp"
+#include <cmath>
 
 USE_NAMESPACE_SHARE
 USE_NAMESPACE_TRADEUP_ENGINE
@@ -76,10 +78,10 @@ void CPUOP::setBatchFloats(std::vector<ITEM::MarketItem> &batch)
     for (auto &input : batch) {
         float wearMinFloat = DEFINITIONS::wearToMinFloat(input.wear);
         float wearMaxFloat = DEFINITIONS::wearToMaxFloat(input.wear);
-        float finalMinFloat = wearMinFloat;
-        float finalMaxFloat = wearMaxFloat;
-        if (input.minFloat > wearMinFloat) {finalMinFloat = input.minFloat;}
-        if (input.maxFloat < wearMaxFloat) {finalMaxFloat = input.maxFloat;}
+        if (input.minFloat > wearMinFloat) {wearMinFloat = input.minFloat;}
+        if (input.maxFloat < wearMaxFloat) {wearMaxFloat = input.maxFloat;}
+        float finalMinFloat = std::lerp(wearMinFloat, wearMaxFloat, COMP::computeConfig.minimumInputFloatPercentage / 100.0);
+        float finalMaxFloat = std::lerp(wearMinFloat, wearMaxFloat, COMP::computeConfig.maximumInputFloatPercentage / 100.0);
         input.floatVal = RAND::getRandomFloat(finalMinFloat, finalMaxFloat);
     }
 }

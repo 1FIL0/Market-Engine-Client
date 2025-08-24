@@ -28,6 +28,8 @@ COMP::ComputeConfig::ComputeConfig(void)
         categories.push_back(categoriesDoc[i].GetInt());
     }
     batchSize = ccDoc["Batch Size"].GetInt();
+    minimumInputFloatPercentage = ccDoc["Minimum Input Float"].GetFloat();
+    maximumInputFloatPercentage = ccDoc["Maximum Input Float"].GetFloat();
     maxInputPrice = ccDoc["Max Input Price"].GetFloat();
     singleItem = ccDoc["Single Item Batch"].GetBool();
     profitMargin = ccDoc["Profit Margin"].GetFloat();

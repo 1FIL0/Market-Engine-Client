@@ -17,6 +17,8 @@ public:
     std::vector<int> categories;
     std::vector<int> grades;
     int batchSize;
+    float minimumInputFloatPercentage;
+    float maximumInputFloatPercentage;
     float maxInputPrice;
     bool singleItem;
     float profitMargin;

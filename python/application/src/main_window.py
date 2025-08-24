@@ -742,6 +742,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "Compute Categories": [],
             "Single Item Batch": False,
             "Batch Size": 0,
+            "Minimum Input Float": 0,
+            "Maximum Input Float": 0,
             "Max Input Price": 0,
             "Profit Margin": 0,
             "Devices": [],
@@ -757,6 +759,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.tradeupEngineSettingsStatTrak.isChecked(): config["Compute Categories"].append(1)
         config["Single Item Batch"] = self.tradeupEngineSettingsSingleItemBatch.isChecked()
         config["Batch Size"] = self.tradeupEngineSettingsBatchSize.value()
+        config["Minimum Input Float"] = self.tradeupEngineSettingsMinInputFloat.value()
+        config["Maximum Input Float"] = self.tradeupEngineSettingsMaxInputFloat.value()
         config["Max Input Price"] = self.tradeupEngineSettingsMaxInputPrice.value()
         config["Profit Margin"] = self.tradeupEngineSettingsProfitMargin.value()
         config["Compute Mode"] = self.computeModeBox.currentIndex()
@@ -773,6 +777,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "Compute Categories": [0, 1],
             "Single Item Batch": False,
             "Batch Size": 15,
+            "Minimum Input Float": 50,
+            "Maximum Input Float": 80,
             "Max Input Price": 10000,
             "Profit Margin": 140,
             "Compute Mode": 0,
@@ -796,6 +802,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if category == 1: self.tradeupEngineSettingsStatTrak.setChecked(True)
         self.tradeupEngineSettingsSingleItemBatch.setChecked(config["Single Item Batch"])
         self.tradeupEngineSettingsBatchSize.setValue(config["Batch Size"])
+        self.tradeupEngineSettingsMinInputFloat.setValue(config["Minimum Input Float"])
+        self.tradeupEngineSettingsMaxInputFloat.setValue(config["Maximum Input Float"])
         self.tradeupEngineSettingsMaxInputPrice.setValue(config["Max Input Price"])
         self.tradeupEngineSettingsProfitMargin.setValue(config["Profit Margin"])
         self.computeModeBox.setCurrentIndex(config["Compute Mode"])
