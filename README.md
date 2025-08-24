@@ -14,10 +14,11 @@ in the client to use the official API over at https://website.com. To start find
 intervally. Then head over to the tradeup engine tab and run the engine. Make sure to configure all of your hardware in the settings.
 
 ## Building from source
-Building happens in the shell network, follow instructions at https://github.com/1FIL0/market_engine_shell_network
+Building happens in the shell network, follow instructions at https://github.com/1FIL0/Market-Engine-Shell-Network
 
 ## Licence
 Market Engine is licenced under the GPL v3.0 licence
+
 
 
 
