@@ -5,8 +5,8 @@
 A powerful GPU-Powered CS2 Tradeup engine designed to brute-force profitable tradeups. Configure max input floats for an easier time finding items on the market, Select your CPU or your GPU's as you like, 
 and manage tradeups easily via the tradeups tab. Includes an item viewer page for all skins and a manager for changing skin prices if they're off.
 
-## Downloads
-Downloads are listed on the Market Engine website (https://website.com) and github releases. Currently the project supports Windows and Linux
+## Download
+There's a windows and linux version you can download over at https://market-engine.xyz.
 
 ## How to use
 In order to use the client, you must either setup your own API from https://github.com/1FIL0/Market-Engine-API or login through the accounts page
@@ -18,6 +18,7 @@ Building happens in the shell network, follow instructions at https://github.com
 
 ## Licence
 Market Engine is licenced under the GPL v3.0 licence
+
 
 
 
