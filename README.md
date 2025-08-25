@@ -10,7 +10,7 @@ There's a windows and linux version you can download over at https://market-engi
 
 ## How to use
 In order to use the client, you must either setup your own API from https://github.com/1FIL0/Market-Engine-API or login through the accounts page
-in the client to use the official API over at https://website.com. To start finding tradeups simply go to the sonar tab and automatically scan for new items
+in the client to use the official API. To start finding tradeups simply go to the sonar tab and automatically scan for new items
 intervally. Then head over to the tradeup engine tab and run the engine. Make sure to configure all of your hardware in the settings.
 
 ## Building from source
@@ -18,6 +18,7 @@ Building happens in the shell network, follow instructions at https://github.com
 
 ## Licence
 Market Engine is licenced under the GPL v3.0 licence
+
 
 
 
