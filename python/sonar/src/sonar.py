@@ -35,7 +35,8 @@ def requestReadyItems() -> None:
         return
 
     headers = {
-        "Authorization": f"Bearer {accessToken}"
+        "Authorization": f"Bearer {accessToken}",
+        "Accept": "application/json"
     }
 
     try:
@@ -47,7 +48,10 @@ def requestReadyItems() -> None:
         logger.sendMessage(f"Something went wrong! Status code: {res.status_code}, Error: {res.text}")
         return
         
-    readyItemsData = res.json()
+    logger.sendMessage(f"Status code: {res.status_code}")
+    saveReadyItems(res.json())
+
+def saveReadyItems(readyItemsData: dict[str, Any]):
     logger.sendMessage("Writing items to files")
     file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_CLIENT_READY_ITEMS, readyItemsData)
     newModifiedItemsData = file_handler.loadJson(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS)
