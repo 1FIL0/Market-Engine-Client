@@ -3,7 +3,7 @@ from main_window import MainWindow
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import Qt
 import qt_resource
-import flask_server
+import auth_server
 import os
 import item_memory
 import fwatcher_manager
@@ -15,7 +15,7 @@ def main():
 
 def init():
     validator.validateFiles()
-    flask_server.runServer()
+    auth_server.init()
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)

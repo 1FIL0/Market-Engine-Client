@@ -1,6 +1,10 @@
+from io import BytesIO
 import os
 import sys
+
+import requests
 import path
+import auth_server
 sys.path.insert(0, path.PATH_SHARE)
 from subprocess import Popen
 from typing import Any, Optional, cast
@@ -9,20 +13,19 @@ from item import MarketItem
 from tradeup_def import Tradeup, TradeupInputEntry, TradeupOutputEntry
 from PyQt5.QtWidgets import QCheckBox, QDoubleSpinBox, QGridLayout, QHBoxLayout, QMainWindow, QLabel, QVBoxLayout, QWidget
 from PyQt5.QtGui import QIcon, QPixmap
-from PyQt5.QtCore import QSize, QThread, QTimer, Qt
+from PyQt5.QtCore import QSize, QTimer, Qt
 from form_main_window import Ui_MainWindow
 import definitions
-import qt_request_worker
 import tradeup_memory
 import shared_args
 import proc
-import user_auth
 import file_handler
 import qt_resource
 from qt_stdout_worker import QTStdoutWorker
 import widgets
 import hardware
 import item_memory
+import logger
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -31,16 +34,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setMaximumSize(1400, 1100)
         self.setWindowTitle("Market Engine Client 1.0.0")
         self.setWindowIcon(QIcon(definitions.PATH_MARKET_ENGINE_ASSETS + "/ui/market_engine_client_desktop.png"))
-        self.initRequestThreads()
         self.initRefresher()
         self.initApp()
-
-    def initRequestThreads(self):
-        self.requestStatusWorkerThread: QThread = QThread()
-        self.requestStatusWorker = qt_request_worker.QTRequestWorker(definitions.URL_MARKET_ENGINE_FETCH_SERVER_STATUS, 5)
-        self.requestStatusWorker.moveToThread(self.requestStatusWorkerThread)
-        self.requestStatusWorker.finishedSuccess.connect(self.updateServerStatus)
-        self.requestStatusWorkerThread.start()
 
     def initRefresher(self):
         tradeup_memory.addTradeupsLoadedCallback(lambda: self.refreshManagerStats())
@@ -52,8 +47,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.statusSpecialReports.setText(status["Special Reports"])
 
     def initApp(self):
-        self.initClient()
-        self.requestStatusWorker.start()
+        self.initAccount()
         self.updateCenterStacked(0)
         self.initProcesses()
         self.initLeftTab()
@@ -63,23 +57,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initTradeupEngine()
         self.initTradeupViewer()
         self.initItemLibrary()
-
-    def initClient(self):
-        loginURL = definitions.URL_MARKET_ENGINE_APP_LOGIN
-        self.loginThroughBrowser.clicked.connect(lambda: self.openBrowserUrl(loginURL))
-        user_auth.setUserValidatedCallback(self.handlerValidated)
-        if user_auth.tryAutologin(): self.handlerValidated()
-
-    def openBrowserUrl(self, url: str):
-        webbrowser.open(url)
-
-    def handlerValidated(self):
-        # Run on UI thread to not run on flask server thread
-        QTimer.singleShot(0, self.handleLoggedIn)
-
-    def handleLoggedIn(self):
-        self.labelLoggedInStatus.setText("Logged In")
-        self.loginThroughBrowser.hide()
 
     def initProcesses(self):
         self.processSonar: Optional[Popen[str]] = None
@@ -117,6 +94,32 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.buttonYoutube.clicked.connect(lambda: self.openBrowserUrl("https://www.youtube.com/@1FIL0-f7f"))
         self.buttonDiscord.clicked.connect(lambda: self.openBrowserUrl("https://discord.com"))
         self.buttonGithub.clicked.connect(lambda: self.openBrowserUrl("https://github.com/1FIL0"))
+
+    def openBrowserUrl(self, url: str):
+        webbrowser.open(url)
+
+    # _____ ACCOUNT _____ #
+
+    def initAccount(self):
+        self.loginThroughBrowser.clicked.connect(lambda: auth_server.openAuthorizationURL())
+        self.updateAccount()
+        auth_server.setUserAuthorizedCallback(self.handleAccountValidated)
+
+    def handleAccountValidated(self):
+        # Run on UI thread to not run on flask server thread
+        QTimer.singleShot(0, self.updateAccount)
+
+    def updateAccount(self):
+        logger.sendMessage("Updating account information")
+        authUserData = auth_server.getAuthUserData()
+        if not authUserData: return
+        self.labelLoggedInStatus.setText(f"Logged In as {authUserData.name}")
+        res = requests.get(authUserData.picture)
+        imgData = BytesIO(res.content)
+        accountPixmap = QPixmap()
+        accountPixmap.loadFromData(imgData.read())
+        self.accountIcon.setPixmap(accountPixmap)
+        self.loginThroughBrowser.hide()
 
     # _____ SONAR _____ #
 
