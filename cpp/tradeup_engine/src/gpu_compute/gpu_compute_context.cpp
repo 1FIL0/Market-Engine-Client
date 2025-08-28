@@ -133,7 +133,7 @@ void COMPGPU::ComputeContext::prepareBuffers(const int category, const int grade
     prepareBatch(category, grade);
 
     // Create entirely new buffers
-    LOGGER::sendMessage("Preparing buffers");
+    if (COMP::computeConfig.outputVerbose) LOGGER::sendMessage("Preparing buffers");
     ITEM::MarketItemMemoryFlatCollections collectionOutputsFlat = ITEM::getItemsTradeupableCategoryGradeCollectionsFlattened(category, grade + 1);
     
     m_flatCollectionOutputsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 

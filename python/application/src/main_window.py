@@ -42,7 +42,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         tradeup_memory.addTradeupsLoadedCallback(lambda: self.refreshTradeupEntries())
 
     def updateServerStatus(self, status: dict[str, Any]):
-        self.statusServer.setText(status["Server"])
+        self.statusGeneral.setText(status["General"])
         self.statusAPI.setText(status["API"])
         self.statusSpecialReports.setText(status["Special Reports"])
 
@@ -89,11 +89,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # _____ HOME _____ #
     
     def initHome(self):
-        self.buttonCheckUpdates.clicked.connect(lambda: None)
         self.buttonGoToWebsite.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE))
-        self.buttonYoutube.clicked.connect(lambda: self.openBrowserUrl("https://www.youtube.com/@1FIL0-f7f"))
-        self.buttonDiscord.clicked.connect(lambda: self.openBrowserUrl("https://discord.com"))
-        self.buttonGithub.clicked.connect(lambda: self.openBrowserUrl("https://github.com/1FIL0"))
+        self.buttonGoToRepo.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE_REPO))
+        self.buttonYoutube.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_1FIL0_YOUTUBE))
+        self.buttonDiscord.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_1FIL0_DISCORD))
+        self.buttonGithub.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE))
 
     def openBrowserUrl(self, url: str):
         webbrowser.open(url)
@@ -113,7 +113,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         logger.sendMessage("Updating account information")
         authUserData = auth_server.getAuthUserData()
         if not authUserData: return
-        self.labelLoggedInStatus.setText(f"Logged In as {authUserData.name}")
+        self.labelLoggedInStatus.setText(f"Logged in as {authUserData.name}")
+        self.apiAccessLabel.setText("API access granted")
         res = requests.get(authUserData.picture)
         imgData = BytesIO(res.content)
         accountPixmap = QPixmap()
