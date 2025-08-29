@@ -12,28 +12,24 @@ message(STATUS "OpenSSL include dirs: ${OPENSSL_INCLUDE_DIR}")
 message(STATUS "OpenSSL libraries: ${OPENSSL_LIBRARIES}")
 
 # EMBED GPU KERNEL START
-if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    set(GPU_KERNEL_CL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src/gpu_kernel_cl)
-    set(GPU_KERNEL_HPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src/gpu_kernel_embedded)
+set(GPU_KERNEL_CL_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src/gpu_kernel_cl)
+set(GPU_KERNEL_HPP_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../src/gpu_kernel_embedded)
 
-    set(CL_KERNEL_SOURCE ${GPU_KERNEL_CL_DIR}/kernel.cl)
-    get_filename_component(KERNEL_NAME_WE ${CL_KERNEL_SOURCE} NAME_WE)
-    set(GPU_EMBEDDED_HEADER_FILE ${GPU_KERNEL_HPP_DIR}/${KERNEL_NAME_WE}_cl_embedded.hpp)
-    set(GPU_PREPROCESSED_CL_FILE ${GPU_KERNEL_HPP_DIR}/${KERNEL_NAME_WE}_cl_preprocessed.hpp)
-    add_custom_command(
-        OUTPUT ${GPU_EMBEDDED_HEADER_FILE}
-        COMMAND echo "Preprocessing and embedding GPU kernel: ${CL_KERNEL_SOURCE}"
-        COMMAND mkdir -p $GPU_KERNEL_HPP_DIR
-        COMMAND cpp -P ${CL_KERNEL_SOURCE} -o ${GPU_PREPROCESSED_CL_FILE}
-        COMMAND xxd -n "kernel_cl_hpp_${KERNEL_NAME_WE}" -i ${GPU_PREPROCESSED_CL_FILE} > ${GPU_EMBEDDED_HEADER_FILE}
-        DEPENDS ${CL_KERNEL_SOURCE}
-        VERBATIM
-    )
-    list(APPEND GENERATED_HEADERS ${GPU_EMBEDDED_HEADER_FILE})
-    add_custom_target(embed_gpu_kernels ALL DEPENDS ${GENERATED_HEADERS})
-else()
-    message(WARNING "Platform not supported for embedding GPU Kernel")
-endif()
+set(CL_KERNEL_SOURCE ${GPU_KERNEL_CL_DIR}/kernel.cl)
+get_filename_component(KERNEL_NAME_WE ${CL_KERNEL_SOURCE} NAME_WE)
+set(GPU_EMBEDDED_HEADER_FILE ${GPU_KERNEL_HPP_DIR}/${KERNEL_NAME_WE}_cl_embedded.hpp)
+set(GPU_PREPROCESSED_CL_FILE ${GPU_KERNEL_HPP_DIR}/${KERNEL_NAME_WE}_cl_preprocessed.hpp)
+add_custom_command(
+    OUTPUT ${GPU_EMBEDDED_HEADER_FILE}
+    COMMAND echo "Preprocessing and embedding GPU kernel: ${CL_KERNEL_SOURCE}"
+    COMMAND mkdir -p $GPU_KERNEL_HPP_DIR
+    COMMAND cpp -P ${CL_KERNEL_SOURCE} -o ${GPU_PREPROCESSED_CL_FILE}
+    COMMAND xxd -n "kernel_cl_hpp_${KERNEL_NAME_WE}" -i ${GPU_PREPROCESSED_CL_FILE} > ${GPU_EMBEDDED_HEADER_FILE}
+    DEPENDS ${CL_KERNEL_SOURCE}
+    VERBATIM
+)
+list(APPEND GENERATED_HEADERS ${GPU_EMBEDDED_HEADER_FILE})
+add_custom_target(embed_gpu_kernels ALL DEPENDS ${GENERATED_HEADERS})
 # EMBED GPU KERNEL END
 
 file(GLOB CALCULATOR_DIRS ${CMAKE_SOURCE_DIR}/../src/*)
