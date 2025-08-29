@@ -53,7 +53,9 @@ def createServer():
             "code": authCode,
             "redirect_uri": URL_CLIENT_AUTH_CALLBACK
         }
-        fetchTokens(payload=payload)
+        res = fetchTokens(payload=payload)
+        if res.status_code != 200:
+            return "Error, something went wrong"
         return "Success, you may close this page"
 
     return gServer
@@ -75,6 +77,8 @@ def fetchTokens(payload: dict[str, Any]):
 
     if gAuthorizedCallback:
         gAuthorizedCallback()
+
+    return res
 
 def refreshTokens():
     refreshToken = keyring.get_password("market_engine_client", "refresh_token")

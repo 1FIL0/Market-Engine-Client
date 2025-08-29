@@ -34,7 +34,7 @@ const std::vector<MarketItem> &getItemsCategoryGradeCollection (const int catego
 const std::vector<MarketItem> &getItemsTradeupableCategoryGrade(const bool tradeupable, const int category, const int grade);
 const std::vector<MarketItem> &getItemsTradeupableCategoryGradeCollection(const bool tradeupable, const int category, const int grade, const int collection);
 
-// Only or mainly used for GPU engine
+// Only used for GPU engine
 MarketItemMemoryFlatCollections getItemsTradeupableCategoryGradeCollectionsFlattened(const int category, const int grade);
 
 END_ENGINE_NAMESPACE
