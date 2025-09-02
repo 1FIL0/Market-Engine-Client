@@ -11,11 +11,13 @@ def main():
     global gProcApp
     cmdList: list[str] = []
     if shared_args.argDist == "dev":
-        cmdList = ["python3", "-u", f"{definitions.PATH_DIST_CLIENT_APP_BINARY}", "--dist", shared_args.argDist]
-    elif shared_args.argDist == "release":
-        cmdList = [f"{definitions.PATH_DIST_CLIENT_APP_BINARY}", "--dist", shared_args.argDist]
-    gProcApp = proc.runSubProcess(cmdList)
+        cmdList = ["python3", "-u", f"{definitions.PATH_DIST_CLIENT_APP_BINARY}", "--dist", "dev"] + sys.argv[1:]
+    elif shared_args.argDist == "release" or not shared_args.argDist:
+        print(43434)
+        cmdList = [f"{definitions.PATH_DIST_CLIENT_APP_BINARY}", "--dist", "release"] + sys.argv[1:]
+    gProcApp = proc.runSubProcess(cmdList, None, None)
     gProcApp.wait()
 
 if __name__ == "__main__":
-    main()
+	main()
+    
