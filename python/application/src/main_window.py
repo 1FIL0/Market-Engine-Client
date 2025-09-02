@@ -257,13 +257,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             border-color: rgb({color})
         }}"""
         buttonText = "Select"
-        button = qt_resource.createButton(buttonName, buttonText, qt_resource.fontSystemHudBold, buttonSheet)
+        button = qt_resource.createButton(buttonName, buttonText, qt_resource.fontSystemHudNormal, buttonSheet)
         button.clicked.connect(lambda: self.loadTradeup(tradeup))
         return button
 
     def createTradeupEntryDeleteButton(self, tradeup: Tradeup):
         buttonName = f"delete{tradeup.tradeupHash}"
-        button = qt_resource.createButton(buttonName, "", qt_resource.fontSystemHudBold)
+        button = qt_resource.createButton(buttonName, "", qt_resource.fontSystemHudNormal)
         icon = qt_resource.iconDelete
         button.setIcon(icon)
         button.setIconSize(QSize(20, 20))
@@ -272,7 +272,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def createTradeupEntryFavButton(self, tradeup: Tradeup):
         buttonName = f"fav{tradeup.tradeupHash}"
-        button = qt_resource.createButton(buttonName, "", qt_resource.fontSystemHudBold)
+        button = qt_resource.createButton(buttonName, "", qt_resource.fontSystemHudNormal)
         icon = qt_resource.iconFavDisabled
         if tradeup.favourite: icon = qt_resource.iconFavEnabled
         button.setIcon(icon)
@@ -347,8 +347,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def loadTradeupOverview(self, tradeup: Tradeup):
         self.favouriteTradeupCheckbox.setChecked(tradeup.favourite)
         self.favouriteTradeupCheckbox.stateChanged.connect(lambda: self.favouriteTradeup(tradeup))
-        self.tradeupCategory.setText(f"{tradeup.tradeupCategory}")
-        self.tradeupGrade.setText(f"{tradeup.tradeupGrade}")
+        self.tradeupCategory.setText(f"{definitions.categoryToString(tradeup.tradeupCategory)}")
+        self.tradeupGrade.setText(f"{definitions.gradeToString(tradeup.tradeupGrade)}")
         self.tradeupDeviceUsed.setText(f"{tradeup.deviceUsed}")
         self.tradeupOutputs.setText(f"{tradeup.totalOutputs}")
         self.tradeupDateFound.setText(f"{tradeup.dateFound}")
@@ -475,14 +475,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             and item.grade in grades
             and item.wear in wears
         ]
-        searchText = self.librarySearchBar.toPlainText()
+        searchText = self.librarySearchBar.text()
         filteredItems = item_memory.getItemsByName(filteredItems, searchText)
         self.sortFilteredItems(filteredItems)
         return filteredItems
 
     def getFilteredItemsAll(self):
         filteredItems = item_memory.getAllItems()
-        searchText = self.librarySearchBar.toPlainText()
+        searchText = self.librarySearchBar.text()
         filteredItems = item_memory.getItemsByName(filteredItems, searchText)
         self.sortFilteredItems(filteredItems)
         return filteredItems
@@ -611,13 +611,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def createItemLibraryBottomInfoCenterSect(self, filteredItem: MarketItem):
         centerSect = qt_resource.createWidget(f"itemInfoCenter", QVBoxLayout(), Qt.AlignmentFlag.AlignCenter)
-        headerLabel = qt_resource.createLabel(f"itemHeaderCenter", "", qt_resource.fontSystemHudBold, Qt.AlignCenter)
+        headerLabel = qt_resource.createLabel(f"itemHeaderCenter", "", qt_resource.fontSystemHudNormal, Qt.AlignCenter)
         if filteredItem.useModifiedState:
             headerLabel.setText("Modification Enabled")
         else:
             headerLabel.setText("Modification Disabled")
-        enableButton = qt_resource.createButton("enableModified", "Enable", qt_resource.fontSystemHudBold)
-        disableButton = qt_resource.createButton("enableModified", "Disable", qt_resource.fontSystemHudBold)
+        enableButton = qt_resource.createButton("enableModified", "Enable", qt_resource.fontSystemHudNormal)
+        disableButton = qt_resource.createButton("enableModified", "Disable", qt_resource.fontSystemHudNormal)
         enableButton.clicked.connect(lambda: self.setItemModificationState(filteredItem, True))
         disableButton.clicked.connect(lambda: self.setItemModificationState(filteredItem, False))
         centerSect.layout().addWidget(headerLabel)
@@ -627,12 +627,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def createItemLibraryBottomInfoRightSect(self, filteredItem: MarketItem):
         rightSect = qt_resource.createWidget(f"itemInfoRight", QVBoxLayout(), Qt.AlignRight, "")
-        headerLabel = qt_resource.createLabel("itemHeaderRight", "Modified price", qt_resource.fontSystemHudBold, Qt.AlignCenter)
-        customPriceBox = qt_resource.createDoubleSpinBox(f"customSpinBox", "$", "", qt_resource.fontSystemHudBold, 0.0, 10000.0)
+        headerLabel = qt_resource.createLabel("itemHeaderRight", "Modified price", qt_resource.fontSystemHudNormal, Qt.AlignCenter)
+        customPriceBox = qt_resource.createDoubleSpinBox(f"customSpinBox", "$", "", qt_resource.fontSystemHudNormal, 0.0, 10000.0)
         self.loadItemModificationValue(filteredItem, customPriceBox)
         buttonsBox = qt_resource.createWidget(f"itemButtonsBox", QHBoxLayout(), Qt.AlignCenter)
-        saveButton = qt_resource.createButton(f"itemEnableButton", "Save", qt_resource.fontSystemHudBold)
-        discardButton = qt_resource.createButton(f"itemDisableButton", "Discard", qt_resource.fontSystemHudBold)
+        saveButton = qt_resource.createButton(f"itemEnableButton", "Save", qt_resource.fontSystemHudNormal)
+        discardButton = qt_resource.createButton(f"itemDisableButton", "Discard", qt_resource.fontSystemHudNormal)
         saveButton.clicked.connect(lambda: self.saveItemModificationValue(filteredItem, customPriceBox.value()))
         discardButton.clicked.connect(lambda: self.loadItemModificationValue(filteredItem, customPriceBox))
         rightSect.layout().addWidget(headerLabel)
@@ -722,8 +722,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for i in range(len(gpus)):
             gpu = gpus[i]
             gpuWidget = qt_resource.createWidget("gpuWidget" + str(i), QHBoxLayout(), Qt.AlignLeft)
-            gpuLabel = qt_resource.createLabel("gpuLabel" + str(i), gpu.name, qt_resource.fontSystemHudBold, Qt.AlignLeft)
-            gpuEnableBox: QCheckBox = qt_resource.createCheckbox("gpuCheckbox" + str(i), "Enabled", qt_resource.fontSystemHudBold, False)
+            gpuLabel = qt_resource.createLabel("gpuLabel" + str(i), gpu.name, qt_resource.fontSystemHudNormal, Qt.AlignLeft)
+            gpuEnableBox: QCheckBox = qt_resource.createCheckbox("gpuCheckbox" + str(i), "Enabled", qt_resource.fontSystemHudNormal, False)
             gpuWidget.layout().addWidget(gpuEnableBox)
             gpuWidget.layout().addWidget(gpuLabel)
             self.tradeupEngineSettingsGPUS.layout().addWidget(gpuWidget)
@@ -781,10 +781,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "Compute Categories": [0, 1],
             "Single Item Batch": False,
             "Batch Size": 15,
-            "Minimum Input Float": 50,
-            "Maximum Input Float": 80,
+            "Minimum Input Float": 35,
+            "Maximum Input Float": 55,
             "Max Input Price": 10000,
-            "Profit Margin": 140,
+            "Profit Margin": 120,
             "Compute Mode": 0,
             "Devices": [],
             "Max Tradeups In File": 75,

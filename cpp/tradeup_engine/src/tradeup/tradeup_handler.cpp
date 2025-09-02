@@ -171,12 +171,12 @@ void TRADEUP::handleDocumentOvercapacity(rapidjson::Document &doc, rapidjson::Va
         return;
     }
 
-    int lowestProfitability = 0;
+    float lowestProfitability = 0;
     rapidjson::SizeType leastProfitableIndex = 0;
 
     for (rapidjson::SizeType i = 0; i < dataVal.Size(); ++i) {
         const rapidjson::Value &tradeupCPU = dataVal[i];
-        if (tradeupCPU["Profitability"].GetFloat() > lowestProfitability && !tradeupCPU["Favourite"].GetBool()) {
+        if (tradeupCPU["Profitability"].GetFloat() < lowestProfitability && !tradeupCPU["Favourite"].GetBool()) {
             lowestProfitability = tradeupCPU["Profitability"].GetFloat();
             leastProfitableIndex = i;
         } 
