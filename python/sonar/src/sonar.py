@@ -24,7 +24,7 @@ def beginScanLoop() -> None:
 def requestReadyItems() -> None:
     global gModifiedItemsData
     global gModifiedLookup
-    gModifiedItemsData = file_handler.loadJson(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS)
+    gModifiedItemsData = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS))
     gModifiedLookup = {item["Perm ID"]: item for item in gModifiedItemsData["DATA"]}
         
     logger.sendMessage("Fetching items from server")
@@ -53,11 +53,11 @@ def requestReadyItems() -> None:
 
 def saveReadyItems(readyItemsData: dict[str, Any]):
     logger.sendMessage("Writing items to files")
-    file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_CLIENT_READY_ITEMS, readyItemsData)
-    newModifiedItemsData = file_handler.loadJson(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS)
+    file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_CLIENT_READY_ITEMS), readyItemsData)
+    newModifiedItemsData = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS))
     for item in readyItemsData["DATA"]:
         manageModifiedItemsEntry(item, newModifiedItemsData) 
-    file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS, newModifiedItemsData)
+    file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS), newModifiedItemsData)
 
 def manageModifiedItemsEntry(scannedItem: dict[str, Any], newModifiedItemsData: dict[str, Any]) -> None:
     # Item already added, skip

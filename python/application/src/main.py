@@ -10,7 +10,7 @@ import fwatcher_manager
 import validator
 import tradeup_memory
 import asyncio
-from qasync import QEventLoop
+from qasync import QEventLoop  # pyright: ignore[reportMissingTypeStubs]
 import path
 sys.path.insert(0, path.PATH_SHARE)
 
