@@ -33,7 +33,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)  # This sets up the UI elements from the .ui file  # pyright: ignore[reportUnknownMemberType]
         self.setMaximumSize(1400, 1100)
         self.setWindowTitle("Market Engine Client 1.0.0")
-        self.setWindowIcon(QIcon(definitions.PATH_MARKET_ENGINE_ASSETS + "/ui/market_engine_client_desktop.png"))
+        self.setWindowIcon(QIcon(str(definitions.PATH_DIST_ASSETS / "ui" / "market_engine_client_desktop.png")))
         self.initRefresher()
         self.initApp()
 
@@ -205,7 +205,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.totalTradeups.setText(f"{str(len(tradeups))}")
 
     def deleteTradeups(self):
-        data: dict[str, Any] = file_handler.loadJson(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS)
+        data: dict[str, Any] = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS))
         dataArray = data["DATA"]
         if self.selectEveryTradeup.isChecked():
             for tradeupEntry in dataArray[:]:
@@ -223,7 +223,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     if tradeupEntry["Chance To Profit"] > self.tradeupsChanceToProfit.value():
                         continue
                 dataArray.remove(tradeupEntry)
-        file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS, data)
+        file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS), data)
 
     def refreshTradeupEntries(self):
         self.setUpdatesEnabled(False)
@@ -462,7 +462,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.setUpdatesEnabled(True)
 
     def getFilteredItemsConfig(self):
-        config = file_handler.loadJson(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY)
+        config = file_handler.loadJson(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY))
         collections = set(config["Filter Collections"])
         categories = set(config["Filter Categories"])
         grades = set(config["Filter Grades"])
@@ -488,7 +488,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return filteredItems
 
     def loadFilteredItemsModified(self, filteredItems: list[MarketItem]):
-        modifiedItemsData = file_handler.loadJson(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS)
+        modifiedItemsData = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS))
         modifiedLookup = {
             item["Perm ID"]: item
             for item in modifiedItemsData["DATA"]
@@ -643,31 +643,31 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         return rightSect
 
     def saveItemModificationValue(self, filteredItem: MarketItem, value: float):
-        data = file_handler.loadJson(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS)
+        data = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS))
         for item in data["DATA"]:
             if item["Perm ID"] == filteredItem.permID:
                 item["Modified Price"] = value
                 filteredItem.modifiedPrice = value
                 break
-        file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS, data)
+        file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS), data)
         self.switchFilteredItemPrice(filteredItem)
         self.reloadItemLibraryBottomBar(filteredItem)
 
     def loadItemModificationValue(self, filteredItem: MarketItem, modificationSpinBox: QDoubleSpinBox):
-        data = file_handler.loadJson(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS)
+        data = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS))
         for item in data["DATA"]:
             if item["Perm ID"] == filteredItem.permID:
                 modificationSpinBox.setValue(item["Modified Price"])
                 break
 
     def setItemModificationState(self, filteredItem: MarketItem, state: bool):
-        data = file_handler.loadJson(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS)
+        data = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS))
         for item in data["DATA"]:
             if item["Perm ID"] == filteredItem.permID:
                 item["Use Modified State"] = state
         filteredItem.useModifiedState = state
         self.switchFilteredItemPrice(filteredItem)
-        file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS, data)
+        file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS), data)
         self.reloadItemLibraryBottomBar(filteredItem)
         
     def switchFilteredItemPrice(self, filteredItem: MarketItem):
@@ -732,7 +732,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.computeModeBox.currentIndexChanged.connect(lambda: self.updateGPUSettingsVisibility())
         self.updateGPUSettingsVisibility()
 
-        if file_handler.readFile(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE) == "{}": self.defaultTradeupEngineSettings()
+        if file_handler.readFile(str(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE)) == "{}": self.defaultTradeupEngineSettings()
 
     def updateGPUSettingsVisibility(self):
         if self.computeModeBox.currentIndex() == 1:
@@ -773,7 +773,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 config["Devices"].append(self.gpuLabels[i].text())
         config["Max Tradeups In File"] = self.tradeupEngineSettingsFileTradeupCapacity.value()
         config["Output Verbose"] = self.tradeupEngineSettingsOutputVerbose.isChecked()
-        file_handler.replaceJsonDataAtomic(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE, config)
+        file_handler.replaceJsonDataAtomic(str(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE), config)
 
     def defaultTradeupEngineSettings(self):
         config = {
@@ -790,11 +790,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             "Max Tradeups In File": 75,
             "Output Verbose": True,
         }
-        file_handler.replaceJsonDataAtomic(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE, config)
+        file_handler.replaceJsonDataAtomic(str(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE), config)
         self.loadTradeupEngineSettings()
 
     def loadTradeupEngineSettings(self):
-        config = file_handler.loadJson(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE)
+        config = file_handler.loadJson(str(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE))
         for rarity in config["Compute Rarities"]:
             if rarity == 0: self.tradeupEngineSettingsConsumer.setChecked(True)
             if rarity == 1: self.tradeupEngineSettingsIndustrial.setChecked(True)
@@ -841,7 +841,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ]
         self.buttonItemLibraryCheckAllCollections.clicked.connect(lambda: self.itemLibraryCheckAllCollections(True))
         self.buttonItemLibraryUncheckAllCollections.clicked.connect(lambda: self.itemLibraryCheckAllCollections(False))
-        if file_handler.readFile(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY) == "{}": self.defaultItemLibrarySettings()
+        if file_handler.readFile(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY)) == "{}": self.defaultItemLibrarySettings()
 
     def itemLibraryCheckAllCollections(self, val: bool):
         for checkbox in self.itemLibraryCollectionCheckboxes:
@@ -957,7 +957,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.colWildfire.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_WILDFIRE)  
         if self.colWinterOffensive.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_WINTER_OFFENSIVE)  
         if self.colXRay.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_XRAY)
-        file_handler.replaceJsonDataAtomic(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY, config)
+        file_handler.replaceJsonDataAtomic(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY), config)
 
     def defaultItemLibrarySettings(self):
         config = {
@@ -977,11 +977,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for collection in range(definitions.consts.COLLECTION_MAX):
             config["Filter Collections"].append(collection)
 
-        file_handler.replaceJsonDataAtomic(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY, config)
+        file_handler.replaceJsonDataAtomic(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY), config)
         self.loadItemLibrarySettings()
 
     def loadItemLibrarySettings(self):
-        config = file_handler.loadJson(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY)
+        config = file_handler.loadJson(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY))
         for grade in config["Filter Grades"]:
             if grade == 0: self.itemLibraryGradeConsumer.setChecked(True)
             if grade == 1: self.itemLibraryGradeIndustrial.setChecked(True)
@@ -1096,7 +1096,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.buttonUISettingsDiscard.clicked.connect(lambda: self.loadUISettings())
         self.buttonUISettingsDefaults.clicked.connect(lambda: self.defaultUISettings())
         self.outputHistorySizeVal = 0
-        if file_handler.readFile(definitions.PATH_CONFIG_CLIENT_UI) == "{}": self.defaultUISettings()
+        if file_handler.readFile(str(definitions.PATH_CONFIG_CLIENT_UI)) == "{}": self.defaultUISettings()
 
     def saveUISettings(self):
         config = {
@@ -1105,18 +1105,18 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         }
         config["Theme"] = self.uiTheme.currentIndex()
         config["Output History Size"] = self.outputHistorySize.value()
-        file_handler.replaceJsonDataAtomic(definitions.PATH_CONFIG_CLIENT_UI, config)
+        file_handler.replaceJsonDataAtomic(str(definitions.PATH_CONFIG_CLIENT_UI), config)
 
     def defaultUISettings(self):
         config = {
             "Theme": 0,
             "Output History Size": 100000,
         }
-        file_handler.replaceJsonDataAtomic(definitions.PATH_CONFIG_CLIENT_UI, config)
+        file_handler.replaceJsonDataAtomic(str(definitions.PATH_CONFIG_CLIENT_UI), config)
         self.loadUISettings()
 
     def loadUISettings(self):
-        config = file_handler.loadJson(definitions.PATH_CONFIG_CLIENT_UI)
+        config = file_handler.loadJson(str(definitions.PATH_CONFIG_CLIENT_UI))
         self.uiTheme.setCurrentIndex(config["Theme"])
         self.outputHistorySize.setValue(config["Output History Size"])
         self.outputHistorySizeVal = config["Output History Size"]

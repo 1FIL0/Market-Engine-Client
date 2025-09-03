@@ -13,7 +13,6 @@ def main():
     if shared_args.argDist == "dev":
         cmdList = ["python3", "-u", f"{definitions.PATH_DIST_CLIENT_APP_BINARY}", "--dist", "dev"] + sys.argv[1:]
     elif shared_args.argDist == "release" or not shared_args.argDist:
-        print(43434)
         cmdList = [f"{definitions.PATH_DIST_CLIENT_APP_BINARY}", "--dist", "release"] + sys.argv[1:]
     gProcApp = proc.runSubProcess(cmdList, None, None)
     gProcApp.wait()
