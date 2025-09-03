@@ -17,9 +17,9 @@ fWatcherThreads: list[QThread] = list()
 def init():
     global fWatcherWorkers
     global fWatcherThreads
-    readyItemsFWatcher = QTFWatcherWorker(definitions.PATH_DATA_CLIENT_READY_ITEMS, 0.01, 0.1, handleReadyItemsUpdate)
-    modifiedItemsFWatcher = QTFWatcherWorker(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS, 0.01, 0.1, handleModifiedItemsUpdate)
-    tradeupsFWatcher = QTFWatcherWorker(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS, 0.01, 0.1, handleTradeupsUpdate)
+    readyItemsFWatcher = QTFWatcherWorker(str(definitions.PATH_DATA_CLIENT_READY_ITEMS), 0.01, 0.1, handleReadyItemsUpdate)
+    modifiedItemsFWatcher = QTFWatcherWorker(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS), 0.01, 0.1, handleModifiedItemsUpdate)
+    tradeupsFWatcher = QTFWatcherWorker(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS), 0.01, 0.1, handleTradeupsUpdate)
 
     readyItemsFWatcherThread = QThread()
     modifiedFWatcherThread = QThread()

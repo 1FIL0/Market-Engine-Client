@@ -22,7 +22,7 @@ def loadTradeups() -> None:
     startTime = perf_counter()
     global gTradeups
     clearArrays()
-    data = file_handler.loadJson(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS)
+    data = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS))
     for tradeupEntry in data["DATA"]:
         tradeup: Tradeup = Tradeup()
         for inputEntry in tradeupEntry["Inputs"]:
@@ -78,7 +78,7 @@ def getTradeups() -> list[Tradeup]:
 def recalculateTradeupsFile() -> None:
     startTime = perf_counter()
     logger.sendMessage("Refreshing tradeups")
-    data = file_handler.loadJson(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS)
+    data = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS))
     for entry in data["DATA"]:
         inputItemEntries: list[dict[str, Any]] = list()
         outputItemEntries: list[dict[str, Any]] = list()
@@ -97,7 +97,7 @@ def recalculateTradeupsFile() -> None:
         entry["Profitability"] = operations.getProfitability(inputPrice, outputItemEntries)
         entry["Profitability Steam Tax"] = operations.getProfitabilitySteamTax(inputPrice, outputItemEntries)
         hashTradeup(entry)
-    file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS, data)
+    file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS), data)
     endTime = perf_counter()
     logger.sendMessage(f"Tradeups Recalculated in {endTime - startTime:.4f} seconds")
 
@@ -121,18 +121,18 @@ def hashTradeup(entry: dict[str, Any]) -> None:
     entry["Tradeup Hash"] = digest
 
 def deleteTradeupFromFile(hash: str) -> None:
-    data = file_handler.loadJson(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS)
+    data = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS))
     for tradeupEntry in data["DATA"]:
         if tradeupEntry["Tradeup Hash"] == hash:
             data["DATA"].remove(tradeupEntry)
-    file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS, data)
+    file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS), data)
 
 def favouriteTradeupInFile(hash: str, val: bool) -> None:
-    data = file_handler.loadJson(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS)
+    data = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS))
     for tradeupEntry in data["DATA"]:
         if tradeupEntry["Tradeup Hash"] == hash:
             tradeupEntry["Favourite"] = val
-    file_handler.replaceJsonDataAtomic(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS, data)
+    file_handler.replaceJsonDataAtomic(str(definitions.PATH_DATA_CLIENT_PROFITABLE_TRADEUPS), data)
 
 def addTradeupsLoadedCallback(callback: Callable[[], None]) -> None:
     global gTradeupsLoadedCallbacks

@@ -1,6 +1,9 @@
 import sys
 from typing import Callable, Optional
 
+from PyQt5 import sip
+from PyQt5.QtGui import QIcon
+
 from item import MarketItem
 import path
 sys.path.insert(0, path.PATH_SHARE)
@@ -29,7 +32,6 @@ def createItemBoxPressable(item: MarketItem, callback: Callable[[MarketItem], No
 
 def createItemButtonIcon(item: MarketItem, callback: Callable[[MarketItem], None]) -> QPushButton:
     color = definitions.gradeToRGBString(item.grade)
-    icon = qt_resource.loadSkinIcon(item)
     buttonIconName = f"itemIcon{item.tempID}"
     buttonIconSheet = f"""#{buttonIconName} {{
         border: 1px solid;
@@ -37,10 +39,16 @@ def createItemButtonIcon(item: MarketItem, callback: Callable[[MarketItem], None
         border-color: rgb({color})
     }}"""
     buttonIcon = qt_resource.createButton(buttonIconName, "", qt_resource.fontSystemHudNormal, buttonIconSheet)
-    buttonIcon.setIcon(icon)
+    buttonIcon.setIcon(QIcon(str(definitions.PATH_DIST_ASSETS / "unknown.png")))
     buttonIcon.setIconSize(QSize(128, 128))
+    qt_resource.getSkinIcon(item, lambda icon: loadButtonFetchedIconCallback(buttonIcon, icon))
     buttonIcon.clicked.connect(lambda: callback(item))
     return buttonIcon
+
+def loadButtonFetchedIconCallback(button: QPushButton, icon: QIcon):
+    if sip.isdeleted(button): return
+    button.setIcon(icon)
+    button.setIconSize(QSize(128, 128))
 
 def createItemNameLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
     itemLabelName = qt_resource.createLabel(f"itemLabelName{item.tempID}", f"{item.weaponName} {item.skinName}", qt_resource.fontSystemHudNormal, alignment)

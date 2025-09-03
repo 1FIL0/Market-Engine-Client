@@ -9,6 +9,10 @@ import item_memory
 import fwatcher_manager
 import validator
 import tradeup_memory
+import asyncio
+from qasync import QEventLoop
+import path
+sys.path.insert(0, path.PATH_SHARE)
 
 def main():
 	init()
@@ -19,13 +23,17 @@ def init():
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.ApplicationAttribute.AA_UseHighDpiPixmaps, True)
-    app = QApplication(sys.argv) 
+    app = QApplication(sys.argv)
+    asyncioLoop = QEventLoop(app)
+    asyncio.set_event_loop(asyncioLoop)
     qt_resource.loadAppResources()
     window = MainWindow() 
     window.show()
     item_memory.init()
     tradeup_memory.init()
     fwatcher_manager.init()
+    with asyncioLoop:
+        asyncioLoop.run_forever()
     sys.exit(app.exec_())
 
 if __name__ == "__main__":

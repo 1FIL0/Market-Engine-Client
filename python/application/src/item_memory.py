@@ -25,8 +25,8 @@ def loadItems():
     global gItemsAllByPermIDLookup
 
     if not os.path.exists(definitions.PATH_DATA_CLIENT_READY_ITEMS) or not os.path.exists(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS): return
-    readyItemsData = file_handler.loadJson(definitions.PATH_DATA_CLIENT_READY_ITEMS)
-    modifiedItemsData = file_handler.loadJson(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS)
+    readyItemsData = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_READY_ITEMS))
+    modifiedItemsData = file_handler.loadJson(str(definitions.PATH_DATA_CLIENT_MODIFIED_ITEMS))
     resetArrays()
 
     modifiedLookup = {item["Perm ID"]: item for item in modifiedItemsData["DATA"]}
