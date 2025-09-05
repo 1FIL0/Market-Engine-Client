@@ -31,7 +31,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)  # This sets up the UI elements from the .ui file  # pyright: ignore[reportUnknownMemberType]
-        self.setMaximumSize(1400, 1100)
+        self.setMaximumSize(1300, 1200)
         self.setWindowTitle("Market Engine Client 1.0.0")
         self.setWindowIcon(QIcon(str(definitions.PATH_DIST_ASSETS / "ui" / "market_engine_client_desktop.png")))
         self.initRefresher()
@@ -40,11 +40,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def initRefresher(self):
         tradeup_memory.addTradeupsLoadedCallback(lambda: self.refreshManagerStats())
         tradeup_memory.addTradeupsLoadedCallback(lambda: self.refreshTradeupEntries())
-
-    def updateServerStatus(self, status: dict[str, Any]):
-        self.statusGeneral.setText(status["General"])
-        self.statusAPI.setText(status["API"])
-        self.statusSpecialReports.setText(status["Special Reports"])
 
     def initApp(self):
         self.initAccount()
@@ -89,6 +84,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     # _____ HOME _____ #
     
     def initHome(self):
+        item_memory.addReadyItemsLoadedCallback(lambda: self.itemsLoadedHome.setText(f"Items Loaded: {len(item_memory.getAllItems())}"))
+        tradeup_memory.addTradeupsLoadedCallback(lambda: self.tradeupsFoundHome.setText(f"Tradeups Found: {len(tradeup_memory.getTradeups())}"))
         self.buttonGoToWebsite.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE))
         self.buttonGoToRepo.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE_REPO))
         self.buttonYoutube.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_1FIL0_YOUTUBE))
@@ -127,6 +124,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def initSonar(self):
         self.buttonSonarExec.clicked.connect(lambda: self.execSonar())
         self.buttonSonarEnd.clicked.connect(lambda: self.killSonar())
+        self.buttonSonarExecHome.clicked.connect(lambda: self.execSonar())
+        self.buttonSonarEndHome.clicked.connect(lambda: self.killSonar())
 
     def execSonar(self):
         if self.processSonar != None: return
@@ -137,6 +136,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             cmdList = [f"{definitions.PATH_DIST_CLIENT_SONAR_BINARY}", "--dist", shared_args.argDist]
         self.processSonar = proc.runSubProcess(cmdList)
         self.sonarStatusStacked.setCurrentIndex(0)
+        self.sonarStatusStackedHome.setCurrentIndex(0)
         self.processSonarSTDOutWorker = QTStdoutWorker(self.processSonar)
         self.processSonarSTDOutWorker.lineRead.connect(self.writeSonarOutput)
         self.processSonarSTDOutWorker.start()
@@ -146,6 +146,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         proc.killSubProcess(self.processSonar)
         self.processSonar = None
         self.sonarStatusStacked.setCurrentIndex(1)
+        self.sonarStatusStackedHome.setCurrentIndex(1)
         self.processSonarSTDOutWorker.stop()
 
     def writeSonarOutput(self, line: str):
@@ -157,12 +158,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def initTradeupEngine(self):
         self.buttonTradeupEngineExec.clicked.connect(lambda: self.execTradeupEngine())
         self.buttonTradeupEngineEnd.clicked.connect(lambda: self.killTradeupEngine())
+        self.buttonTradeupEngineExecHome.clicked.connect(lambda: self.execTradeupEngine())
+        self.buttonTradeupEngineEndHome.clicked.connect(lambda: self.killTradeupEngine())
 
     def execTradeupEngine(self):
         if self.processCalculator != None: return
         cmdList = [f"{definitions.PATH_DIST_CLIENT_TRADEUP_ENGINE_BINARY}"]
         self.processCalculator = proc.runSubProcess(cmdList)
         self.tradeupEngineStatusStacked.setCurrentIndex(0)
+        self.tradeupEngineStatusStackedHome.setCurrentIndex(0)
         self.processTradeupEngineSTDOutWorker = QTStdoutWorker(self.processCalculator)
         self.processTradeupEngineSTDOutWorker.lineRead.connect(self.writeTradeupEngineOutput)
         self.processTradeupEngineSTDOutWorker.start()
@@ -172,6 +176,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         proc.killSubProcess(self.processCalculator)
         self.processCalculator = None
         self.tradeupEngineStatusStacked.setCurrentIndex(1)
+        self.tradeupEngineStatusStackedHome.setCurrentIndex(1)
         self.processTradeupEngineSTDOutWorker.stop()
 
     def writeTradeupEngineOutput(self, line: str):
