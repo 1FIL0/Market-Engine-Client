@@ -1,6 +1,7 @@
 # FILE WATCHER MANAGER
 
 import sys
+from typing import Optional
 import path
 sys.path.insert(0, path.PATH_SHARE)
 import item_memory
@@ -11,8 +12,12 @@ from time import perf_counter
 from qt_fwatcher_worker import QTFWatcherWorker 
 from PyQt5.QtCore import QThread
 
-fWatcherWorkers: list[QTFWatcherWorker] = list()
-fWatcherThreads: list[QThread] = list()
+INDEX_FWATCHER_READY_ITEMS = 0
+INDEX_FWATCHER_MODIFIED_ITEMS = 1
+INDEX_FWATCHER_TRADEUPS = 2
+
+fWatcherWorkers: list[Optional[QTFWatcherWorker]] = [None, None, None]
+fWatcherThreads: list[Optional[QThread]] = [None, None, None]
 
 def init():
     global fWatcherWorkers
@@ -33,12 +38,12 @@ def init():
     modifiedItemsFWatcher.moveToThread(modifiedFWatcherThread)
     tradeupsFWatcher.moveToThread(tradeupsFWatcherThread)
 
-    fWatcherWorkers.append(readyItemsFWatcher)
-    fWatcherWorkers.append(modifiedItemsFWatcher)
-    fWatcherWorkers.append(tradeupsFWatcher)
-    fWatcherThreads.append(readyItemsFWatcherThread)
-    fWatcherThreads.append(modifiedFWatcherThread)
-    fWatcherThreads.append(tradeupsFWatcherThread)
+    fWatcherWorkers[INDEX_FWATCHER_READY_ITEMS] = readyItemsFWatcher
+    fWatcherWorkers[INDEX_FWATCHER_MODIFIED_ITEMS] = modifiedItemsFWatcher
+    fWatcherWorkers[INDEX_FWATCHER_TRADEUPS] = tradeupsFWatcher
+    fWatcherThreads[INDEX_FWATCHER_READY_ITEMS] = readyItemsFWatcherThread
+    fWatcherThreads[INDEX_FWATCHER_MODIFIED_ITEMS] = modifiedFWatcherThread
+    fWatcherThreads[INDEX_FWATCHER_TRADEUPS] = tradeupsFWatcherThread
     
     readyItemsFWatcherThread.start()
     modifiedFWatcherThread.start()

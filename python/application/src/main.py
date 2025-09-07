@@ -32,9 +32,10 @@ def init():
     item_memory.init()
     tradeup_memory.init()
     fwatcher_manager.init()
+
+    app.aboutToQuit.connect(asyncioLoop.stop)
     with asyncioLoop:
         asyncioLoop.run_forever()
-    sys.exit(app.exec_())
 
 if __name__ == "__main__":
 	main()
