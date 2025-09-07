@@ -24,4 +24,4 @@ Building happens in the shell network. Follow the instructions at https://github
 
 ## LICENCE
 
-This project is licenced under the GPL V3.0 licence.
+Read the LICENCE file
