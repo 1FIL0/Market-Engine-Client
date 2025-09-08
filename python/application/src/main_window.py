@@ -77,8 +77,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             case 3: self.setWindowTitle("Profitable Tradeups - Market Engine Client 1.0.0")
             case 4: self.setWindowTitle("Item Library - Market Engine Client 1.0.0")
             case 5: self.setWindowTitle("Engine Settings - Market Engine Client 1.0.0")
-            case 6: self.setWindowTitle("Hello user - Market Engine Client 1.0.0")
-            case 7: self.setWindowTitle("Account - Market Engine Client 1.0.0")
+            case 6: self.setWindowTitle("Account - Market Engine Client 1.0.0")
             case _: pass
 
     # _____ HOME _____ #
@@ -88,9 +87,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         tradeup_memory.addTradeupsLoadedCallback(lambda: self.tradeupsFoundHome.setText(f"Tradeups Found: {len(tradeup_memory.getTradeups())}"))
         self.buttonGoToWebsite.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE))
         self.buttonGoToRepo.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE_REPO))
+        self.buttonCheckForUpdates.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE_DOWNLOADS))
         self.buttonYoutube.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_1FIL0_YOUTUBE))
         self.buttonDiscord.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_1FIL0_DISCORD))
-        self.buttonGithub.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE))
+        self.buttonGithub.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE_REPO))
 
     def openBrowserUrl(self, url: str):
         webbrowser.open(url)
