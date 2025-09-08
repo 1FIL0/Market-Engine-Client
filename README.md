@@ -4,7 +4,7 @@
 
 ## Overview
 
-A powerful GPU-Powered Tradeup engine designed to brute-force millions of profitable CS2 tradeups as quickly as possible. The engine can run on either your CPU, or as many GPU'S as you have installed (cross-vendor). Provides many parameters you can tweak to increase efficiency, and you can easily view your tradeups via an easy to use manager. Also includes an item viewer in order to see all CS2 market items and their details. All tradeups are hashed, meaning that duplicates will not be saved, which in turn means saving a lot of time.
+This is a GPU-powered CS2 trade-up engine built to calculate millions of trade-ups as fast as possible. You can run it on your CPU, or hook up as many GPUs as you’ve got (works across vendors). There are many settings you can change to make the engine as fast as possible, and a simple manager to keep track of all the trade-ups you've found. The program comes with an item viewer so you can browse every CS2 market item and its details. Trade-ups are hashed, so you won’t get duplicates, and in turn save time.
 
 ## Website
 
