@@ -27,12 +27,14 @@ import hardware
 import item_memory
 import logger
 
+MARKET_ENGINE_VER = "1.0.0"
+
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super().__init__()
         self.setupUi(self)  # This sets up the UI elements from the .ui file  # pyright: ignore[reportUnknownMemberType]
         self.setMaximumSize(1300, 1200)
-        self.setWindowTitle("Market Engine Client 1.0.0")
+        self.setWindowTitle(f"Market Engine Client {MARKET_ENGINE_VER}")
         self.setWindowIcon(QIcon(str(definitions.PATH_DIST_ASSETS / "ui" / "market_engine_client_desktop.png")))
         self.initRefresher()
         self.initApp()
@@ -52,6 +54,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.initTradeupEngine()
         self.initTradeupViewer()
         self.initItemLibrary()
+        self.initHelp()
 
     def initProcesses(self):
         self.processSonar: Optional[Popen[str]] = None
@@ -67,17 +70,19 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.buttonTabItemLibrary.clicked.connect(lambda: self.updateCenterStacked(4))
         self.buttonTabSettings.clicked.connect(lambda: self.updateCenterStacked(5))
         self.buttonTabAccount.clicked.connect(lambda: self.updateCenterStacked(6))
+        self.buttonTabHelp.clicked.connect(lambda: self.updateCenterStacked(7))
 
     def updateCenterStacked(self, index: int):
         self.centralStacked.setCurrentIndex(index)
         match index:
-            case 0: self.setWindowTitle("Home - Market Engine Client 1.0.0")
-            case 1: self.setWindowTitle("Sonar - Market Engine Client 1.0.0")
-            case 2: self.setWindowTitle("Compute Calculator - Market Engine Client 1.0.0")
-            case 3: self.setWindowTitle("Profitable Tradeups - Market Engine Client 1.0.0")
-            case 4: self.setWindowTitle("Item Library - Market Engine Client 1.0.0")
-            case 5: self.setWindowTitle("Engine Settings - Market Engine Client 1.0.0")
-            case 6: self.setWindowTitle("Account - Market Engine Client 1.0.0")
+            case 0: self.setWindowTitle(f"Home - Market Engine Client {MARKET_ENGINE_VER}")
+            case 1: self.setWindowTitle(f"Sonar - Market Engine Client {MARKET_ENGINE_VER}")
+            case 2: self.setWindowTitle(f"Tradeup Engine - Market Engine Client {MARKET_ENGINE_VER}")
+            case 3: self.setWindowTitle(f"Tradeup Viewer - Market Engine Client {MARKET_ENGINE_VER}")
+            case 4: self.setWindowTitle(f"Item Library - Market Engine Client {MARKET_ENGINE_VER}")
+            case 5: self.setWindowTitle(f"Settings - Market Engine Client {MARKET_ENGINE_VER}")
+            case 6: self.setWindowTitle(f"Account - Market Engine Client {MARKET_ENGINE_VER}")
+            case 7: self.setWindowTitle(f"Help - Market Engine Client {MARKET_ENGINE_VER}")
             case _: pass
 
     # _____ HOME _____ #
@@ -398,9 +403,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         labelIcon.setFixedSize(25, 25)
         iconPath = ""
         if outputItem.price - tradeup.totalInputCost > 0.0:
-            iconPath = os.path.join(definitions.PATH_DIST_ASSETS, "icons", "win.png")
+            iconPath = os.path.join(definitions.PATH_DIST_ASSETS, "icons_market_engine", "win.png")
         else:
-            iconPath = os.path.join(definitions.PATH_DIST_ASSETS, "icons", "lose.png")
+            iconPath = os.path.join(definitions.PATH_DIST_ASSETS, "icons_market_engine", "lose.png")
         pixmap = QPixmap(iconPath)
         pixmap = pixmap.scaled(25, 25)
         labelIcon.setPixmap(pixmap)
@@ -684,6 +689,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def reloadItemLibraryBottomBar(self, filteredItem: MarketItem):
         self.clearItemLibraryBottomInfo()
         self.createItemLibraryBottomInfo(filteredItem)
+
+    # _____ HELP _____ #
+
+    def initHelp(self):
+        self.marketEngineDocsButton.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE_DOCS))
 
     # _____ SETTINGS _____ #
 
