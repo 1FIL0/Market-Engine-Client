@@ -14,9 +14,12 @@ def main():
     launchApp()
 
 def setEnvironment():
-    ldPath = str(definitions.PATH_LD_LIBRARY)
-    os.environ["LD_LIBRARY_PATH"] = ldPath 
-    logger.sendMessage(f"Using LD_LIBRARY_PATH [ {ldPath} ]")
+    libPath = str(definitions.PATH_LIB)
+    if definitions.SYSTEM == definitions.SYSTEM_WINDOWS:
+        os.environ["PATH"] = libPath + os.pathsep + os.environ.get("PATH", "")
+    elif definitions.SYSTEM == definitions.SYSTEM_LINUX:
+        os.environ["LD_LIBRARY_PATH"] = libPath + os.pathsep + os.environ.get("LD_LIBRARY_PATH", "")
+    logger.sendMessage(f"Using Library Path [ {libPath} ]")
 
 def launchApp():
     global gProcApp
