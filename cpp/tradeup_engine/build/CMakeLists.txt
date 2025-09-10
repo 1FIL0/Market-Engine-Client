@@ -51,15 +51,10 @@ add_dependencies(engine embed_gpu_kernels)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(engine PRIVATE OpenMP::OpenMP_CXX OpenCL OpenSSL::Crypto)
-    target_compile_options(engine PRIVATE -fopenmp -O2 -Wall -Wextra)
+    target_compile_options(engine PRIVATE -fopenmp -O2 -Wall -Wextra )
     target_link_options(engine PRIVATE -fopenmp)
 else()
-    target_link_libraries(engine PRIVATE 
-        OpenMP::OpenMP_CXX 
-        OpenCL
-        OpenSSL::Crypto
-    )
-
+    target_link_libraries(engine PRIVATE OpenMP::OpenMP_CXX OpenCL OpenSSL::Crypto)
     target_compile_options(engine PRIVATE -fopenmp -O2 -Wall -Wextra)
-    target_link_options(engine PRIVATE -fopenmp)
+    target_link_options(engine PRIVATE -static-libstdc++ -static-libgcc)
 endif()

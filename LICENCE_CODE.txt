@@ -1,4 +1,7 @@
+=================================================================
+Market Engine Client Code
 Copyright (C) 2025 OneFil (1FIL0) https://github.com/1FIL0
+=================================================================
 
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
