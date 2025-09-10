@@ -19,10 +19,11 @@ set(CL_KERNEL_SOURCE ${GPU_KERNEL_CL_DIR}/kernel.cl)
 get_filename_component(KERNEL_NAME_WE ${CL_KERNEL_SOURCE} NAME_WE)
 set(GPU_EMBEDDED_HEADER_FILE ${GPU_KERNEL_HPP_DIR}/${KERNEL_NAME_WE}_cl_embedded.hpp)
 set(GPU_PREPROCESSED_CL_FILE ${GPU_KERNEL_HPP_DIR}/${KERNEL_NAME_WE}_cl_preprocessed.hpp)
+
+file(MAKE_DIRECTORY ${GPU_KERNEL_HPP_DIR})
 add_custom_command(
     OUTPUT ${GPU_EMBEDDED_HEADER_FILE}
-    COMMAND echo "Preprocessing and embedding GPU kernel: ${CL_KERNEL_SOURCE}"
-    COMMAND mkdir -p $GPU_KERNEL_HPP_DIR
+    COMMAND ${CMAKE_COMMAND} -E echo "Preprocessing and embedding GPU kernel: ${CL_KERNEL_SOURCE}"
     COMMAND cpp -P ${CL_KERNEL_SOURCE} -o ${GPU_PREPROCESSED_CL_FILE}
     COMMAND xxd -n "kernel_cl_hpp_${KERNEL_NAME_WE}" -i ${GPU_PREPROCESSED_CL_FILE} > ${GPU_EMBEDDED_HEADER_FILE}
     DEPENDS ${CL_KERNEL_SOURCE}
@@ -46,6 +47,7 @@ file(GLOB_RECURSE SOURCES_SHARE
 )
 
 add_executable(engine ${SOURCES_CALCULATOR} ${SOURCES_SHARE})
+add_dependencies(engine embed_gpu_kernels)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_link_libraries(engine PRIVATE OpenMP::OpenMP_CXX OpenCL OpenSSL::Crypto)
@@ -54,7 +56,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
 else()
     target_link_libraries(engine PRIVATE 
         OpenMP::OpenMP_CXX 
-        OpenCL::OpenCL 
+        OpenCL
         OpenSSL::Crypto
     )
 
