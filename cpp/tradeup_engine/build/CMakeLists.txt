@@ -52,12 +52,12 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     target_compile_options(engine PRIVATE -fopenmp -O2 -Wall -Wextra)
     target_link_options(engine PRIVATE -fopenmp)
 else()
-    target_link_libraries(engine PRIVATE
-        ws2_32
-        crypt32
-        OpenCL
-        libcrypto
+    target_link_libraries(engine PRIVATE 
+        OpenMP::OpenMP_CXX 
+        OpenCL::OpenCL 
+        OpenSSL::Crypto
     )
-    target_compile_options(engine PRIVATE -O2 -Wall -Wextra -fopenmp)
+
+    target_compile_options(engine PRIVATE -fopenmp -O2 -Wall -Wextra)
     target_link_options(engine PRIVATE -fopenmp)
 endif()

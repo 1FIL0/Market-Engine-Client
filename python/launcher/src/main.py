@@ -1,13 +1,24 @@
+import os
 import sys
 import path
 sys.path.insert(0, path.PATH_SHARE)
 import proc
 import definitions
 import shared_args
+import logger
 
 gProcApp = None
 
 def main():
+    setEnvironment()
+    launchApp()
+
+def setEnvironment():
+    ldPath = str(definitions.PATH_LD_LIBRARY)
+    os.environ["LD_LIBRARY_PATH"] = ldPath 
+    logger.sendMessage(f"Using LD_LIBRARY_PATH [ {ldPath} ]")
+
+def launchApp():
     global gProcApp
     cmdList: list[str] = []
     if shared_args.argDist == "dev":
