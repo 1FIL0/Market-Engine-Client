@@ -1,25 +1,14 @@
-import os
 import sys
 import path
 sys.path.insert(0, path.PATH_SHARE)
 import proc
 import definitions
 import shared_args
-import logger
 
 gProcApp = None
 
 def main():
-    setEnvironment()
     launchApp()
-
-def setEnvironment():
-    libPath = str(definitions.PATH_LIB)
-    if definitions.SYSTEM == definitions.SYSTEM_WINDOWS:
-        os.environ["PATH"] = libPath + os.pathsep + os.environ.get("PATH", "")
-    elif definitions.SYSTEM == definitions.SYSTEM_LINUX:
-        os.environ["LD_LIBRARY_PATH"] = libPath + os.pathsep + os.environ.get("LD_LIBRARY_PATH", "")
-    logger.sendMessage(f"Using Library Path [ {libPath} ]")
 
 def launchApp():
     global gProcApp

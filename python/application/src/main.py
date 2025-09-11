@@ -12,12 +12,15 @@ import tradeup_memory
 import asyncio
 from qasync import QEventLoop  # pyright: ignore[reportMissingTypeStubs]
 import path
+import definitions
+import logger
 sys.path.insert(0, path.PATH_SHARE)
 
 def main():
 	init()
 
 def init():
+    setEnvironment()
     validator.validateFiles()
     auth_server.init()
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
@@ -36,6 +39,14 @@ def init():
     app.aboutToQuit.connect(asyncioLoop.stop)
     with asyncioLoop:
         asyncioLoop.run_forever()
+
+def setEnvironment():
+    libPath = str(definitions.PATH_LIB)
+    if definitions.SYSTEM == definitions.SYSTEM_WINDOWS:
+        os.environ["PATH"] = libPath + os.pathsep + os.environ.get("PATH", "")
+    elif definitions.SYSTEM == definitions.SYSTEM_LINUX:
+        os.environ["LD_LIBRARY_PATH"] = libPath + os.pathsep + os.environ.get("LD_LIBRARY_PATH", "")
+    logger.sendMessage(f"Using Library Path [ {libPath} ]")
 
 if __name__ == "__main__":
 	main()
