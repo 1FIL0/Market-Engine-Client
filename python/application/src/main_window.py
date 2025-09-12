@@ -136,9 +136,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.processSonar != None: return
         cmdList: list[str] = []
         if shared_args.argDist == "dev":
-            cmdList = ["python3", "-u", f"{definitions.PATH_DIST_CLIENT_SONAR_BINARY}", "--dist", shared_args.argDist]
+            cmdList = [str(definitions.PYTHON_CMD_CLIENT), "-u", f"{definitions.PATH_DIST_CLIENT_SONAR_BINARY}", "--dist", shared_args.argDist]
         elif shared_args.argDist == "release":
             cmdList = [f"{definitions.PATH_DIST_CLIENT_SONAR_BINARY}", "--dist", shared_args.argDist]
+        print(cmdList)
         self.processSonar = proc.runSubProcess(cmdList)
         self.sonarStatusStacked.setCurrentIndex(0)
         self.sonarStatusStackedHome.setCurrentIndex(0)

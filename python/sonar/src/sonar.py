@@ -40,7 +40,7 @@ def requestReadyItems() -> None:
     }
 
     try:
-        res = requests.post(definitions.URL_MARKET_ENGINE_FETCH_ITEMS, headers=headers)
+        res = requests.post(definitions.URL_MARKET_ENGINE_FETCH_ITEMS, headers=headers, timeout=5)
     except Exception as _:
         logger.sendMessage("Could not fetch items. Check server status")
         return
