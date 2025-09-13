@@ -132,7 +132,7 @@ void COMPGPU::ComputeContext::prepareBuffers(const int category, const int grade
     cleanTradeups();
     prepareBatch(category, grade);
 
-    // Create entirely new buffers
+    // Create entirely new buffers - REDO THIS LATER TO IMPROVE PERFORMANCE
     if (COMP::computeConfig.outputVerbose) LOGGER::sendMessage("Preparing buffers");
     ITEM::MarketItemMemoryFlatCollections collectionOutputsFlat = ITEM::getItemsTradeupableCategoryGradeCollectionsFlattened(category, grade + 1);
     
@@ -176,13 +176,13 @@ void COMPGPU::ComputeContext::cleanTradeups(void)
 void COMPGPU::ComputeContext::setKernelArgs(void)
 {
     if (COMP::computeConfig.outputVerbose) LOGGER::sendMessage("Setting kernel args");
-    auto batchSize = m_batch.size();
+    uint32_t batchSize = (uint32_t)m_batch.size();
     m_kernel.setArg(0, sizeof(cl_mem), &m_tradeupsBuffer);
     m_kernel.setArg(1, sizeof(cl_mem), &m_batchBuffer);
     m_kernel.setArg(2, sizeof(cl_mem), &m_flatCollectionOutputsBuffer);
     m_kernel.setArg(3, sizeof(cl_mem), &m_collectionIndicesStartBuffer);
-    m_kernel.setArg(4, sizeof(cl_mem), &m_collectionIndicesEndBuffer);
-    m_kernel.setArg(5, sizeof(long), &batchSize);
+    m_kernel.setArg(4, sizeof(cl_mem), &m_collectionIndicesEndBuffer); 
+    m_kernel.setArg(5, sizeof(uint32_t), &batchSize);
     m_kernel.setArg(6, sizeof(uint64_t), &m_combinationsAmount);
     m_kernel.setArg(7, sizeof(float), &m_profitabilityMargin);
 }

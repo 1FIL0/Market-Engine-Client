@@ -27,9 +27,9 @@ __kernel void combinationKernel(__global Tradeup *tradeups,
                                 __global MarketItem *flatCollectionOutputsPool,
                                 __global int *collectionIndicesStart,
                                 __global int *collectionIndicesEnd,
-                                __private long batchSize,
-                                __private ulong combinationsAmount,
-                                __private float profitabilityMargin)
+                                uint batchSize,
+                                ulong combinationsAmount,
+                                float profitabilityMargin)
 {
     ulong gid = get_global_id(0);
     ulong combStart = gid;
