@@ -136,7 +136,7 @@ void TRADEUP::writeTradeup(TRADEUP::TradeupCPU &tradeupCPU, const std::string &d
     rapidjson::PrettyWriter<rapidjson::StringBuffer> finalWriter(docBuffer);
     doc.Accept(finalWriter);
     
-    FILES::writeFileAtomic(PATH_DATA_CLIENT_PROFITABLE_TRADEUPS_TEMP, std::string(docBuffer.GetString()));
+    FILES::writeFileAtomic(PATH_DATA_CLIENT_PROFITABLE_TRADEUPS, PATH_DATA_CLIENT_PROFITABLE_TRADEUPS_TEMP, std::string(docBuffer.GetString()));
 }
 
 std::string TRADEUP::hashTradeup(const TRADEUP::TradeupCPU &tradeupCPU)

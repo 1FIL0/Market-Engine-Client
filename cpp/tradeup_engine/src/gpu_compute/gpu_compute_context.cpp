@@ -22,6 +22,7 @@
 #include "tradeup_hardware_converter.hpp"
 #include "kernel_cl_embedded.hpp"
 #include "system_info.hpp"
+#include <iostream>
 
 USE_NAMESPACE_TRADEUP_ENGINE
 USE_NAMESPACE_SHARE

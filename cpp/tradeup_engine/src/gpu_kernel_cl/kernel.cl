@@ -27,9 +27,9 @@ __kernel void combinationKernel(__global Tradeup *tradeups,
                                 __global MarketItem *flatCollectionOutputsPool,
                                 __global int *collectionIndicesStart,
                                 __global int *collectionIndicesEnd,
-                                uint batchSize,
-                                ulong combinationsAmount,
-                                float profitabilityMargin)
+                                __private uint batchSize,
+                                __private ulong combinationsAmount,
+                                __private float profitabilityMargin)
 {
     ulong gid = get_global_id(0);
     ulong combStart = gid;
@@ -52,7 +52,8 @@ __kernel void combinationKernel(__global Tradeup *tradeups,
 
     __private Tradeup tradeup = processCombination(flatCollectionOutputsPool, collectionIndicesStart, collectionIndicesEnd, combination);
     if (tradeup.profitability > profitabilityMargin) {
-        tradeups[gid] = tradeup;
+        printf("%f %f", tradeup.profitability, profitabilityMargin);
         tradeup.processed = true; // tradeup is replaced by new value and "processed". later set to false when "clearing" tradeups in the host
+        tradeups[gid] = tradeup;
     }
 }
