@@ -748,7 +748,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.computeModeBox.currentIndexChanged.connect(lambda: self.updateGPUSettingsVisibility())
         self.updateGPUSettingsVisibility()
 
-        if file_handler.readFile(str(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE)) == "{}": self.defaultTradeupEngineSettings()
+        if file_handler.readFileLocked(str(definitions.PATH_CONFIG_CLIENT_TRADEUP_ENGINE)) == "{}": self.defaultTradeupEngineSettings()
 
     def updateGPUSettingsVisibility(self):
         if self.computeModeBox.currentIndex() == 1:
@@ -857,7 +857,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         ]
         self.buttonItemLibraryCheckAllCollections.clicked.connect(lambda: self.itemLibraryCheckAllCollections(True))
         self.buttonItemLibraryUncheckAllCollections.clicked.connect(lambda: self.itemLibraryCheckAllCollections(False))
-        if file_handler.readFile(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY)) == "{}": self.defaultItemLibrarySettings()
+        if file_handler.readFileLocked(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY)) == "{}": self.defaultItemLibrarySettings()
 
     def itemLibraryCheckAllCollections(self, val: bool):
         for checkbox in self.itemLibraryCollectionCheckboxes:
@@ -1112,7 +1112,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.buttonUISettingsDiscard.clicked.connect(lambda: self.loadUISettings())
         self.buttonUISettingsDefaults.clicked.connect(lambda: self.defaultUISettings())
         self.outputHistorySizeVal = 0
-        if file_handler.readFile(str(definitions.PATH_CONFIG_CLIENT_UI)) == "{}": self.defaultUISettings()
+        if file_handler.readFileLocked(str(definitions.PATH_CONFIG_CLIENT_UI)) == "{}": self.defaultUISettings()
 
     def saveUISettings(self):
         config = {

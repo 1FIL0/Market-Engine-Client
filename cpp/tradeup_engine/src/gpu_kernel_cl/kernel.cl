@@ -52,7 +52,6 @@ __kernel void combinationKernel(__global Tradeup *tradeups,
 
     __private Tradeup tradeup = processCombination(flatCollectionOutputsPool, collectionIndicesStart, collectionIndicesEnd, combination);
     if (tradeup.profitability > profitabilityMargin) {
-        printf("%f %f", tradeup.profitability, profitabilityMargin);
         tradeup.processed = true; // tradeup is replaced by new value and "processed". later set to false when "clearing" tradeups in the host
         tradeups[gid] = tradeup;
     }
