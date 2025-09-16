@@ -14,13 +14,18 @@ from qasync import QEventLoop
 import path
 import definitions
 import logger
+import tempfile
+import filelock
 sys.path.insert(0, path.PATH_SHARE)
+
+g_instanceLockFile = None
 
 def main():
 	init()
 
 def init():
     setEnvironment()
+    checkInstanceRunning()
     validator.validateFiles()
     auth_server.init()
     os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
@@ -47,6 +52,22 @@ def setEnvironment():
     elif definitions.SYSTEM == definitions.SYSTEM_LINUX:
         os.environ["LD_LIBRARY_PATH"] = libPath + os.pathsep + os.environ.get("LD_LIBRARY_PATH", "")
     logger.sendMessage(f"Using Library Path [ {libPath} ]")
+
+def checkInstanceRunning():
+    global g_instanceLockFile
+    lockPath = os.path.join(tempfile.gettempdir(), 'market_engine_client.lock')
+    g_instanceLockFile = open(lockPath, 'w')
+
+    try:
+        if definitions.SYSTEM == definitions.SYSTEM_WINDOWS:
+            import msvcrt
+            msvcrt.locking(g_instanceLockFile.fileno(), msvcrt.LK_NBLCK, 1)
+        elif definitions.SYSTEM == definitions.SYSTEM_LINUX:
+            import fcntl
+            fcntl.flock(g_instanceLockFile, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except (OSError, IOError):
+        print("Another instance is already running.")
+        sys.exit(1)
 
 if __name__ == "__main__":
 	main()
