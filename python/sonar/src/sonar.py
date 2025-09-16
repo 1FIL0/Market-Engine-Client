@@ -9,7 +9,7 @@ import keyring
 import logger
 import file_handler
 
-sleepMin = 1
+sleepMin = 5
 gModifiedItemsData: dict[str, Any] = {}
 gModifiedLookup: dict[str, Any] = {}
 
