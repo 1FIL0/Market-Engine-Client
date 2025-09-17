@@ -9,7 +9,7 @@ This is a GPU-powered CS2 trade-up engine built to calculate millions of trade-u
 Part of the Market Engine project. NOT AFFILIATED WITH VALVE OR ANY OTHER SERVICES.
 
 ## Early Access
-This project is in very early access. The client was originally designed for Linux + CPU compute and may have some bugs regarding Windows and certain hardware.
+This project is in very early access and bugs are expected. The client was originally designed for Linux + CPU compute and may have some bugs regarding Windows and certain hardware.
 
 ## Website
 
