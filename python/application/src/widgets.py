@@ -98,7 +98,7 @@ def createChanceToProfitLabel(tradeup: Tradeup, alignment: Optional[Qt.Alignment
     return chanceToProfLabel
 
 def createFloatValLabel(floatVal: float, alignment: Optional[Qt.AlignmentFlag] = None):
-    chanceToProfLabel = qt_resource.createLabel("floatValLabel", f"Float Value {round(floatVal, 2)}", qt_resource.fontSystemHudNormal, alignment)
+    chanceToProfLabel = qt_resource.createLabel("floatValLabel", f"Float Value {round(floatVal, 4)}", qt_resource.fontSystemHudNormal, alignment)
     return chanceToProfLabel
 
 def createEntryItemTradeupChanceLabel(tradeupChance: float, alignment: Optional[Qt.AlignmentFlag] = None):
