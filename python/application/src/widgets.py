@@ -76,7 +76,7 @@ def createItemCurrentPriceLabel(item: MarketItem, alignment: Optional[Qt.Alignme
 
 def createItemSteamTaxPriceLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
     itemLabelPrice = qt_resource.createLabel(f"priceLabelSteamTaxPrice{item.tempID}", f"Current Price Steam Tax ${str(item.priceSteamTax)}", qt_resource.fontSystemHudNormal, alignment)
-    return itemLabelPrice  
+    return itemLabelPrice
 
 def createItemSteamMarketURLLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
     itemSteamMarketURL = qt_resource.createLabel(f"steamMarketURL{item.tempID}", f"<a style='color:red;' href=\"{item.steamMarketUrl}\">Steam Market URL</a>", qt_resource.fontSystemHudNormal, alignment)

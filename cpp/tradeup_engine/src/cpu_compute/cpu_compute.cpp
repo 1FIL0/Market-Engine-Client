@@ -38,7 +38,8 @@ void COMPCPU::startCompute(void)
             continue;
         }
 
-        CPUOP::pushRandomItemBatch(batch, COMP::computeConfig.batchSize, grade, category, COMP::computeConfig.maxInputPrice);
+        (COMP::computeConfig.singleItem) ? CPUOP::pushSingleItemBatch(batch, COMP::computeConfig.batchSize, grade, category, COMP::computeConfig.maxInputPrice) :
+                                            CPUOP::pushRandomItemBatch(batch, COMP::computeConfig.batchSize, grade, category, COMP::computeConfig.maxInputPrice);
 
         if (COMP::computeConfig.outputVerbose) {
             logComputeDiagnostics(category, grade, batch, currentBatch, combinationsAmount);
