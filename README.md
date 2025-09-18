@@ -4,7 +4,7 @@
 
 ## Overview
 
-This is a GPU-powered CS2 trade-up engine built to calculate millions of trade-ups as fast as possible. You can run it on your CPU, or hook up as many GPUs as you’ve got (works across vendors). There are many settings you can change to make the engine as fast as possible, and a simple manager to keep track of all the trade-ups you've found. The program comes with an item viewer so you can browse every CS2 market item and its details. Trade-ups are hashed, so you won’t get duplicates, and in turn save time.
+This is a CPU/GPU-powered CS2 trade-up engine built to calculate millions of trade-ups as fast as possible. You can run it on your CPU, or hook up as many GPUs as you’ve got (works across vendors). There are many settings you can change to make the engine as fast as possible, and a simple manager to keep track of all the trade-ups you've found. The program comes with an item viewer so you can browse every CS2 market item and its details. Trade-ups are hashed, so you won’t get duplicates, and in turn save time.
 
 Part of the Market Engine project. NOT AFFILIATED WITH VALVE OR ANY OTHER SERVICES.
 
