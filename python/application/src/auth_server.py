@@ -87,7 +87,10 @@ def fetchTokens(payload: dict[str, Any]):
     logger.sendMessage(f"Fetched tokens")
     tokensData = res.json()
     gAccessToken = tokensData.get("access_token")
-    gIDToken = tokensData.get("id_token") 
+    gIDToken = tokensData.get("id_token")
+    refreshToken = tokensData.get("refresh_token")
+    if refreshToken:
+        keyring.set_password("market_engine_client", "refresh_token", refreshToken)
     keyring.set_password("market_engine_client", "access_token", gAccessToken)
     keyring.set_password("market_engine_client", "id_token", gIDToken)
     constructAuthUserData()
