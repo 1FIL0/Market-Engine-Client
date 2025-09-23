@@ -21,7 +21,8 @@ For prebuilt Windows installers and Linux Appimages, head over to https://market
 
 ## How to use
 
-For instructions on how to operate the software, refer to the documentation at https://marketengine.onefil.dev/docs
+For instructions on how to operate the software, refer to the documentation at https://marketengine.onefil.dev/docs  
+If you experience any issues, visit the discord: https://discord.gg/tM53kbYVa6
 
 ## Building from source
 
@@ -30,3 +31,4 @@ Building happens in the shell network. Follow the instructions at https://github
 ## LICENCE
 
 Read the LICENCE file
+
