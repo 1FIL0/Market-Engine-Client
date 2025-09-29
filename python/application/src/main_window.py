@@ -44,7 +44,7 @@ import hardware
 import item_memory
 import logger
 
-MARKET_ENGINE_VER = "1.0.0"
+MARKET_ENGINE_VER = "1.0.1"
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
