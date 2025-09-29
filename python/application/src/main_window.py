@@ -107,6 +107,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def initHome(self):
         item_memory.addReadyItemsLoadedCallback(lambda: self.itemsLoadedHome.setText(f"Items Loaded: {len(item_memory.getAllItems())}"))
         tradeup_memory.addTradeupsLoadedCallback(lambda: self.tradeupsFoundHome.setText(f"Tradeups Found: {len(tradeup_memory.getTradeups())}"))
+        self.verLabel.setText(f"Version: {MARKET_ENGINE_VER}")
         self.buttonGoToWebsite.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE))
         self.buttonGoToRepo.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE_REPO))
         self.buttonCheckForUpdates.clicked.connect(lambda: self.openBrowserUrl(definitions.URL_MARKET_ENGINE_DOWNLOADS))
