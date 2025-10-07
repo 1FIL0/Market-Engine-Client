@@ -120,7 +120,7 @@ void COMPCPU::yieldCombination(const std::vector<ITEM::MarketItem> &combination)
     
     CPUOP::pushAvgInputFloat(tradeupCPU);
     CPUOP::pushInputsCombinedPrice(tradeupCPU);
-    CPUOP::pushOutputItems(tradeupCPU);
+    CPUOP::pushOutputItems(tradeupCPU);!
     CPUOP::pushChanceToProfit(tradeupCPU);
     CPUOP::pushProfitability(tradeupCPU);
 
