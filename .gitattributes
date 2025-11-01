@@ -1,2 +1,2 @@
 *.hpp linguist-language=C++
-*.cl linguist-language=OpenCL C
+*.cl linguist-language=OpenCL
