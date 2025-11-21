@@ -113,17 +113,10 @@ void COMPCPU::processCombinations(const std::vector<ITEM::MarketItem> &batch, co
     }
 }
 
-void COMPCPU::yieldCombination(const std::vector<ITEM::MarketItem> &combination)
+void COMPCPU::yieldCombination(std::vector<ITEM::MarketItem> &combination)
 {
     TRADEUP::TradeupCPU tradeupCPU;
-    tradeupCPU.inputs = combination;
-    
-    CPUOP::pushAvgInputFloat(tradeupCPU);
-    CPUOP::pushAdjustedAvgInputFloat(tradeupCPU);
-    CPUOP::pushInputsCombinedPrice(tradeupCPU);
-    CPUOP::pushOutputItems(tradeupCPU);
-    CPUOP::pushChanceToProfit(tradeupCPU);
-    CPUOP::pushProfitability(tradeupCPU);
+    CPUOP::makeCombinationTradeup(tradeupCPU, combination);
 
     if (tradeupCPU.profitability >= COMP::computeConfig.profitMargin) {
         #pragma omp critical

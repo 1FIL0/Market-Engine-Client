@@ -35,6 +35,17 @@
 USE_NAMESPACE_SHARE
 USE_NAMESPACE_TRADEUP_ENGINE
 
+void CPUOP::makeCombinationTradeup(TRADEUP::TradeupCPU &tradeupCPU, std::vector<ITEM::MarketItem> &combination)
+{
+    tradeupCPU.inputs = combination;
+    CPUOP::pushAvgInputFloat(tradeupCPU);
+    CPUOP::pushAdjustedAvgInputFloat(tradeupCPU);
+    CPUOP::pushInputsCombinedPrice(tradeupCPU);
+    CPUOP::pushOutputItems(tradeupCPU);
+    CPUOP::pushChanceToProfit(tradeupCPU);
+    CPUOP::pushProfitability(tradeupCPU);
+}
+
 uint64_t CPUOP::getCombinationsAmount(int n, int k) {
     if (k > n) return 0;
     if (k == 0 || k == n) return 1;
@@ -155,9 +166,11 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
         std::vector<ITEM::MarketItem> collectionItemsCopy = collectionItemsRef;
 
         for (auto &collectionItemCopy : collectionItemsCopy) {
-            float floatVal = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.adjustedAvgInputFloat);
-            if (DEFINITIONS::itemFloatValToInt(floatVal) != collectionItemCopy.wear) {continue;}
-            collectionItemCopy.floatVal = floatVal;
+            float outputFloat = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.avgInputFloat);
+            float adjustedOutputFloat = calculateAdjustedOutputItemFloat(collectionItemCopy, tradeupCPU.adjustedAvgInputFloat);
+            if (DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) {continue;}
+            collectionItemCopy.floatVal = outputFloat;
+            collectionItemCopy.adjustedFloatVal = adjustedOutputFloat;
             outputs.push_back(collectionItemCopy);
         }
     }
@@ -166,7 +179,12 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     tradeupCPU.outputs = sortedOutputs;
 }
 
-float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float adjustedAvgInputFloat)
+float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float avgInputFloat)
+{
+    return ((outputItem.maxFloat - outputItem.minFloat) * avgInputFloat + outputItem.minFloat);
+}
+
+float CPUOP::calculateAdjustedOutputItemFloat(const ITEM::MarketItem &outputItem, const float adjustedAvgInputFloat)
 {
     float outputFloat = adjustedAvgInputFloat * (outputItem.maxFloat - outputItem.minFloat) + outputItem.minFloat;
     return outputFloat;

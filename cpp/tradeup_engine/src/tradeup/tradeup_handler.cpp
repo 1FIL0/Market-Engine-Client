@@ -118,6 +118,7 @@ void TRADEUP::writeTradeup(TRADEUP::TradeupCPU &tradeupCPU, const std::string &d
         inputDoc.AddMember("Grade", rapidjson::Value().SetInt(input.grade), allocator);
         inputDoc.AddMember("Wear", rapidjson::Value().SetInt(input.wear), allocator);
         inputDoc.AddMember("Float Val", rapidjson::Value().SetFloat(input.floatVal), allocator);
+        inputDoc.AddMember("Adjusted Float Val", rapidjson::Value().SetFloat(input.adjustedFloatVal), allocator);
         inputsArrayDoc.PushBack(inputDoc, allocator);
     }
     tradeupVal.AddMember("Inputs", inputsArrayDoc, allocator);
@@ -136,6 +137,7 @@ void TRADEUP::writeTradeup(TRADEUP::TradeupCPU &tradeupCPU, const std::string &d
         outputDoc.AddMember("Grade", rapidjson::Value().SetInt(output.grade), allocator);
         outputDoc.AddMember("Wear", rapidjson::Value().SetInt(output.wear), allocator);
         outputDoc.AddMember("Float Val", rapidjson::Value().SetFloat(output.floatVal), allocator);
+        outputDoc.AddMember("Adjusted Float Val", rapidjson::Value().SetFloat(output.adjustedFloatVal), allocator);
         outputDoc.AddMember("Output Amount", rapidjson::Value().SetInt(output.outputAmount), allocator);
         outputDoc.AddMember("Tradeup Chance", rapidjson::Value().SetFloat(output.tradeUpChance), allocator);
         outputDoc.AddMember("Money Gain", rapidjson::Value().SetFloat(output.price - tradeupCPU.totalInputPrice), allocator);

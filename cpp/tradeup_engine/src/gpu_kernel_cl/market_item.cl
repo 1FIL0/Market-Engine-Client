@@ -35,7 +35,7 @@ typedef struct MarketItem
     bool tradeupable;
     int collection;
     int outputAmount;
-    float floatVal, minFloat, maxFloat;
+    float floatVal, adjustedFloatVal, minFloat, maxFloat;
     float tradeUpChance;
 } MarketItem;
 #pragma pack(pop)

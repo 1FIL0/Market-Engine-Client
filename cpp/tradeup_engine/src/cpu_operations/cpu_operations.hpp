@@ -28,6 +28,7 @@
 
 START_ENGINE_NAMESPACE_MULTI(CPUOP)
 
+void makeCombinationTradeup(TRADEUP::TradeupCPU &tradeupCPU, std::vector<ITEM::MarketItem> &combination);
 uint64_t getCombinationsAmount(int n, int k);
 
 ITEM::MarketItem getRandomItem(const int grade, const int category, const int forceIndex = -1);
@@ -43,7 +44,8 @@ void pushAdjustedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU);
 void pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU);
 
 void pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU);
-float calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float adjustedAvgInputFloat);
+float calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float avgInputFloat);
+float calculateAdjustedOutputItemFloat(const ITEM::MarketItem &outputItem, const float adjustedAvgInputFloat);
 std::vector<ITEM::MarketItem> sortOutputTickets(std::vector<ITEM::MarketItem> &outputs);
 
 void pushChanceToProfit(TRADEUP::TradeupCPU &tradeupCPU);

@@ -48,6 +48,7 @@ class TradeupInputEntry:
         self.grade: int = 0
         self.wear: int = 0
         self.floatVal: float = 0.0
+        self.adjustedFloatVal: float = 0.0
 
 class TradeupOutputEntry:
     def __init__(self):
@@ -59,6 +60,7 @@ class TradeupOutputEntry:
         self.grade: int = 0
         self.wear: int = 0
         self.floatVal: float = 0.0
+        self.adjustedFloatVal: float = 0.0
         self.outputAmount: int = 0
         self.tradeupChance: float = 0.0
         self.moneyGain: float = 0.0
