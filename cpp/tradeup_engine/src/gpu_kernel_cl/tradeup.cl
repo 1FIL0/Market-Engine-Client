@@ -33,6 +33,7 @@ typedef struct Tradeup {
     MarketItem outputs[MAX_GPU_TRADEUP_OUTPUTS];
     int totalOutputSize;
     float avgInputFloat;
+    float adjustedAvgInputFloat;
     float totalInputPrice;
     float profitability;
     float chanceToProfit;

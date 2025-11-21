@@ -37,6 +37,7 @@ struct TradeupGPU {
     ITEM::MarketItem outputs[MAX_GPU_TRADEUP_OUTPUTS];
     int totalOutputSize;
     float avgInputFloat;
+    float adjustedAvgInputFloat;
     float totalInputPrice;
     float profitability;
     float chanceToProfit;
@@ -49,6 +50,7 @@ struct TradeupCPU {
     std::vector<ITEM::MarketItem> inputs;
     std::vector<ITEM::MarketItem> outputs;
     float avgInputFloat;
+    float adjustedAvgInputFloat;
     float totalInputPrice;
     float profitability;
     float chanceToProfit;

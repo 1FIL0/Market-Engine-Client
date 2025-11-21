@@ -127,6 +127,16 @@ void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
     tradeupCPU.avgInputFloat = avgFloat;
 }
 
+void CPUOP::pushAdjustedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
+{
+    float adjustedAvgFloat = 0.0;
+    for (auto &input : tradeupCPU.inputs) {
+        adjustedAvgFloat += (input.floatVal - input.minFloat) / (input.maxFloat - input.minFloat);
+    }
+    adjustedAvgFloat /= 10.0;
+    tradeupCPU.adjustedAvgInputFloat = adjustedAvgFloat;
+}
+
 void CPUOP::pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU)
 {
     float totalPrice = 0.0;
@@ -145,7 +155,7 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
         std::vector<ITEM::MarketItem> collectionItemsCopy = collectionItemsRef;
 
         for (auto &collectionItemCopy : collectionItemsCopy) {
-            float floatVal = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.avgInputFloat);
+            float floatVal = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.adjustedAvgInputFloat);
             if (DEFINITIONS::itemFloatValToInt(floatVal) != collectionItemCopy.wear) {continue;}
             collectionItemCopy.floatVal = floatVal;
             outputs.push_back(collectionItemCopy);
@@ -156,9 +166,10 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     tradeupCPU.outputs = sortedOutputs;
 }
 
-float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float avgFloat)
+float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float adjustedAvgInputFloat)
 {
-    return ((outputItem.maxFloat - outputItem.minFloat) * avgFloat + outputItem.minFloat);
+    float outputFloat = adjustedAvgInputFloat * (outputItem.maxFloat - outputItem.minFloat) + outputItem.minFloat;
+    return outputFloat;
 }
 
 std::vector<ITEM::MarketItem> CPUOP::sortOutputTickets(std::vector<ITEM::MarketItem> &outputs)

@@ -38,10 +38,11 @@ void setBatchFloats(std::vector<ITEM::MarketItem> &batch);
 // NOT IN USE
 //void pushInputFloats(TRADEUP::TradeupCPU &tradeupCPU);
 void pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU);
+void pushAdjustedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU);
 void pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU);
 
 void pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU);
-float calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float avgFloat);
+float calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float adjustedAvgInputFloat);
 std::vector<ITEM::MarketItem> sortOutputTickets(std::vector<ITEM::MarketItem> &outputs);
 
 void pushChanceToProfit(TRADEUP::TradeupCPU &tradeupCPU);
