@@ -56,6 +56,17 @@ struct TradeupCPU {
     float chanceToProfit;
     float profitabilitySteamTax;
     float chanceToProfitSteamTax;
+
+    TradeupCPU()
+    {
+        avgInputFloat = 0.0;
+        adjustedAvgInputFloat = 0.0;
+        totalInputPrice = 0.0;
+        profitability = 0.0;
+        chanceToProfit = 0.0;
+        profitabilitySteamTax = 0.0;
+        chanceToProfitSteamTax = 0.0;
+    }
 };
 
 END_ENGINE_NAMESPACE

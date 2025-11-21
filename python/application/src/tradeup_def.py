@@ -29,6 +29,7 @@ class Tradeup:
         self.tradeupCategory: int = 0
         self.tradeupGrade: int = 0
         self.averageInputFloat: float = 0.0
+        self.adjustedAverageInputFloat: float = 0.0
         self.totalInputCost: float = 0.0
         self.totalOutputs: float = 0
         self.chanceToProfit: float = 0.0

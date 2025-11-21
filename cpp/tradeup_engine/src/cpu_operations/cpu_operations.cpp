@@ -105,17 +105,17 @@ void CPUOP::setBatchFloats(std::vector<ITEM::MarketItem> &batch)
     }
 }
 
-// NOT IN USE - SETTING FLOATS DURING BATCH PRODUCTION
-//void CPUOP::pushInputFloats(TRADEUP::TradeupCPU &tradeupCPU)
-//{
-//    for (auto &input : tradeupCPU.inputs) {
-//        float maxFloat = DEFINITIONS::wearToMaxFloat(input.wear);
-//        float minFloat = DEFINITIONS::wearToMinFloat(input.wear);
-//        if (input.minFloat > minFloat && minFloat == DEFINITIONS::FLOAT_MIN_FACTORY_NEW) {minFloat = input.minFloat;}
-//        if (input.maxFloat < maxFloat && maxFloat == DEFINITIONS::FLOAT_MAX_BATTLE_SCARRED) {maxFloat = input.maxFloat;}
-//        input.floatVal = (minFloat + maxFloat) / 2.0;
-//    }
-//}
+// !NOT IN USE - CURRENTLY SETTING FLOATS DURING BATCH PRODUCTION
+void CPUOP::pushInputFloats(TRADEUP::TradeupCPU &tradeupCPU)
+{
+    for (auto &input : tradeupCPU.inputs) {
+        float maxFloat = DEFINITIONS::wearToMaxFloat(input.wear);
+        float minFloat = DEFINITIONS::wearToMinFloat(input.wear);
+        if (input.minFloat > minFloat && minFloat == DEFINITIONS::FLOAT_MIN_FACTORY_NEW) {minFloat = input.minFloat;}
+        if (input.maxFloat < maxFloat && maxFloat == DEFINITIONS::FLOAT_MAX_BATTLE_SCARRED) {maxFloat = input.maxFloat;}
+        input.floatVal = (minFloat + maxFloat) / 2.0;
+    }
+}
 
 void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
 {

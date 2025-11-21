@@ -385,6 +385,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tradeupChanceToProfit.setText(f"{round(tradeup.chanceToProfit, 2)}% - {round(tradeup.chanceToProfitSteamTax)}% Steam Tax")
         self.tradeupTotalInputCost.setText(f"${round(tradeup.totalInputCost, 3)}")
         self.tradeupAvgInputFloat.setText(f"{round(tradeup.averageInputFloat, 3)}")
+        self.tradeupAdjustedAvgFloat.setText(f"{round(tradeup.adjustedAverageInputFloat, 3)}")
 
     def loadTradeupInputs(self, tradeup: Tradeup):
         for index, inputItemEntry in enumerate(tradeup.inputEntries):

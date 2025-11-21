@@ -35,8 +35,9 @@ void pushRandomItemBatch(std::vector<ITEM::MarketItem> &batch, const size_t batc
 void pushSingleItemBatch(std::vector<ITEM::MarketItem> &batch, const size_t batchSize, const int grade, const int category, const float maxItemPrice);
 void setBatchFloats(std::vector<ITEM::MarketItem> &batch);
 
-// NOT IN USE
-//void pushInputFloats(TRADEUP::TradeupCPU &tradeupCPU);
+// !NOT IN USE
+void pushInputFloats(TRADEUP::TradeupCPU &tradeupCPU);
+//
 void pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU);
 void pushAdjustedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU);
 void pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU);

@@ -67,6 +67,7 @@ def loadTradeups() -> None:
             newOutputEntry.outputAmount = outputEntry["Output Amount"]
             tradeup.outputEntries.append(newOutputEntry)
         tradeup.averageInputFloat = tradeupEntry["Average Input Float"]
+        tradeup.adjustedAverageInputFloat = tradeupEntry["Adjusted Average Input Float"]
         tradeup.chanceToProfit = tradeupEntry["Chance To Profit"]
         tradeup.chanceToProfitSteamTax = tradeupEntry["Chance To Profit Steam Tax"]
         tradeup.dateFound = tradeupEntry["Date Found"]
