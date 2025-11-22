@@ -35,6 +35,7 @@ TRADEUP::TradeupCPU TRADEUP::GPU2CPU(const TRADEUP::TradeupGPU &tradeupGPU)
    }
    
    tradeupCPU.avgInputFloat = tradeupGPU.avgInputFloat;
+   tradeupCPU.normalizedAvgInputFloat = tradeupGPU.normalizedAvgInputFloat;
    tradeupCPU.totalInputPrice = tradeupGPU.totalInputPrice;
    tradeupCPU.profitability = tradeupGPU.profitability;
    tradeupCPU.chanceToProfit = tradeupGPU.chanceToProfit;
