@@ -391,7 +391,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for index, inputItemEntry in enumerate(tradeup.inputEntries):
             inputItem: MarketItem = item_memory.getItemByPermId(inputItemEntry.permID)
             inputItemBox = self.createInputItemBox(inputItemEntry, inputItem, index)
-            self.tradeupInputsScrollContents.layout().addWidget(inputItemBox)
+            itemsPerRow = 2
+            row = index // itemsPerRow
+            col = index % itemsPerRow
+            self.tradeupInputsScrollContents.layout().addWidget(inputItemBox, row, col)
 
     def createInputItemBox(self, inputItemEntry: TradeupInputEntry, inputItem: MarketItem, index: int):
         inputBoxName = f"input{index}"
@@ -418,7 +421,10 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         for index, outputItemEntry in enumerate(tradeup.outputEntries):
             outputItem = item_memory.getItemByPermId(outputItemEntry.permID)
             outputItemBox = self.createOutputItemBox(tradeup, outputItemEntry, outputItem, index)
-            self.tradeupOutputsScrollContents.layout().addWidget(outputItemBox)
+            itemsPerRow = 2
+            row = index // itemsPerRow
+            col = index % itemsPerRow
+            self.tradeupOutputsScrollContents.layout().addWidget(outputItemBox, row, col)
 
     def createWinLoseIconEntry(self, tradeup: Tradeup, outputItem: MarketItem):
         labelIcon = QLabel()
@@ -608,7 +614,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         itemBox.setMinimumSize(350, 200)
         row = itemIndex // itemsPerRow
         col = itemIndex % itemsPerRow
-        cast(QGridLayout, table.layout()).addWidget(itemBox, row, col)
+        table.layout().addWidget(itemBox, row, col)
 
     def filteredItemButtonPressed(self, filteredItem: MarketItem):
         self.clearItemLibraryBottomInfo()
