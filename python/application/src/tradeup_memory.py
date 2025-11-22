@@ -51,7 +51,7 @@ def loadTradeups() -> None:
             newInputEntry.grade = inputEntry["Grade"]
             newInputEntry.wear = inputEntry["Wear"]
             newInputEntry.floatVal = inputEntry["Float Val"]
-            newInputEntry.adjustedFloatVal = inputEntry["Adjusted Float Val"]
+            newInputEntry.normalizedFloatVal = inputEntry["Normalized Float Val"]
             tradeup.inputEntries.append(newInputEntry)
         for outputEntry in tradeupEntry["Outputs"]:
             newOutputEntry: TradeupOutputEntry = TradeupOutputEntry()
@@ -62,14 +62,14 @@ def loadTradeups() -> None:
             newOutputEntry.grade = outputEntry["Grade"]
             newOutputEntry.wear = outputEntry["Wear"]
             newOutputEntry.floatVal = outputEntry["Float Val"]
-            newOutputEntry.adjustedFloatVal = outputEntry["Adjusted Float Val"]
+            newOutputEntry.normalizedFloatVal = outputEntry["Normalized Float Val"]
             newOutputEntry.moneyGain = outputEntry["Money Gain"]
             newOutputEntry.moneyGainSteamTax = outputEntry["Money Gain Steam Tax"]
             newOutputEntry.tradeupChance = outputEntry["Tradeup Chance"]
             newOutputEntry.outputAmount = outputEntry["Output Amount"]
             tradeup.outputEntries.append(newOutputEntry)
         tradeup.averageInputFloat = tradeupEntry["Average Input Float"]
-        tradeup.adjustedAverageInputFloat = tradeupEntry["Adjusted Average Input Float"]
+        tradeup.normalizedAverageInputFloat = tradeupEntry["Normalized Average Input Float"]
         tradeup.chanceToProfit = tradeupEntry["Chance To Profit"]
         tradeup.chanceToProfitSteamTax = tradeupEntry["Chance To Profit Steam Tax"]
         tradeup.dateFound = tradeupEntry["Date Found"]

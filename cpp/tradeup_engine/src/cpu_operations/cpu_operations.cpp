@@ -39,7 +39,7 @@ void CPUOP::makeCombinationTradeup(TRADEUP::TradeupCPU &tradeupCPU, std::vector<
 {
     tradeupCPU.inputs = combination;
     CPUOP::pushAvgInputFloat(tradeupCPU);
-    CPUOP::pushAdjustedAvgInputFloat(tradeupCPU);
+    CPUOP::pushNormalizedAvgInputFloat(tradeupCPU);
     CPUOP::pushInputsCombinedPrice(tradeupCPU);
     CPUOP::pushOutputItems(tradeupCPU);
     CPUOP::pushChanceToProfit(tradeupCPU);
@@ -113,6 +113,7 @@ void CPUOP::setBatchFloats(std::vector<ITEM::MarketItem> &batch)
         float finalMinFloat = std::lerp(wearMinFloat, wearMaxFloat, COMP::computeConfig.minimumInputFloatPercentage / 100.0);
         float finalMaxFloat = std::lerp(wearMinFloat, wearMaxFloat, COMP::computeConfig.maximumInputFloatPercentage / 100.0);
         input.floatVal = RAND::getRandomFloat(finalMinFloat, finalMaxFloat);
+        pushNormalizedFloat(input, input.floatVal);
     }
 }
 
@@ -128,6 +129,12 @@ void CPUOP::pushInputFloats(TRADEUP::TradeupCPU &tradeupCPU)
     }
 }
 
+void CPUOP::pushNormalizedFloat(ITEM::MarketItem &item, const float itemFloatVal)
+{
+    float normalizedFloat = (itemFloatVal - item.minFloat) / (item.maxFloat - item.minFloat);
+    item.normalizedFloatVal = normalizedFloat;
+}
+
 void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
 {
     float avgFloat = 0.0;
@@ -138,14 +145,14 @@ void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
     tradeupCPU.avgInputFloat = avgFloat;
 }
 
-void CPUOP::pushAdjustedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
+void CPUOP::pushNormalizedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
 {
-    float adjustedAvgFloat = 0.0;
+    float normalizedAvgFloat = 0.0;
     for (auto &input : tradeupCPU.inputs) {
-        adjustedAvgFloat += (input.floatVal - input.minFloat) / (input.maxFloat - input.minFloat);
+        normalizedAvgFloat += input.normalizedFloatVal;
     }
-    adjustedAvgFloat /= 10.0;
-    tradeupCPU.adjustedAvgInputFloat = adjustedAvgFloat;
+    normalizedAvgFloat /= 10.0;
+    tradeupCPU.normalizedAvgInputFloat = normalizedAvgFloat;
 }
 
 void CPUOP::pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU)
@@ -166,11 +173,10 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
         std::vector<ITEM::MarketItem> collectionItemsCopy = collectionItemsRef;
 
         for (auto &collectionItemCopy : collectionItemsCopy) {
-            float outputFloat = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.avgInputFloat);
-            float adjustedOutputFloat = calculateAdjustedOutputItemFloat(collectionItemCopy, tradeupCPU.adjustedAvgInputFloat);
-            if (DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) {continue;}
+            float outputFloat = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.normalizedAvgInputFloat);
+            if (DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) continue;
             collectionItemCopy.floatVal = outputFloat;
-            collectionItemCopy.adjustedFloatVal = adjustedOutputFloat;
+            pushNormalizedFloat(collectionItemCopy, collectionItemCopy.floatVal);
             outputs.push_back(collectionItemCopy);
         }
     }
@@ -179,14 +185,9 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     tradeupCPU.outputs = sortedOutputs;
 }
 
-float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float avgInputFloat)
+float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float normalizedAvgInputFloat)
 {
-    return ((outputItem.maxFloat - outputItem.minFloat) * avgInputFloat + outputItem.minFloat);
-}
-
-float CPUOP::calculateAdjustedOutputItemFloat(const ITEM::MarketItem &outputItem, const float adjustedAvgInputFloat)
-{
-    float outputFloat = adjustedAvgInputFloat * (outputItem.maxFloat - outputItem.minFloat) + outputItem.minFloat;
+    float outputFloat = (outputItem.maxFloat - outputItem.minFloat) * normalizedAvgInputFloat + outputItem.minFloat;
     return outputFloat;
 }
 
