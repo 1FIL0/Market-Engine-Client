@@ -138,7 +138,6 @@ void TRADEUP::writeTradeup(TRADEUP::TradeupCPU &tradeupCPU, const std::string &d
         outputDoc.AddMember("Wear", rapidjson::Value().SetInt(output.wear), allocator);
         outputDoc.AddMember("Float Val", rapidjson::Value().SetFloat(output.floatVal), allocator);
         outputDoc.AddMember("Normalized Float Val", rapidjson::Value().SetFloat(output.normalizedFloatVal), allocator);
-        outputDoc.AddMember("Output Amount", rapidjson::Value().SetInt(output.outputAmount), allocator);
         outputDoc.AddMember("Tradeup Chance", rapidjson::Value().SetFloat(output.tradeUpChance), allocator);
         outputDoc.AddMember("Money Gain", rapidjson::Value().SetFloat(output.price - tradeupCPU.totalInputPrice), allocator);
         outputDoc.AddMember("Money Gain Steam Tax", rapidjson::Value().SetFloat(output.priceSteamTax - tradeupCPU.totalInputPrice), allocator);

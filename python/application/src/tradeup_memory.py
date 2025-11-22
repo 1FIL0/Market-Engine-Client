@@ -66,7 +66,6 @@ def loadTradeups() -> None:
             newOutputEntry.moneyGain = outputEntry["Money Gain"]
             newOutputEntry.moneyGainSteamTax = outputEntry["Money Gain Steam Tax"]
             newOutputEntry.tradeupChance = outputEntry["Tradeup Chance"]
-            newOutputEntry.outputAmount = outputEntry["Output Amount"]
             tradeup.outputEntries.append(newOutputEntry)
         tradeup.averageInputFloat = tradeupEntry["Average Input Float"]
         tradeup.normalizedAverageInputFloat = tradeupEntry["Normalized Average Input Float"]

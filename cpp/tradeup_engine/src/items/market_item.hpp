@@ -38,7 +38,6 @@ struct MarketItem {
 
     bool tradeupable;
     int collection;
-    int outputAmount;
     float floatVal, normalizedFloatVal, minFloat, maxFloat;
     float tradeUpChance;
 

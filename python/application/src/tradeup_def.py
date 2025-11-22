@@ -61,7 +61,6 @@ class TradeupOutputEntry:
         self.wear: int = 0
         self.floatVal: float = 0.0
         self.normalizedFloatVal: float = 0.0
-        self.outputAmount: int = 0
         self.tradeupChance: float = 0.0
         self.moneyGain: float = 0.0
         self.moneyGainSteamTax: float = 0.0

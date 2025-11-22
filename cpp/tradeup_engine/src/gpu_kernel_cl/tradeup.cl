@@ -27,7 +27,7 @@
 #define MAX_GPU_TRADEUP_OUTPUTS 100
 
 #pragma pack(push, 1)
-typedef struct Tradeup {
+typedef struct TradeupGPU {
     bool processed;
     MarketItem inputs[MAX_GPU_TRADEUP_INPUTS];
     MarketItem outputs[MAX_GPU_TRADEUP_OUTPUTS];
@@ -39,5 +39,5 @@ typedef struct Tradeup {
     float chanceToProfit;
     float profitabilitySteamTax;
     float chanceToProfitSteamTax;
-} Tradeup;
+} TradeupGPU;
 #pragma pack(pop)
