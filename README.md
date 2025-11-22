@@ -10,9 +10,6 @@ Part of the Market Engine project. NOT AFFILIATED WITH VALVE OR ANY OTHER SERVIC
 
 ![](readme_assets/me_example1.png)
 
-## NOTE
-Due to the new CS2 update, the tradeup algorithm changed and currently this program doesn't calculate tradeups properly. Fix soon
-
 ## Early Access
 This project is in very early access and bugs are expected. The client was originally designed for Linux + CPU compute and may have some bugs regarding Windows and certain hardware.
 
