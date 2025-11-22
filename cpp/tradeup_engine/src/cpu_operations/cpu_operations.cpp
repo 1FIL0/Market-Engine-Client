@@ -24,9 +24,11 @@
 #include "namespace.hpp"
 #include "randomiser.hpp"
 #include "tradeup.hpp"
+#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
 #include <emmintrin.h>
+#include <iostream>
 #include <vector>
 #include <omp.h>
 #include "cpu_operations.hpp"
@@ -34,6 +36,18 @@
 
 USE_NAMESPACE_SHARE
 USE_NAMESPACE_TRADEUP_ENGINE
+
+void CPUOP::makeCombinationTradeup(TRADEUP::TradeupCPU &tradeupCPU, std::vector<ITEM::MarketItem> &combination)
+{
+    // ! MUST BE IN ORDER
+    tradeupCPU.inputs = combination;
+    CPUOP::pushAvgInputFloat(tradeupCPU);
+    CPUOP::pushNormalizedAvgInputFloat(tradeupCPU);
+    CPUOP::pushInputsCombinedPrice(tradeupCPU);
+    CPUOP::pushOutputItems(tradeupCPU);
+    CPUOP::pushChanceToProfit(tradeupCPU);
+    CPUOP::pushProfitability(tradeupCPU);
+}
 
 uint64_t CPUOP::getCombinationsAmount(int n, int k) {
     if (k > n) return 0;
@@ -102,20 +116,15 @@ void CPUOP::setBatchFloats(std::vector<ITEM::MarketItem> &batch)
         float finalMinFloat = std::lerp(wearMinFloat, wearMaxFloat, COMP::computeConfig.minimumInputFloatPercentage / 100.0);
         float finalMaxFloat = std::lerp(wearMinFloat, wearMaxFloat, COMP::computeConfig.maximumInputFloatPercentage / 100.0);
         input.floatVal = RAND::getRandomFloat(finalMinFloat, finalMaxFloat);
+        pushNormalizedFloat(input, input.floatVal);
     }
 }
 
-// NOT IN USE - SETTING FLOATS DURING BATCH PRODUCTION
-//void CPUOP::pushInputFloats(TRADEUP::TradeupCPU &tradeupCPU)
-//{
-//    for (auto &input : tradeupCPU.inputs) {
-//        float maxFloat = DEFINITIONS::wearToMaxFloat(input.wear);
-//        float minFloat = DEFINITIONS::wearToMinFloat(input.wear);
-//        if (input.minFloat > minFloat && minFloat == DEFINITIONS::FLOAT_MIN_FACTORY_NEW) {minFloat = input.minFloat;}
-//        if (input.maxFloat < maxFloat && maxFloat == DEFINITIONS::FLOAT_MAX_BATTLE_SCARRED) {maxFloat = input.maxFloat;}
-//        input.floatVal = (minFloat + maxFloat) / 2.0;
-//    }
-//}
+void CPUOP::pushNormalizedFloat(ITEM::MarketItem &item, const float itemFloatVal)
+{
+    float normalizedFloat = (itemFloatVal - item.minFloat) / (item.maxFloat - item.minFloat);
+    item.normalizedFloatVal = normalizedFloat;
+}
 
 void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
 {
@@ -125,6 +134,16 @@ void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
     }
     avgFloat /= 10.0;
     tradeupCPU.avgInputFloat = avgFloat;
+}
+
+void CPUOP::pushNormalizedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
+{
+    float normalizedAvgFloat = 0.0;
+    for (auto &input : tradeupCPU.inputs) {
+        normalizedAvgFloat += input.normalizedFloatVal;
+    }
+    normalizedAvgFloat /= 10.0;
+    tradeupCPU.normalizedAvgInputFloat = normalizedAvgFloat;
 }
 
 void CPUOP::pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU)
@@ -139,68 +158,43 @@ void CPUOP::pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU)
 void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
 {
     std::vector<ITEM::MarketItem> outputs;
+    std::array<float, DEFINITIONS::COLLECTION_END> collectionChances{};
+    std::array<int, DEFINITIONS::COLLECTION_END> distinctCollectionItems{};
 
     for (auto &input : tradeupCPU.inputs) {
+        collectionChances[input.collection] += 10.0;
+        
         const std::vector<ITEM::MarketItem> &collectionItemsRef = ITEM::getItemsCategoryGradeCollection(input.category, input.grade + 1, input.collection);
         std::vector<ITEM::MarketItem> collectionItemsCopy = collectionItemsRef;
 
         for (auto &collectionItemCopy : collectionItemsCopy) {
-            float floatVal = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.avgInputFloat);
-            if (DEFINITIONS::itemFloatValToInt(floatVal) != collectionItemCopy.wear) {continue;}
-            collectionItemCopy.floatVal = floatVal;
-            outputs.push_back(collectionItemCopy);
-        }
-    }
-
-    std::vector<ITEM::MarketItem> sortedOutputs = sortOutputTickets(outputs);
-    tradeupCPU.outputs = sortedOutputs;
-}
-
-float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float avgFloat)
-{
-    return ((outputItem.maxFloat - outputItem.minFloat) * avgFloat + outputItem.minFloat);
-}
-
-std::vector<ITEM::MarketItem> CPUOP::sortOutputTickets(std::vector<ITEM::MarketItem> &outputs)
-{
-    std::vector<ITEM::MarketItem> sortedOutputs;
-    std::vector<ITEM::MarketItem> singleItems;
-    std::array<int, DEFINITIONS::COLLECTION_END> collectionAmounts;
-    size_t outputsSize = outputs.size();
-
-    // FOR REMOVE DUPLICATES AND ADD OUTPUT AMOUNTS TO COLLECTION ARRAY AND MARKET ITEMS
-    for (auto &output : outputs) {
-        bool dup = false;
-        for (auto &singleItem : singleItems) {
-            if (singleItem.tempID == output.tempID) {
-                ++singleItem.outputAmount;
-                ++collectionAmounts[singleItem.collection];
-                dup = true;
-                break;
+            float outputFloat = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.normalizedAvgInputFloat);
+            // Ignore incorrect wears
+            if (DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) continue;
+            collectionItemCopy.floatVal = outputFloat;
+            pushNormalizedFloat(collectionItemCopy, collectionItemCopy.floatVal);
+            
+            // no duplicates allowed
+            if (std::find(outputs.begin(), outputs.end(), collectionItemCopy) != outputs.end()) {
+                continue;
             }
+
+            outputs.push_back(collectionItemCopy);
+            ++distinctCollectionItems[collectionItemCopy.collection];
         }
-
-        if (dup) {
-            continue;
-        }
-        
-        output.outputAmount = 1;
-        singleItems.push_back(output);
-        ++collectionAmounts[output.collection];
     }
 
-    // FOR CALCULATE TRADEUP CHANCE
-    for (auto &singleItem : singleItems) {
-        int totalCollectionOutputs = collectionAmounts[singleItem.collection];
-        singleItem.tradeUpChance = (((float)totalCollectionOutputs / outputsSize) * singleItem.outputAmount / totalCollectionOutputs) * 100;
+    for (auto &output : outputs) {
+        output.tradeUpChance = collectionChances[output.collection] / distinctCollectionItems[output.collection];
     }
 
-    // FOR GET BACK MEMORY
-    for (auto &singleItem : singleItems) {
-        sortedOutputs.push_back(singleItem);
-    }
+    tradeupCPU.outputs = outputs;
+}
 
-    return sortedOutputs;
+float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float normalizedAvgInputFloat)
+{
+    float outputFloat = (outputItem.maxFloat - outputItem.minFloat) * normalizedAvgInputFloat + outputItem.minFloat;
+    return outputFloat;
 }
 
 float CPUOP::getExpectedPrice(const std::vector<ITEM::MarketItem> &sortedOutputs)

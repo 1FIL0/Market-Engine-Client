@@ -118,10 +118,12 @@ void TRADEUP::writeTradeup(TRADEUP::TradeupCPU &tradeupCPU, const std::string &d
         inputDoc.AddMember("Grade", rapidjson::Value().SetInt(input.grade), allocator);
         inputDoc.AddMember("Wear", rapidjson::Value().SetInt(input.wear), allocator);
         inputDoc.AddMember("Float Val", rapidjson::Value().SetFloat(input.floatVal), allocator);
+        inputDoc.AddMember("Normalized Float Val", rapidjson::Value().SetFloat(input.normalizedFloatVal), allocator);
         inputsArrayDoc.PushBack(inputDoc, allocator);
     }
     tradeupVal.AddMember("Inputs", inputsArrayDoc, allocator);
     tradeupVal.AddMember("Average Input Float", rapidjson::Value().SetFloat(tradeupCPU.avgInputFloat), allocator);
+    tradeupVal.AddMember("Normalized Average Input Float", rapidjson::Value().SetFloat(tradeupCPU.normalizedAvgInputFloat), allocator);
     tradeupVal.AddMember("Total Input Cost", rapidjson::Value().SetFloat(tradeupCPU.totalInputPrice), allocator);
     for (auto &output : outputs) {
         rapidjson::Value outputDoc(rapidjson::kObjectType);
@@ -135,7 +137,7 @@ void TRADEUP::writeTradeup(TRADEUP::TradeupCPU &tradeupCPU, const std::string &d
         outputDoc.AddMember("Grade", rapidjson::Value().SetInt(output.grade), allocator);
         outputDoc.AddMember("Wear", rapidjson::Value().SetInt(output.wear), allocator);
         outputDoc.AddMember("Float Val", rapidjson::Value().SetFloat(output.floatVal), allocator);
-        outputDoc.AddMember("Output Amount", rapidjson::Value().SetInt(output.outputAmount), allocator);
+        outputDoc.AddMember("Normalized Float Val", rapidjson::Value().SetFloat(output.normalizedFloatVal), allocator);
         outputDoc.AddMember("Tradeup Chance", rapidjson::Value().SetFloat(output.tradeUpChance), allocator);
         outputDoc.AddMember("Money Gain", rapidjson::Value().SetFloat(output.price - tradeupCPU.totalInputPrice), allocator);
         outputDoc.AddMember("Money Gain Steam Tax", rapidjson::Value().SetFloat(output.priceSteamTax - tradeupCPU.totalInputPrice), allocator);
@@ -154,7 +156,7 @@ void TRADEUP::writeTradeup(TRADEUP::TradeupCPU &tradeupCPU, const std::string &d
     rapidjson::StringBuffer docBuffer;
     rapidjson::PrettyWriter<rapidjson::StringBuffer> finalWriter(docBuffer);
     doc.Accept(finalWriter);
-    
+
     FILES::writeFileAtomic(PATH_DATA_CLIENT_PROFITABLE_TRADEUPS, PATH_DATA_CLIENT_PROFITABLE_TRADEUPS_TEMP, std::string(docBuffer.GetString()));
 }
 

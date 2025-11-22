@@ -385,6 +385,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.tradeupChanceToProfit.setText(f"{round(tradeup.chanceToProfit, 2)}% - {round(tradeup.chanceToProfitSteamTax)}% Steam Tax")
         self.tradeupTotalInputCost.setText(f"${round(tradeup.totalInputCost, 3)}")
         self.tradeupAvgInputFloat.setText(f"{round(tradeup.averageInputFloat, 3)}")
+        self.tradeupNormalizedAvgFloat.setText(f"{round(tradeup.normalizedAverageInputFloat, 3)}")
 
     def loadTradeupInputs(self, tradeup: Tradeup):
         for index, inputItemEntry in enumerate(tradeup.inputEntries):
@@ -399,12 +400,14 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         leftBox = self.createTradeupItemBoxLeftContents(inputLeftName, inputItem)
         itemPriceLabel = widgets.createItemCurrentPriceLabel(inputItem)
         itemFloatValLabel = widgets.createFloatValLabel(inputItemEntry.floatVal)
+        itemNormalizedFloatValLabel = widgets.createNormalizedFloatValLabel(inputItemEntry.normalizedFloatVal)
         itemSteamMarketURLLabel = widgets.createItemSteamMarketURLLabel(inputItem)
         
         rightBox = self.createGeneralTradeupItemBox(f"inputRight{index}", inputItem)
         rightBoxContents = qt_resource.createWidget("inputRightContents", QVBoxLayout())
         rightBoxContents.layout().addWidget(itemPriceLabel)
         rightBoxContents.layout().addWidget(itemFloatValLabel)
+        rightBoxContents.layout().addWidget(itemNormalizedFloatValLabel)
         rightBoxContents.layout().addWidget(itemSteamMarketURLLabel)
         rightBox.layout().addWidget(rightBoxContents)
         inputItemBox.layout().addWidget(leftBox)
@@ -438,6 +441,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         leftBox = self.createTradeupItemBoxLeftContents(outputLeftName, outputItem)
         itemPriceLabel = widgets.createItemCurrentPriceLabel(outputItem)
         itemFloatValLabel = widgets.createFloatValLabel(outputItemEntry.floatVal)
+        itemNormalizedFloatValLabel = widgets.createNormalizedFloatValLabel(outputItemEntry.normalizedFloatVal)
         itemTradeupChanceLabel = widgets.createEntryItemTradeupChanceLabel(outputItemEntry.tradeupChance)
         itemMoneyGainLabel = widgets.createEntryItemMoneyGainLabel(outputItemEntry.moneyGain, outputItemEntry.moneyGainSteamTax)
         itemSteamMarketURLLabel = widgets.createItemSteamMarketURLLabel(outputItem)
@@ -448,6 +452,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         rightBoxContents.layout().addWidget(winLoseIcon)
         rightBoxContents.layout().addWidget(itemPriceLabel)
         rightBoxContents.layout().addWidget(itemFloatValLabel)
+        rightBoxContents.layout().addWidget(itemNormalizedFloatValLabel)
         rightBoxContents.layout().addWidget(itemTradeupChanceLabel)
         rightBoxContents.layout().addWidget(itemMoneyGainLabel)
         rightBoxContents.layout().addWidget(itemSteamMarketURLLabel)

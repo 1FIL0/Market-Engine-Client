@@ -38,13 +38,17 @@ struct MarketItem {
 
     bool tradeupable;
     int collection;
-    int outputAmount;
-    float floatVal, minFloat, maxFloat;
+    float floatVal, normalizedFloatVal, minFloat, maxFloat;
     float tradeUpChance;
 
     MarketItem();
+
     bool operator<(const MarketItem &otherItem) {
         return permID < otherItem.permID;
+    }
+
+    bool operator==(const MarketItem &otherItem) {
+        return permID == otherItem.permID && tempID == otherItem.tempID && wear == otherItem.wear;
     }
 };
 #pragma pack(pop)

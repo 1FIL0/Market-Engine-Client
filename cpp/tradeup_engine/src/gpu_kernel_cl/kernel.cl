@@ -21,27 +21,28 @@
 #include "operations.cl"
 #include "tradeup.cl"
 
-Tradeup processCombination(__global MarketItem *flatCollectionOutputsPool,
+TradeupGPU processCombination(__global MarketItem *flatCollectionOutputsPool,
                         __global int *collectionIndicesStart,
                         __global int *collectionIndiciesEnd,
                         __private MarketItem *combination)
 {
-    __private Tradeup tradeup;
+    __private TradeupGPU tradeup;
     
     for (int i = 0; i < MAX_GPU_TRADEUP_INPUTS; ++i) {
         tradeup.inputs[i] = combination[i];
     }
 
     pushAvgInputFloat(&tradeup);
+    pushNormalizedAvgInputFloat(&tradeup);
     pushTotalInputPrice(&tradeup);
-    pushOutputs(&tradeup, flatCollectionOutputsPool, collectionIndicesStart, collectionIndiciesEnd);
+    pushOutputItems(&tradeup, flatCollectionOutputsPool, collectionIndicesStart, collectionIndiciesEnd);
     pushChanceToProfit(&tradeup);
     pushProfitability(&tradeup);
 
     return tradeup;
 }
 
-__kernel void combinationKernel(__global Tradeup *tradeups,
+__kernel void combinationKernel(__global TradeupGPU *tradeups,
                                 __global MarketItem *batch,
                                 __global MarketItem *flatCollectionOutputsPool,
                                 __global int *collectionIndicesStart,
@@ -69,7 +70,7 @@ __kernel void combinationKernel(__global Tradeup *tradeups,
         combination[i] = batch[localIndices[i]];
     }
 
-    __private Tradeup tradeup = processCombination(flatCollectionOutputsPool, collectionIndicesStart, collectionIndicesEnd, combination);
+    __private TradeupGPU tradeup = processCombination(flatCollectionOutputsPool, collectionIndicesStart, collectionIndicesEnd, combination);
     if (tradeup.profitability > profitabilityMargin) {
         tradeup.processed = true; // tradeup is replaced by new value and "processed". later set to false when "clearing" tradeups in the host
         tradeups[gid] = tradeup;

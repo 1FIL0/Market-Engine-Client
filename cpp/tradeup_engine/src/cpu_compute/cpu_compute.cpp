@@ -39,7 +39,7 @@ USE_NAMESPACE_SHARE
 
 void COMPCPU::init(void)
 {
-    
+    //omp_set_num_threads(1);
 }
 
 void COMPCPU::startCompute(void)
@@ -113,16 +113,10 @@ void COMPCPU::processCombinations(const std::vector<ITEM::MarketItem> &batch, co
     }
 }
 
-void COMPCPU::yieldCombination(const std::vector<ITEM::MarketItem> &combination)
+void COMPCPU::yieldCombination(std::vector<ITEM::MarketItem> &combination)
 {
     TRADEUP::TradeupCPU tradeupCPU;
-    tradeupCPU.inputs = combination;
-    
-    CPUOP::pushAvgInputFloat(tradeupCPU);
-    CPUOP::pushInputsCombinedPrice(tradeupCPU);
-    CPUOP::pushOutputItems(tradeupCPU);
-    CPUOP::pushChanceToProfit(tradeupCPU);
-    CPUOP::pushProfitability(tradeupCPU);
+    CPUOP::makeCombinationTradeup(tradeupCPU, combination);
 
     if (tradeupCPU.profitability >= COMP::computeConfig.profitMargin) {
         #pragma omp critical

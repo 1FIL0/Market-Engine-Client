@@ -23,19 +23,13 @@
 #include "definitions.cl"
 #include "tradeup.cl"
 
-// NOT IN USE - RANDOMISING FLOATS DURING BATCH CREATION
-//void pushInputFloatVals(__private Tradeup *tradeup)
-//{
-//    for (int i = 0; i < MAX_GPU_TRADEUP_INPUTS; ++i) {
-//        float maxFloat = wearToMaxFloat(tradeup->inputs[i].wear);
-//        float minFloat = wearToMinFloat(tradeup->inputs[i].wear);
-//        if (tradeup->inputs[i].minFloat > minFloat && minFloat == FLOAT_MIN_FACTORY_NEW) {minFloat = tradeup->inputs[i].minFloat;}
-//        if (tradeup->inputs[i].maxFloat < maxFloat && maxFloat == FLOAT_MAX_BATTLE_SCARRED) {maxFloat = tradeup->inputs[i].maxFloat;}
-//        tradeup->inputs[i].floatVal = (minFloat + maxFloat) / 2.0;
-//    }
-//}
+void pushNormalizedFloat(__private MarketItem *item, __private const float itemFloatVal)
+{
+    float normalizedFloat = (itemFloatVal - item->minFloat) / (item->maxFloat - item->minFloat);
+    item->normalizedFloatVal = normalizedFloat;
+}
 
-void pushTotalInputPrice(__private Tradeup *tradeup)
+void pushTotalInputPrice(__private TradeupGPU *tradeup)
 {
     float totalPrice = 0.0;
     for (int i = 0; i < MAX_GPU_TRADEUP_INPUTS; ++i) {
@@ -44,7 +38,7 @@ void pushTotalInputPrice(__private Tradeup *tradeup)
     }
 }
 
-void pushAvgInputFloat(__private Tradeup *tradeup)
+void pushAvgInputFloat(__private TradeupGPU *tradeup)
 {
     float avgFloat = 0.0;
     for (int i = 0; i < 10; ++i) {
@@ -54,88 +48,72 @@ void pushAvgInputFloat(__private Tradeup *tradeup)
     tradeup->avgInputFloat = avgFloat;
 }
 
+void pushNormalizedAvgInputFloat(__private TradeupGPU *tradeup)
+{
+    float normalizedAvgFloat = 0.0;
+    for (int i = 0; i < 10; ++i) {
+        normalizedAvgFloat += tradeup->inputs[i].normalizedFloatVal;
+    }
+    normalizedAvgFloat /= 10.0;
+    tradeup->normalizedAvgInputFloat = normalizedAvgFloat;
+}
+
 float calculateOutputItemFloat(__private const MarketItem *outputItem, 
                                 __private float avgFloat)
 {
     return ((outputItem->maxFloat - outputItem->minFloat) * avgFloat + outputItem->minFloat);
 }
 
-void sortOutputItemsTickets(__private MarketItem *outputTickets,
-                            __private int outputTicketsSize,
-                            __private MarketItem *sortedOutputs,
-                            __private int *sortedOutputsSize)
-{
-    __private MarketItem singleItems[256];
-    __private int currentSingleItems = 0;
-    __private int collectionAmounts[COLLECTION_END];
-
-    // FOR REMOVE DUPLICATES AND ADD OUTPUT AMOUNTS TO COLLECTION ARRAY AND MARKET ITEMS
-    for (int i = 0; i < outputTicketsSize; ++i) {
-        bool dup = false;
-        for (int j = 0; j < currentSingleItems; ++j) {
-            if (singleItems[j].tempID == outputTickets[i].tempID) {
-                ++singleItems[j].outputAmount;
-                ++collectionAmounts[singleItems[j].collection];
-                dup = true;
-                break;
-            }
-        }
-
-        if (dup) {
-            continue;
-        }
-        
-        singleItems[currentSingleItems] = outputTickets[i];
-        singleItems[currentSingleItems].outputAmount = 1;
-        ++collectionAmounts[outputTickets[i].collection];
-        ++currentSingleItems;
-    }
-
-    // FOR CALCULATE TRADEUP CHANCE
-    for (int i = 0; i < currentSingleItems; ++i) {
-        int totalCollectionOutputs = collectionAmounts[singleItems[i].collection];
-        singleItems[i].tradeUpChance = (((float)totalCollectionOutputs / outputTicketsSize) * singleItems[i].outputAmount / totalCollectionOutputs) * 100;
-    }
-
-    // FOR GET BACK MEMORY
-    for (int i = 0; i < currentSingleItems; ++i) {
-        sortedOutputs[i] = singleItems[i];
-    }
-    *sortedOutputsSize = currentSingleItems;
-}
-
-void pushOutputs(__private Tradeup *tradeup,
+void pushOutputItems(__private TradeupGPU *tradeup,
                 __global MarketItem *outputItemsPool,
                 __global int *collectionIndicesStart,
                 __global int *collectionIndiciesEnd)
 {
-    __private int currentTicket = 0;
-    __private MarketItem outputTickets[MAX_GPU_TRADEUP_OUTPUTS];
+    __private MarketItem outputs[MAX_GPU_TRADEUP_OUTPUTS];
+    __private float collectionChances[COLLECTION_END] = {0.0};
+    __private int distinctCollectionItems[COLLECTION_END] = {0};
+
+    __private int currentOutputItem = 0;
 
     for (int i = 0; i < 10; ++i) {
+        collectionChances[tradeup->inputs[i].collection] += 10.0; 
         int collectionIndexStart = collectionIndicesStart[tradeup->inputs[i].collection];
         int collectionIndexEnd = collectionIndiciesEnd[tradeup->inputs[i].collection];
 
         for (int j = collectionIndexStart; j < collectionIndexEnd; ++j) {
-            MarketItem itemTicket = outputItemsPool[j];
-            float itemFloatVal = calculateOutputItemFloat(&itemTicket, tradeup->avgInputFloat);
+            MarketItem possibleOutput = outputItemsPool[j];
+            float itemFloatVal = calculateOutputItemFloat(&possibleOutput, tradeup->avgInputFloat);
 
-            if (itemTicket.wear != itemFloatValToInt(itemFloatVal)) {
+            // Ignore incorrect wears
+            if (possibleOutput.wear != itemFloatValToInt(itemFloatVal)) {
                 continue;
             }
+            // Ignore duplicates
+            bool dup = false;
+            for (int i = 0; i < currentOutputItem; ++i) {
+                if (outputs[i].permID == possibleOutput.permID) {
+                    dup = true;
+                    break;
+                }
+            }
+            if (dup) continue;
 
-            itemTicket.floatVal = itemFloatVal;
-            outputTickets[currentTicket++] = itemTicket;
+            possibleOutput.floatVal = itemFloatVal;
+            pushNormalizedFloat(&possibleOutput, possibleOutput.floatVal);
+            outputs[currentOutputItem++] = possibleOutput;
+            ++distinctCollectionItems[possibleOutput.collection];
         }
     }
 
-    __private int outputSize = currentTicket;
-    __private int sortedOutputsSize;
-    sortOutputItemsTickets(outputTickets, outputSize, tradeup->outputs, &sortedOutputsSize);
-    tradeup->totalOutputSize = sortedOutputsSize;
+    for (int i = 0; i < currentOutputItem; ++i) {
+        outputs[i].tradeUpChance = collectionChances[outputs[i].collection] / distinctCollectionItems[outputs[i].collection];
+        tradeup->outputs[i] = outputs[i];
+    }
+
+    tradeup->totalOutputSize = currentOutputItem;
 }
 
-float getExpectedPrice(__private Tradeup *tradeup)
+float getExpectedPrice(__private TradeupGPU *tradeup)
 {
     float expectedPrice = 0.0;
 
@@ -145,7 +123,7 @@ float getExpectedPrice(__private Tradeup *tradeup)
     return expectedPrice;
 }
 
-void pushProfitability(__private Tradeup *tradeup)
+void pushProfitability(__private TradeupGPU *tradeup)
 {
     float expectedPrice = getExpectedPrice(tradeup);
     float profitability = (expectedPrice / tradeup->totalInputPrice) * 100;
@@ -154,7 +132,7 @@ void pushProfitability(__private Tradeup *tradeup)
     tradeup->profitabilitySteamTax = profitabilitySteamTax;
 }
 
-void pushChanceToProfit(__private Tradeup *tradeup)
+void pushChanceToProfit(__private TradeupGPU *tradeup)
 {
     float chanceToProfit = 0.0;
     float chanceToProfitSteamTax = 0.0;
