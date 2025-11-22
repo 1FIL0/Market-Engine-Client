@@ -25,8 +25,10 @@
 #include <vector>
 #include <omp.h>
 #include <cstdint>
+#include "definitions.hpp"
 
 START_ENGINE_NAMESPACE_MULTI(CPUOP)
+USE_NAMESPACE_SHARE
 
 void makeCombinationTradeup(TRADEUP::TradeupCPU &tradeupCPU, std::vector<ITEM::MarketItem> &combination);
 uint64_t getCombinationsAmount(int n, int k);
@@ -45,9 +47,10 @@ void pushNormalizedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU);
 void pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU);
 
 void pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU);
+
+std::array<float, DEFINITIONS::COLLECTION_END> getOutputCollectionChances(const TRADEUP::TradeupCPU &tradeupCPU);
 float calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float normalizedAvgInputFloat);
 float calculateNormalizedOutputItemFloat(const ITEM::MarketItem &outputItem, const float realOutputFloat);
-std::vector<ITEM::MarketItem> sortOutputTickets(std::vector<ITEM::MarketItem> &outputs);
 
 void pushChanceToProfit(TRADEUP::TradeupCPU &tradeupCPU);
 float getExpectedPrice(const std::vector<ITEM::MarketItem> &sortedOutputs);

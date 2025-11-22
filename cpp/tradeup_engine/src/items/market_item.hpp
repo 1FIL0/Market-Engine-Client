@@ -43,8 +43,13 @@ struct MarketItem {
     float tradeUpChance;
 
     MarketItem();
+
     bool operator<(const MarketItem &otherItem) {
         return permID < otherItem.permID;
+    }
+
+    bool operator==(const MarketItem &otherItem) {
+        return permID == otherItem.permID && tempID == otherItem.tempID && wear == otherItem.wear;
     }
 };
 #pragma pack(pop)
