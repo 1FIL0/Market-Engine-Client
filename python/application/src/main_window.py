@@ -804,6 +804,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.tradeupEngineSettingsMilspec.isChecked(): config["Compute Rarities"].append(2)
         if self.tradeupEngineSettingsRestricted.isChecked(): config["Compute Rarities"].append(3)
         if self.tradeupEngineSettingsClassified.isChecked(): config["Compute Rarities"].append(4)
+        if self.tradeupEngineSettingsCovert.isChecked(): config["Compute Rarities"].append(5)
         if self.tradeupEngineSettingsNormal.isChecked(): config["Compute Categories"].append(0)
         if self.tradeupEngineSettingsStatTrak.isChecked(): config["Compute Categories"].append(1)
         config["Single Item Batch"] = self.tradeupEngineSettingsSingleItemBatch.isChecked()
@@ -822,7 +823,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def defaultTradeupEngineSettings(self):
         config = {
-            "Compute Rarities": [0, 1, 2, 3, 4],
+            "Compute Rarities": [0, 1, 2, 3, 4, 5],
             "Compute Categories": [0, 1],
             "Single Item Batch": False,
             "Batch Size": 15,
@@ -846,6 +847,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if rarity == 2: self.tradeupEngineSettingsMilspec.setChecked(True)
             if rarity == 3: self.tradeupEngineSettingsRestricted.setChecked(True)
             if rarity == 4: self.tradeupEngineSettingsClassified.setChecked(True)
+            if rarity == 5: self.tradeupEngineSettingsCovert.setChecked(True)
         for category in config["Compute Categories"]:
             if category == 0: self.tradeupEngineSettingsNormal.setChecked(True)
             if category == 1: self.tradeupEngineSettingsStatTrak.setChecked(True)
@@ -882,7 +884,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.colLake, self.colLimitedEditionItem, self.colMilitia, self.colMirage, self.colMirage2021, self.colNorse, self.colNuke, self.colNuke2018, self.colOffice, self.colOverpass, self.colOverpass2024, 
             self.colPhoenix, self.colPrisma, self.colPrisma2, self.colRadiant, self.colRecoil, self.colRevolution, self.colRevolverCase, self.colRiptide, self.colRisingSun, self.colSafehouse, self.colShadow, 
             self.colShatteredWeb, self.colSnakebite, self.colSpectrum, self.colSpectrum2, self.colSportAndField, self.colStMarc, self.colTrain, self.colTrain2021, self.colTrain2025, self.colVanguard, self.colVertigo, 
-            self.colVertigo2021, self.colWildfire, self.colWinterOffensive, self.colXRay
+            self.colVertigo2021, self.colWildfire, self.colWinterOffensive, self.colXRay, self.colGenesis
         ]
         self.buttonItemLibraryCheckAllCollections.clicked.connect(lambda: self.itemLibraryCheckAllCollections(True))
         self.buttonItemLibraryUncheckAllCollections.clicked.connect(lambda: self.itemLibraryCheckAllCollections(False))
@@ -1002,6 +1004,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.colWildfire.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_WILDFIRE)  
         if self.colWinterOffensive.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_WINTER_OFFENSIVE)  
         if self.colXRay.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_XRAY)
+        if self.colGenesis.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_GENESIS)
         file_handler.replaceJsonDataAtomic(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY), config)
 
     def defaultItemLibrarySettings(self):
@@ -1133,6 +1136,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if collection == definitions.consts.COLLECTION_WILDFIRE: self.colWildfire.setChecked(True)  
             if collection == definitions.consts.COLLECTION_WINTER_OFFENSIVE: self.colWinterOffensive.setChecked(True)  
             if collection == definitions.consts.COLLECTION_XRAY: self.colXRay.setChecked(True)
+            if collection == definitions.consts.COLLECTION_GENESIS: self.colGenesis.setChecked(True)
 
     # _____ SETTINGS UI _____ #
 
