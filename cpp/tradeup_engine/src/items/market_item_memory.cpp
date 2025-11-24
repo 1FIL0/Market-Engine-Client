@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdlib>
+#include <iostream>
 #include <rapidjson/document.h>
 #include <string>
 #include <unordered_map>
@@ -93,7 +94,13 @@ void ITEM::loadMarketItems(void)
 
         marketItem.tradeupable = readyJsonItem["Tradeupable"].GetBool();
         marketItem.collection = DEFINITIONS::collectionToInt(readyJsonItem["Collection"].GetString());
-        if (marketItem.collection == -1) {
+
+        for (auto &crateEntry : readyJsonItem["Crates"].GetArray()) {
+            int crate = DEFINITIONS::crateToInt(crateEntry.GetString());
+            coldData.crates.push_back(crate);
+        }
+        // Star / Contraband items aren't in any collections. rather in crates.
+        if ((marketItem.collection == -1) && (marketItem.grade != DEFINITIONS::GRADE_STAR && marketItem.grade != DEFINITIONS::GRADE_CONTRABAND)) {
             LOGGER::sendMessage("Item not in collection " + coldData.weaponName + " " + coldData.skinName);
         }
         if (marketItem.grade == -1) {
@@ -116,21 +123,44 @@ void ITEM::sortMarketItems(void)
     std::sort(g_marketItems.begin(), g_marketItems.end());
 
     for (auto &item : g_marketItems) {
-        if (item.grade != -1) {
+        auto coldData = getColdData(item);
+
+        if (item.grade == -1) {
+            sendCorruptedItemError(item);
+            continue;
+        }
+        else {
             g_itemsTradeCategoryGrade[item.tradeupable][item.category][item.grade].push_back(item);
         }
 
-        if (item.collection != -1 && item.grade != -1) {
-            g_itemsTradeCategoryGradeCollection[item.tradeupable][item.category][item.grade][item.collection].push_back(item);
-            g_itemsCategoryGradeCollection[item.category][item.grade][item.collection].push_back(item);
+        // Convert star/contraband item's crates to their collection counterpart and add item to vector for each collection counterpart
+        if (item.grade == DEFINITIONS::GRADE_STAR || item.grade == DEFINITIONS::GRADE_CONTRABAND) {
+            for (int crate : coldData.crates) {
+                int collectionEqu = DEFINITIONS::crateToCollection(crate);
+                if (collectionEqu == -1) continue;
+                g_itemsTradeCategoryGradeCollection[item.tradeupable][item.category][item.grade][collectionEqu].push_back(item);
+                g_itemsCategoryGradeCollection[item.category][item.grade][collectionEqu].push_back(item);
+            }
+            continue;
         }
-        else {
-            auto data = getColdData(item);
-            LOGGER::sendMessage("ERROR, CORRUPTED ITEM: " + data.weaponName + " " + data.skinName);
+
+        // Non star/contraband items
+        if (item.collection == -1) {
+            sendCorruptedItemError(item);
+            continue;
         }
+        
+        g_itemsTradeCategoryGradeCollection[item.tradeupable][item.category][item.grade][item.collection].push_back(item);
+        g_itemsCategoryGradeCollection[item.category][item.grade][item.collection].push_back(item);
     }
 
     LOGGER::sendMessage("Items loaded: " + std::to_string(g_marketItems.size()));
+}
+
+void ITEM::sendCorruptedItemError(const ITEM::MarketItem &item)
+{
+    auto data = getColdData(item);
+    LOGGER::sendMessage("ERROR, CORRUPTED ITEM: " + data.weaponName + " " + data.skinName);
 }
 
 const std::vector<ITEM::MarketItem> &ITEM::getItems(void)

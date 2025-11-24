@@ -46,6 +46,7 @@ void loadMarketItems(void);
 
 void pushMarketItem(const MarketItem &item, const MarketItemColdData &coldData);
 void sortMarketItems(void);
+void sendCorruptedItemError(const ITEM::MarketItem &item);
 
 const std::vector<MarketItem> &getItems(void);
 MarketItemColdData getColdData(const MarketItem &item);
