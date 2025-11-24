@@ -64,7 +64,7 @@ void COMPCPU::startCompute(void)
             logComputeDiagnostics(category, grade, batch, currentBatch, combinationsAmount);
         }
         
-        processCombinations(batch, combinationsAmount);  
+        processCombinations(batch, combinationsAmount, grade);  
 
         ++currentBatch;
     }
@@ -87,23 +87,27 @@ void COMPCPU::logComputeDiagnostics(const int category, const int grade, const s
     LOGGER::sendMessage(msg);
 }
 
-void COMPCPU::processCombinations(const std::vector<ITEM::MarketItem> &batch, const uint64_t combinationsAmount)
+void COMPCPU::processCombinations(const std::vector<ITEM::MarketItem> &batch, const uint64_t combinationsAmount, const int grade)
 {
     int n = batch.size();
-    const int combSize = 10;
+
+    const int combSize = [&] {
+        if (grade == DEFINITIONS::GRADE_COVERT) return 5;
+        return 10;
+    }();
 
     #pragma omp parallel
     {
         #pragma omp for
         for (uint64_t combStart = 0; combStart < combinationsAmount; ++combStart) {
-            int localIndices[combSize];
+            std::vector<int> localIndices(combSize);
             int combTemp = combStart;
             for (int i = 0; i < combSize; ++i) {
                 localIndices[i] = combTemp % (n - i) + i;
                 combTemp /= (n - i);
             }
     
-            std::vector<ITEM::MarketItem> combination(10);
+            std::vector<ITEM::MarketItem> combination(combSize);
             for (int i = 0; i < combSize; ++i) {
                 combination[i] = batch[localIndices[i]];
             }

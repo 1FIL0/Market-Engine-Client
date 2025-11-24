@@ -510,7 +510,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         allItems = item_memory.getAllItems()
         filteredItems = [
             item for item in allItems
-            if item.collection in collections
+            if ((item.collection in collections) or (not definitions.validCollection(item.collection) and definitions.consts.COLLECTION_UNKNOWN in collections))
             and item.category in categories
             and item.grade in grades
             and item.wear in wears
@@ -884,7 +884,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             self.colLake, self.colLimitedEditionItem, self.colMilitia, self.colMirage, self.colMirage2021, self.colNorse, self.colNuke, self.colNuke2018, self.colOffice, self.colOverpass, self.colOverpass2024, 
             self.colPhoenix, self.colPrisma, self.colPrisma2, self.colRadiant, self.colRecoil, self.colRevolution, self.colRevolverCase, self.colRiptide, self.colRisingSun, self.colSafehouse, self.colShadow, 
             self.colShatteredWeb, self.colSnakebite, self.colSpectrum, self.colSpectrum2, self.colSportAndField, self.colStMarc, self.colTrain, self.colTrain2021, self.colTrain2025, self.colVanguard, self.colVertigo, 
-            self.colVertigo2021, self.colWildfire, self.colWinterOffensive, self.colXRay, self.colGenesis
+            self.colVertigo2021, self.colWildfire, self.colWinterOffensive, self.colXRay, self.colGenesis, self.colNonCollection
         ]
         self.buttonItemLibraryCheckAllCollections.clicked.connect(lambda: self.itemLibraryCheckAllCollections(True))
         self.buttonItemLibraryUncheckAllCollections.clicked.connect(lambda: self.itemLibraryCheckAllCollections(False))
@@ -908,7 +908,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.itemLibraryGradeRestricted.isChecked(): config["Filter Grades"].append(3)
         if self.itemLibraryGradeClassified.isChecked(): config["Filter Grades"].append(4)
         if self.itemLibraryGradeCovert.isChecked(): config["Filter Grades"].append(5)
-        if self.itemLibraryGradeContraband.isChecked(): config["Filter Grades"].append(6)
+        if self.itemLibraryGradeStar.isChecked(): config["Filter Grades"].append(6)
+        if self.itemLibraryGradeContraband.isChecked(): config["Filter Grades"].append(7)
         if self.itemLibraryCategoryNormal.isChecked(): config["Filter Categories"].append(0)
         if self.itemLibraryCategoryStatTrak.isChecked(): config["Filter Categories"].append(1)
         if self.itemLibraryCategorySouvenir.isChecked(): config["Filter Categories"].append(2)
@@ -1005,12 +1006,13 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.colWinterOffensive.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_WINTER_OFFENSIVE)  
         if self.colXRay.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_XRAY)
         if self.colGenesis.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_GENESIS)
+        if self.colNonCollection.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_UNKNOWN)
         file_handler.replaceJsonDataAtomic(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY), config)
 
     def defaultItemLibrarySettings(self):
         config = {
             "Filter Grades": [
-                0, 1, 2, 3, 4, 5, 6
+                0, 1, 2, 3, 4, 5, 6, 7
             ],
             "Filter Categories": [
                 0, 1, 2
@@ -1024,6 +1026,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         }
         for collection in range(definitions.consts.COLLECTION_MAX):
             config["Filter Collections"].append(collection)
+        config["Filter Collections"].append(definitions.consts.COLLECTION_UNKNOWN)
 
         file_handler.replaceJsonDataAtomic(str(definitions.PATH_CONFIG_CLIENT_ITEM_LIBRARY), config)
         self.loadItemLibrarySettings()
@@ -1037,7 +1040,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if grade == 3: self.itemLibraryGradeRestricted.setChecked(True)
             if grade == 4: self.itemLibraryGradeClassified.setChecked(True)
             if grade == 5: self.itemLibraryGradeCovert.setChecked(True)
-            if grade == 6: self.itemLibraryGradeContraband.setChecked(True)
+            if grade == 6: self.itemLibraryGradeStar.setChecked(True)
+            if grade == 7: self.itemLibraryGradeContraband.setChecked(True)
         for category in config["Filter Categories"]:
             if category == 0: self.itemLibraryCategoryNormal.setChecked(True)
             if category == 1: self.itemLibraryCategoryStatTrak.setChecked(True)
@@ -1137,6 +1141,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if collection == definitions.consts.COLLECTION_WINTER_OFFENSIVE: self.colWinterOffensive.setChecked(True)  
             if collection == definitions.consts.COLLECTION_XRAY: self.colXRay.setChecked(True)
             if collection == definitions.consts.COLLECTION_GENESIS: self.colGenesis.setChecked(True)
+            if collection == definitions.consts.COLLECTION_UNKNOWN: self.colNonCollection.setChecked(True)
 
     # _____ SETTINGS UI _____ #
 
