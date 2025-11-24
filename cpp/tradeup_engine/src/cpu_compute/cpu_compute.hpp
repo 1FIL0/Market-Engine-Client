@@ -31,7 +31,7 @@ void init(void);
 void getDeviceData(void);
 void startCompute(void);
 void logComputeDiagnostics(const int category, const int grade, const std::vector<ITEM::MarketItem> batch, const uint64_t currentBatch, const uint64_t combinationsAmount);
-void processCombinations(const std::vector<ITEM::MarketItem> &batch, const uint64_t combinationsAmount);
+void processCombinations(const std::vector<ITEM::MarketItem> &batch, const uint64_t combinationsAmount, const int grade);
 void yieldCombination(std::vector<ITEM::MarketItem> &combination);
 void saveTradeupToFile(TRADEUP::TradeupCPU &tradeupCPU);
 

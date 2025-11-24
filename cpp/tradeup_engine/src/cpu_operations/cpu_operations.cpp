@@ -161,7 +161,7 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     std::array<int, DEFINITIONS::COLLECTION_END> distinctCollectionItems{};
 
     for (auto &input : tradeupCPU.inputs) {
-        collectionChances[input.collection] += 10.0;
+        collectionChances[input.collection] += 100.0 / tradeupCPU.inputs.size();
         
         const std::vector<ITEM::MarketItem> &collectionItemsRef = ITEM::getItemsCategoryGradeCollection(input.category, input.grade + 1, input.collection);
         std::vector<ITEM::MarketItem> collectionItemsCopy = collectionItemsRef;
