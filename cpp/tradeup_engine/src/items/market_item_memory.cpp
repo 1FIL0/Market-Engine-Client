@@ -27,7 +27,6 @@
 #include <algorithm>
 #include <array>
 #include <cstdlib>
-#include <iostream>
 #include <rapidjson/document.h>
 #include <string>
 #include <unordered_map>
@@ -97,7 +96,8 @@ void ITEM::loadMarketItems(void)
         // Star / Contraband items aren't in any collections but the outcomes still depend on their crates
         if (marketItem.grade == DEFINITIONS::GRADE_STAR || marketItem.grade == DEFINITIONS::GRADE_CONTRABAND) {
             for (auto &outcomeCollectionEntry : readyJsonItem["Crates"].GetArray()) {
-                int outcomeCollection = DEFINITIONS::crateToInt(outcomeCollectionEntry.GetString());
+                int crate = DEFINITIONS::crateToInt(outcomeCollectionEntry.GetString());
+                int outcomeCollection = DEFINITIONS::crateToCollection(crate);
                 marketItem.outcomeCollections[marketItem.outcomeCollectionsSize++] = outcomeCollection;
             }            
         }
