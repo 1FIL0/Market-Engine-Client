@@ -121,8 +121,10 @@ void CPUOP::setBatchFloats(std::vector<ITEM::MarketItem> &batch)
 
 void CPUOP::pushNormalizedFloat(ITEM::MarketItem &item, const float itemFloatVal)
 {
-    float normalizedFloat = (itemFloatVal - item.minFloat) / (item.maxFloat - item.minFloat);
-    item.normalizedFloatVal = normalizedFloat;
+    // avoid dividing by zero on vanilla knife skins that have -1 float ranges and floats
+    float denom = item.maxFloat - item.minFloat;
+    denom = denom == 0.0f ? std::numeric_limits<float>::epsilon() : denom;
+    item.normalizedFloatVal = (itemFloatVal - item.minFloat) / denom;
 }
 
 void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
@@ -169,7 +171,7 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
         for (auto &collectionItemCopy : collectionItemsCopy) {
             float outputFloat = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.normalizedAvgInputFloat);
             // Ignore incorrect wears
-            if (DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) continue;
+            if (collectionItemCopy.wear != DEFINITIONS::WEAR_NO_WEAR && DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) continue;
             collectionItemCopy.floatVal = outputFloat;
             pushNormalizedFloat(collectionItemCopy, collectionItemCopy.floatVal);
             
