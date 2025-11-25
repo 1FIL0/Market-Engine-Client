@@ -34,6 +34,8 @@ ITEM::MarketItem::MarketItem()
 
     tradeupable = false;
     collection = -1;
+    outcomeCollections.fill(0);
+    outcomeCollectionsSize = 0;
     floatVal = -1.0;
     minFloat = -1.0;
     maxFloat = -1.0;

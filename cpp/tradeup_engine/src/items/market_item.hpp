@@ -20,11 +20,14 @@
 #pragma once
 
 #include "namespace.hpp"
+#include <array>
+#include <cstddef>
 #include <cstdint>
 
 START_ENGINE_NAMESPACE_MULTI(ITEM)
 
 //! MUST BE ALIGNED WITH OPENCL STRUCT
+#define MAX_MARKET_ITEM_COLLECTIONS 100
 
 #pragma pack(push, 1)
 struct MarketItem {
@@ -37,7 +40,11 @@ struct MarketItem {
     float priceSteamTax;
 
     bool tradeupable;
+    
     int collection;
+    std::array<short, MAX_MARKET_ITEM_COLLECTIONS> outcomeCollections;
+    size_t outcomeCollectionsSize;
+
     float floatVal, normalizedFloatVal, minFloat, maxFloat;
     float tradeUpChance;
 

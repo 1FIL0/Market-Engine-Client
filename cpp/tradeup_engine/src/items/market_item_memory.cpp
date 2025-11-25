@@ -75,8 +75,7 @@ void ITEM::loadMarketItems(void)
         marketItem.grade = DEFINITIONS::gradeToInt(readyJsonItem["Grade"].GetString());
         marketItem.wear = DEFINITIONS::wearToInt(readyJsonItem["Wear"].GetString());
         
-        // skip item cuz getting float on price member crashes cause these skins have nullprices and shit. also remove contraband
-        // item so it doesn't flag as corruputed item due to not being in collection 
+        // skip item cuz getting float on price member crashes cause these skins have null prices and shit.
         if (marketItem.category == DEFINITIONS::CATEGORY_SOUVENIR || marketItem.grade == DEFINITIONS::GRADE_CONTRABAND) {
             continue;
         }
@@ -95,16 +94,25 @@ void ITEM::loadMarketItems(void)
         marketItem.tradeupable = readyJsonItem["Tradeupable"].GetBool();
         marketItem.collection = DEFINITIONS::collectionToInt(readyJsonItem["Collection"].GetString());
 
-        for (auto &crateEntry : readyJsonItem["Crates"].GetArray()) {
-            int crate = DEFINITIONS::crateToInt(crateEntry.GetString());
-            coldData.crates.push_back(crate);
+        // Star / Contraband items aren't in any collections but the outcomes still depend on their crates
+        if (marketItem.grade == DEFINITIONS::GRADE_STAR || marketItem.grade == DEFINITIONS::GRADE_CONTRABAND) {
+            for (auto &outcomeCollectionEntry : readyJsonItem["Crates"].GetArray()) {
+                int outcomeCollection = DEFINITIONS::crateToInt(outcomeCollectionEntry.GetString());
+                marketItem.outcomeCollections[marketItem.outcomeCollectionsSize++] = outcomeCollection;
+            }            
         }
+        else {
+            marketItem.outcomeCollections[marketItem.outcomeCollectionsSize++] = marketItem.collection;
+        }
+
         // Star / Contraband items aren't in any collections. rather in crates.
         if ((marketItem.collection == -1) && (marketItem.grade != DEFINITIONS::GRADE_STAR && marketItem.grade != DEFINITIONS::GRADE_CONTRABAND)) {
             LOGGER::sendMessage("Item not in collection " + coldData.weaponName + " " + coldData.skinName);
+            continue;
         }
         if (marketItem.grade == -1) {
             LOGGER::sendMessage("Item has no suitable grades " + coldData.weaponName + " " + coldData.skinName);
+            continue;
         }
         marketItem.minFloat = readyJsonItem["Min Float"].GetFloat();
         marketItem.maxFloat = readyJsonItem["Max Float"].GetFloat();
@@ -122,7 +130,7 @@ void ITEM::sortMarketItems(void)
 {
     std::sort(g_marketItems.begin(), g_marketItems.end());
 
-    for (auto &item : g_marketItems) {
+    for (const auto &item : g_marketItems) {
         auto coldData = getColdData(item);
 
         if (item.grade == -1) {
@@ -132,26 +140,12 @@ void ITEM::sortMarketItems(void)
         else {
             g_itemsTradeCategoryGrade[item.tradeupable][item.category][item.grade].push_back(item);
         }
-
-        // Convert star/contraband item's crates to their collection counterpart and add item to vector for each collection counterpart
-        if (item.grade == DEFINITIONS::GRADE_STAR || item.grade == DEFINITIONS::GRADE_CONTRABAND) {
-            for (int crate : coldData.crates) {
-                int collectionEqu = DEFINITIONS::crateToCollection(crate);
-                if (collectionEqu == -1) continue;
-                g_itemsTradeCategoryGradeCollection[item.tradeupable][item.category][item.grade][collectionEqu].push_back(item);
-                g_itemsCategoryGradeCollection[item.category][item.grade][collectionEqu].push_back(item);
-            }
-            continue;
-        }
-
-        // Non star/contraband items
-        if (item.collection == -1) {
-            sendCorruptedItemError(item);
-            continue;
-        }
         
-        g_itemsTradeCategoryGradeCollection[item.tradeupable][item.category][item.grade][item.collection].push_back(item);
-        g_itemsCategoryGradeCollection[item.category][item.grade][item.collection].push_back(item);
+        for (size_t oci = 0; oci < item.outcomeCollectionsSize; ++oci) {
+            int outcomeCollection = item.outcomeCollections[oci];
+            g_itemsTradeCategoryGradeCollection[item.tradeupable][item.category][item.grade][outcomeCollection].push_back(item);
+            g_itemsCategoryGradeCollection[item.category][item.grade][outcomeCollection].push_back(item);
+        }
     }
 
     LOGGER::sendMessage("Items loaded: " + std::to_string(g_marketItems.size()));

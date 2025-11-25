@@ -131,7 +131,7 @@ void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
     for (auto &input : tradeupCPU.inputs) {
         avgFloat += input.floatVal;
     }
-    avgFloat /= 10.0;
+    avgFloat /= tradeupCPU.inputs.size();
     tradeupCPU.avgInputFloat = avgFloat;
 }
 
@@ -141,7 +141,7 @@ void CPUOP::pushNormalizedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
     for (auto &input : tradeupCPU.inputs) {
         normalizedAvgFloat += input.normalizedFloatVal;
     }
-    normalizedAvgFloat /= 10.0;
+    normalizedAvgFloat /= tradeupCPU.inputs.size();
     tradeupCPU.normalizedAvgInputFloat = normalizedAvgFloat;
 }
 
@@ -161,7 +161,7 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     std::array<int, DEFINITIONS::COLLECTION_END> distinctCollectionItems{};
 
     for (auto &input : tradeupCPU.inputs) {
-        collectionChances[input.collection] += 100.0 / tradeupCPU.inputs.size();
+        collectionChances[input.collection] += (100.0 / tradeupCPU.inputs.size());
         
         const std::vector<ITEM::MarketItem> &collectionItemsRef = ITEM::getItemsCategoryGradeCollection(input.category, input.grade + 1, input.collection);
         std::vector<ITEM::MarketItem> collectionItemsCopy = collectionItemsRef;
@@ -179,12 +179,17 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
             }
 
             outputs.push_back(collectionItemCopy);
-            ++distinctCollectionItems[collectionItemCopy.collection];
+            for (size_t oci = 0; oci < collectionItemCopy.outcomeCollectionsSize; ++oci) {
+                ++distinctCollectionItems[collectionItemCopy.outcomeCollections[oci]];
+            }
         }
     }
 
     for (auto &output : outputs) {
-        output.tradeUpChance = collectionChances[output.collection] / distinctCollectionItems[output.collection];
+        for (size_t oci = 0; oci < output.outcomeCollectionsSize; ++oci) {
+            int outcomeCollection = output.outcomeCollections[oci];
+            output.tradeUpChance = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
+        }
     }
 
     tradeupCPU.outputs = outputs;
