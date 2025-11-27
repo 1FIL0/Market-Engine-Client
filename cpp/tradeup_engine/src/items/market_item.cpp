@@ -25,7 +25,7 @@ USE_NAMESPACE_TRADEUP_ENGINE
 
 ITEM::MarketItem::MarketItem()
 {
-    tempID = -1;
+    tempAccessID = -1;
     permID = 0;
     grade = -1;
     category = -1;

@@ -24,7 +24,7 @@
 #pragma pack(push, 1)
 typedef struct MarketItem 
 {
-    int tempID;
+    int tempAccessID;
     ulong permID;
     int grade;
     int category;

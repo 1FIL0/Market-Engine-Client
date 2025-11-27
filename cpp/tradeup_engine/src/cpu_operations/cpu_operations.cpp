@@ -123,7 +123,7 @@ void CPUOP::pushNormalizedFloat(ITEM::MarketItem &item, const float itemFloatVal
 {
     // avoid dividing by zero on vanilla knife skins that have -1 float ranges and floats
     float denom = item.maxFloat - item.minFloat;
-    denom = denom == 0.0f ? std::numeric_limits<float>::epsilon() : denom;
+    denom = (denom == 0.0) ? std::numeric_limits<float>::epsilon() : denom;
     item.normalizedFloatVal = (itemFloatVal - item.minFloat) / denom;
 }
 

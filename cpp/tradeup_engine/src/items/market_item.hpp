@@ -31,7 +31,7 @@ START_ENGINE_NAMESPACE_MULTI(ITEM)
 
 #pragma pack(push, 1)
 struct MarketItem {
-    int tempID;
+    int tempAccessID;
     uint64_t permID;
     int grade;
     int category;
@@ -55,7 +55,7 @@ struct MarketItem {
     }
 
     bool operator==(const MarketItem &otherItem) {
-        return permID == otherItem.permID && tempID == otherItem.tempID && wear == otherItem.wear;
+        return permID == otherItem.permID && tempAccessID == otherItem.tempAccessID && wear == otherItem.wear;
     }
 };
 #pragma pack(pop)

@@ -68,7 +68,7 @@ void ITEM::loadMarketItems(void)
         MarketItemColdData coldData;
         coldData.weaponName = readyJsonItem["Weapon Name"].GetString();
         coldData.skinName = readyJsonItem["Skin Name"].GetString();
-        marketItem.tempID = readyJsonItem["Temp ID"].GetInt();
+        marketItem.tempAccessID = readyJsonItem["Temp Access ID"].GetInt();
         marketItem.permID = readyJsonItem["Perm ID"].GetUint64();
         marketItem.category = DEFINITIONS::categoryToInt(readyJsonItem["Category"].GetString());
         marketItem.grade = DEFINITIONS::gradeToInt(readyJsonItem["Grade"].GetString());

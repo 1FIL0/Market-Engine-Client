@@ -26,7 +26,7 @@ sys.path.insert(0, path.PATH_SHARE)
 from subprocess import Popen
 from typing import Any, Optional, cast
 import webbrowser
-from item import MarketItem
+from market_item import MarketItem
 from tradeup_def import Tradeup, TradeupInputEntry, TradeupOutputEntry
 from PyQt5.QtWidgets import QCheckBox, QDoubleSpinBox, QGridLayout, QHBoxLayout, QMainWindow, QLabel, QVBoxLayout, QWidget
 from PyQt5.QtGui import QIcon, QPixmap
