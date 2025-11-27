@@ -24,12 +24,12 @@
 #include "market_item.hpp"
 #include "market_item_cold_data.hpp"
 #include "namespace.hpp"
-#include <algorithm>
 #include <array>
 #include <cstdlib>
 #include <rapidjson/document.h>
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 USE_NAMESPACE_SHARE
 USE_NAMESPACE_TRADEUP_ENGINE
@@ -128,8 +128,6 @@ void ITEM::pushMarketItem(const ITEM::MarketItem &item, const ITEM::MarketItemCo
 
 void ITEM::sortMarketItems(void)
 {
-    std::sort(g_marketItems.begin(), g_marketItems.end());
-
     for (const auto &item : g_marketItems) {
         auto coldData = getColdData(item);
 
