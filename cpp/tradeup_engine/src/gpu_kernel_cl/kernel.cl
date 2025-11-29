@@ -21,14 +21,18 @@
 #include "operations.cl"
 #include "tradeup.cl"
 
+#define MAX_COMBINATION_SIZE 10
+
 TradeupGPU processCombination(__global MarketItem *flatCollectionOutputsPool,
                         __global int *collectionIndicesStart,
                         __global int *collectionIndiciesEnd,
-                        __private MarketItem *combination)
+                        __private MarketItem *combination,
+                        __private int combinationSize)
 {
     __private TradeupGPU tradeup;
-    
-    for (int i = 0; i < MAX_GPU_TRADEUP_INPUTS; ++i) {
+    tradeup.totalInputSize = combinationSize;
+
+    for (int i = 0; i < tradeup.totalInputSize; ++i) {
         tradeup.inputs[i] = combination[i];
     }
 
@@ -47,6 +51,7 @@ __kernel void combinationKernel(__global TradeupGPU *tradeups,
                                 __global MarketItem *flatCollectionOutputsPool,
                                 __global int *collectionIndicesStart,
                                 __global int *collectionIndicesEnd,
+                                __private int grade,
                                 __private uint batchSize,
                                 __private ulong combinationsAmount,
                                 __private float profitabilityMargin)
@@ -56,21 +61,22 @@ __kernel void combinationKernel(__global TradeupGPU *tradeups,
     int n = batchSize;
 
     if (combStart >= combinationsAmount) return;
+    int combinationSize = (grade == GRADE_COVERT) ? 5 : 10;
 
-    int localIndices[10];
+    int localIndices[MAX_COMBINATION_SIZE];
     int combTemp = combStart;
     
-    for (int i = 0; i < 10; ++i) {
+    for (int i = 0; i < combinationSize; ++i) {
         localIndices[i] = combTemp % (n - i) + i;
         combTemp /= (n - i);
     }
 
-    MarketItem combination[10];
-    for (int i = 0; i < 10; ++i) {
+    MarketItem combination[MAX_COMBINATION_SIZE];
+    for (int i = 0; i < combinationSize; ++i) {
         combination[i] = batch[localIndices[i]];
     }
 
-    __private TradeupGPU tradeup = processCombination(flatCollectionOutputsPool, collectionIndicesStart, collectionIndicesEnd, combination);
+    __private TradeupGPU tradeup = processCombination(flatCollectionOutputsPool, collectionIndicesStart, collectionIndicesEnd, combination, combinationSize);
     if (tradeup.profitability > profitabilityMargin) {
         tradeup.processed = true; // tradeup is replaced by new value and "processed". later set to false when "clearing" tradeups in the host
         tradeups[gid] = tradeup;

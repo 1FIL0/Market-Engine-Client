@@ -27,7 +27,7 @@ import tradeup_entry_operations as operations
 import hashlib
 import item_memory
 from time import perf_counter
-from item import MarketItem
+from market_item import MarketItem
 
 gTradeups: list[Tradeup] = list()
 gTradeupsLoadedCallbacks: list[Callable[[], None]] = list()

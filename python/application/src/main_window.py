@@ -26,7 +26,7 @@ sys.path.insert(0, path.PATH_SHARE)
 from subprocess import Popen
 from typing import Any, Optional, cast
 import webbrowser
-from item import MarketItem
+from market_item import MarketItem
 from tradeup_def import Tradeup, TradeupInputEntry, TradeupOutputEntry
 from PyQt5.QtWidgets import QCheckBox, QDoubleSpinBox, QGridLayout, QHBoxLayout, QMainWindow, QLabel, QVBoxLayout, QWidget
 from PyQt5.QtGui import QIcon, QPixmap
@@ -918,6 +918,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         if self.itemLibraryWearFT.isChecked(): config["Filter Wears"].append(2)
         if self.itemLibraryWearWW.isChecked(): config["Filter Wears"].append(3)
         if self.itemLibraryWearBS.isChecked(): config["Filter Wears"].append(4)
+        if self.itemLibraryWearNW.isChecked(): config["Filter Wears"].append(5)
         if self.colAlpha.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_ALPHA)  
         if self.colAncient.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_ANCIENT)  
         if self.colAnubis.isChecked(): config["Filter Collections"].append(definitions.consts.COLLECTION_ANUBIS)  
@@ -1018,7 +1019,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 0, 1, 2
             ],
             "Filter Wears": [
-                0, 1, 2, 3, 4
+                0, 1, 2, 3, 4, 5
             ],
             "Filter Collections": [
 
@@ -1052,6 +1053,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             if wear == 2: self.itemLibraryWearFT.setChecked(True)
             if wear == 3: self.itemLibraryWearWW.setChecked(True)
             if wear == 4: self.itemLibraryWearBS.setChecked(True)
+            if wear == 5: self.itemLibraryWearNW.setChecked(True)
         for collection in config["Filter Collections"]:
             if collection == definitions.consts.COLLECTION_ALPHA: self.colAlpha.setChecked(True)  
             if collection == definitions.consts.COLLECTION_ANCIENT: self.colAncient.setChecked(True)  

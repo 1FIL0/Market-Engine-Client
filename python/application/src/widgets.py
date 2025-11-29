@@ -21,7 +21,7 @@ from typing import Callable, Optional
 from PyQt5 import sip
 from PyQt5.QtGui import QIcon
 
-from item import MarketItem
+from market_item import MarketItem
 import path
 sys.path.insert(0, path.PATH_SHARE)
 import qt_resource
@@ -31,7 +31,7 @@ import definitions
 from tradeup_def import Tradeup
 
 def createItemBoxPressable(item: MarketItem, callback: Callable[[MarketItem], None]) -> QWidget:
-    itemBox = qt_resource.createWidget(f"itemBox{item.tempID}", QVBoxLayout(), Qt.AlignmentFlag.AlignTop)
+    itemBox = qt_resource.createWidget(f"itemBox{item.tempAccessID}", QVBoxLayout(), Qt.AlignmentFlag.AlignTop)
     nameLabel = createItemNameLabel(item)
     buttonIcon = createItemButtonIcon(item, callback)
     nameCategoryWearLabel = createItemNameCategoryWearLabel(item)
@@ -49,7 +49,7 @@ def createItemBoxPressable(item: MarketItem, callback: Callable[[MarketItem], No
 
 def createItemButtonIcon(item: MarketItem, callback: Callable[[MarketItem], None]) -> QPushButton:
     color = definitions.gradeToRGBString(item.grade)
-    buttonIconName = f"itemIcon{item.tempID}"
+    buttonIconName = f"itemIcon{item.tempAccessID}"
     buttonIconSheet = f"""#{buttonIconName} {{
         border: 1px solid;
         border-radius: 10px;
@@ -68,35 +68,35 @@ def loadButtonFetchedIconCallback(button: QPushButton, icon: QIcon):
     button.setIconSize(QSize(128, 128))
 
 def createItemNameLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
-    itemLabelName = qt_resource.createLabel(f"itemLabelName{item.tempID}", f"{item.weaponName} {item.skinName}", qt_resource.fontSystemHudNormal, alignment)
+    itemLabelName = qt_resource.createLabel(f"itemLabelName{item.tempAccessID}", f"{item.weaponName} {item.skinName}", qt_resource.fontSystemHudNormal, alignment)
     return itemLabelName
 
 def createItemNameCategoryWearLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
-    itemLabelWearCategory = qt_resource.createLabel(f"itemLabelCategoryWear{item.tempID}", f"{definitions.wearToString(item.wear)} | {definitions.categoryToString(item.category)}", qt_resource.fontSystemHudNormal, alignment)
+    itemLabelWearCategory = qt_resource.createLabel(f"itemLabelCategoryWear{item.tempAccessID}", f"{definitions.wearToString(item.wear)} | {definitions.categoryToString(item.category)}", qt_resource.fontSystemHudNormal, alignment)
     return itemLabelWearCategory
 
 def createItemNameCategoryWearGradeLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
-    itemLabelWearCategory = qt_resource.createLabel(f"itemLabelCategoryWearGrade{item.tempID}", f"{definitions.wearToString(item.wear)} | {definitions.categoryToString(item.category)} | {definitions.gradeToString(item.grade)}", qt_resource.fontSystemHudNormal, alignment)
+    itemLabelWearCategory = qt_resource.createLabel(f"itemLabelCategoryWearGrade{item.tempAccessID}", f"{definitions.wearToString(item.wear)} | {definitions.categoryToString(item.category)} | {definitions.gradeToString(item.grade)}", qt_resource.fontSystemHudNormal, alignment)
     return itemLabelWearCategory
 
 def createItemMarketPriceLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
-    itemLabelPrice = qt_resource.createLabel(f"itemLabelPrice{item.tempID}", f"Market Price ${str(item.marketPrice)}", qt_resource.fontSystemHudNormal, alignment)
+    itemLabelPrice = qt_resource.createLabel(f"itemLabelPrice{item.tempAccessID}", f"Market Price ${str(item.marketPrice)}", qt_resource.fontSystemHudNormal, alignment)
     return itemLabelPrice  
 
 def createModifiedPriceLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
-    itemLabelPrice = qt_resource.createLabel(f"modifiedLabelPrice{item.tempID}", f"Modified Price ${str(item.modifiedPrice)}", qt_resource.fontSystemHudNormal, alignment)
+    itemLabelPrice = qt_resource.createLabel(f"modifiedLabelPrice{item.tempAccessID}", f"Modified Price ${str(item.modifiedPrice)}", qt_resource.fontSystemHudNormal, alignment)
     return itemLabelPrice  
 
 def createItemCurrentPriceLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
-    itemLabelPrice = qt_resource.createLabel(f"currentLabelPrice{item.tempID}", f"Current Price ${str(item.price)}", qt_resource.fontSystemHudNormal, alignment)
+    itemLabelPrice = qt_resource.createLabel(f"currentLabelPrice{item.tempAccessID}", f"Current Price ${str(item.price)}", qt_resource.fontSystemHudNormal, alignment)
     return itemLabelPrice  
 
 def createItemSteamTaxPriceLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
-    itemLabelPrice = qt_resource.createLabel(f"priceLabelSteamTaxPrice{item.tempID}", f"Current Price Steam Tax ${str(item.priceSteamTax)}", qt_resource.fontSystemHudNormal, alignment)
+    itemLabelPrice = qt_resource.createLabel(f"priceLabelSteamTaxPrice{item.tempAccessID}", f"Current Price Steam Tax ${str(item.priceSteamTax)}", qt_resource.fontSystemHudNormal, alignment)
     return itemLabelPrice
 
 def createItemSteamMarketURLLabel(item: MarketItem, alignment: Optional[Qt.AlignmentFlag] = None) -> QLabel:
-    itemSteamMarketURL = qt_resource.createLabel(f"steamMarketURL{item.tempID}", f"<a style='color:red;' href=\"{item.steamMarketUrl}\">Steam Market URL</a>", qt_resource.fontSystemHudNormal, alignment)
+    itemSteamMarketURL = qt_resource.createLabel(f"steamMarketURL{item.tempAccessID}", f"<a style='color:red;' href=\"{item.steamMarketUrl}\">Steam Market URL</a>", qt_resource.fontSystemHudNormal, alignment)
     itemSteamMarketURL.setTextFormat(Qt.TextFormat.RichText)
     itemSteamMarketURL.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
     itemSteamMarketURL.setOpenExternalLinks(True)

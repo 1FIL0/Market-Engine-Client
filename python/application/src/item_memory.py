@@ -22,7 +22,7 @@ import path
 sys.path.insert(0, path.PATH_SHARE)
 import file_handler
 import definitions
-from item import MarketItem
+from market_item import MarketItem
 import logger
 from time import perf_counter
 
@@ -58,7 +58,7 @@ def loadItems():
             continue
 
         readyItem: MarketItem = MarketItem()
-        readyItem.tempID = data["Temp ID"]
+        readyItem.tempAccessID = data["Temp Access ID"]
         readyItem.permID = data["Perm ID"]
         readyItem.weaponName = data["Weapon Name"]
         readyItem.skinName = data["Skin Name"]

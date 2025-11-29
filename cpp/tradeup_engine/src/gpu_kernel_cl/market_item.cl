@@ -19,12 +19,16 @@
 
 #pragma once
 
+#include "definitions.cl"
+
 // ! MUST BE ALIGNED WITH CPU STRUCT
+
+#define MAX_MARKET_ITEM_COLLECTIONS COLLECTION_END
 
 #pragma pack(push, 1)
 typedef struct MarketItem 
 {
-    int tempID;
+    int tempAccessID;
     ulong permID;
     int grade;
     int category;
@@ -36,5 +40,8 @@ typedef struct MarketItem
     int collection;
     float floatVal, normalizedFloatVal, minFloat, maxFloat;
     float tradeUpChance;
+
+    int outcomeCollections[MAX_MARKET_ITEM_COLLECTIONS];
+    int outcomeCollectionsSize;
 } MarketItem;
 #pragma pack(pop)

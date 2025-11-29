@@ -121,8 +121,10 @@ void CPUOP::setBatchFloats(std::vector<ITEM::MarketItem> &batch)
 
 void CPUOP::pushNormalizedFloat(ITEM::MarketItem &item, const float itemFloatVal)
 {
-    float normalizedFloat = (itemFloatVal - item.minFloat) / (item.maxFloat - item.minFloat);
-    item.normalizedFloatVal = normalizedFloat;
+    // avoid dividing by zero on vanilla knife skins that have -1 float ranges and floats
+    float denom = item.maxFloat - item.minFloat;
+    denom = (denom == 0.0) ? std::numeric_limits<float>::epsilon() : denom;
+    item.normalizedFloatVal = (itemFloatVal - item.minFloat) / denom;
 }
 
 void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
@@ -131,7 +133,7 @@ void CPUOP::pushAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
     for (auto &input : tradeupCPU.inputs) {
         avgFloat += input.floatVal;
     }
-    avgFloat /= 10.0;
+    avgFloat /= tradeupCPU.inputs.size();
     tradeupCPU.avgInputFloat = avgFloat;
 }
 
@@ -141,7 +143,7 @@ void CPUOP::pushNormalizedAvgInputFloat(TRADEUP::TradeupCPU &tradeupCPU)
     for (auto &input : tradeupCPU.inputs) {
         normalizedAvgFloat += input.normalizedFloatVal;
     }
-    normalizedAvgFloat /= 10.0;
+    normalizedAvgFloat /= tradeupCPU.inputs.size();
     tradeupCPU.normalizedAvgInputFloat = normalizedAvgFloat;
 }
 
@@ -161,7 +163,7 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     std::array<int, DEFINITIONS::COLLECTION_END> distinctCollectionItems{};
 
     for (auto &input : tradeupCPU.inputs) {
-        collectionChances[input.collection] += 100.0 / tradeupCPU.inputs.size();
+        collectionChances[input.collection] += (100.0 / tradeupCPU.inputs.size());
         
         const std::vector<ITEM::MarketItem> &collectionItemsRef = ITEM::getItemsCategoryGradeCollection(input.category, input.grade + 1, input.collection);
         std::vector<ITEM::MarketItem> collectionItemsCopy = collectionItemsRef;
@@ -169,7 +171,7 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
         for (auto &collectionItemCopy : collectionItemsCopy) {
             float outputFloat = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.normalizedAvgInputFloat);
             // Ignore incorrect wears
-            if (DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) continue;
+            if (collectionItemCopy.wear != DEFINITIONS::WEAR_NO_WEAR && DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) continue;
             collectionItemCopy.floatVal = outputFloat;
             pushNormalizedFloat(collectionItemCopy, collectionItemCopy.floatVal);
             
@@ -179,12 +181,17 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
             }
 
             outputs.push_back(collectionItemCopy);
-            ++distinctCollectionItems[collectionItemCopy.collection];
+            for (int oci = 0; oci < collectionItemCopy.outcomeCollectionsSize; ++oci) {
+                ++distinctCollectionItems[collectionItemCopy.outcomeCollections[oci]];
+            }
         }
     }
 
     for (auto &output : outputs) {
-        output.tradeUpChance = collectionChances[output.collection] / distinctCollectionItems[output.collection];
+        for (int oci = 0; oci < output.outcomeCollectionsSize; ++oci) {
+            int outcomeCollection = output.outcomeCollections[oci];
+            output.tradeUpChance = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
+        }
     }
 
     tradeupCPU.outputs = outputs;
