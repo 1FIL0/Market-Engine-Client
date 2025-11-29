@@ -48,7 +48,7 @@ struct MarketItem {
     float tradeUpChance;
 
     std::array<int, MAX_MARKET_ITEM_COLLECTIONS> outcomeCollections;
-    uint64_t outcomeCollectionsSize;
+    int outcomeCollectionsSize;
 
     MarketItem();
 

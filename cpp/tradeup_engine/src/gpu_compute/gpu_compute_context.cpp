@@ -201,9 +201,10 @@ void COMPGPU::ComputeContext::setKernelArgs(void)
     m_kernel.setArg(2, sizeof(cl_mem), &m_flatCollectionOutputsBuffer);
     m_kernel.setArg(3, sizeof(cl_mem), &m_collectionIndicesStartBuffer);
     m_kernel.setArg(4, sizeof(cl_mem), &m_collectionIndicesEndBuffer); 
-    m_kernel.setArg(5, sizeof(uint32_t), &batchSize);
-    m_kernel.setArg(6, sizeof(uint64_t), &m_combinationsAmount);
-    m_kernel.setArg(7, sizeof(float), &m_profitabilityMargin);
+    m_kernel.setArg(5, sizeof(int), &m_batch[0].grade);
+    m_kernel.setArg(6, sizeof(uint32_t), &batchSize);
+    m_kernel.setArg(7, sizeof(uint64_t), &m_combinationsAmount);
+    m_kernel.setArg(8, sizeof(float), &m_profitabilityMargin);
 }
 
 void COMPGPU::ComputeContext::startCompute(void)

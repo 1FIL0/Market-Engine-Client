@@ -139,7 +139,7 @@ void ITEM::sortMarketItems(void)
             g_itemsTradeCategoryGrade[item.tradeupable][item.category][item.grade].push_back(item);
         }
         
-        for (size_t oci = 0; oci < item.outcomeCollectionsSize; ++oci) {
+        for (int oci = 0; oci < item.outcomeCollectionsSize; ++oci) {
             int outcomeCollection = item.outcomeCollections[oci];
             g_itemsTradeCategoryGradeCollection[item.tradeupable][item.category][item.grade][outcomeCollection].push_back(item);
             g_itemsCategoryGradeCollection[item.category][item.grade][outcomeCollection].push_back(item);

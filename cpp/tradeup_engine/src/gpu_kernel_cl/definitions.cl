@@ -63,6 +63,10 @@ enum {
     COLLECTION_END
 };
 
+enum {
+    GRADE_CONSUMER = 0, GRADE_INDUSTRIAL, GRADE_MILSPEC, GRADE_RESTRICTED, GRADE_CLASSIFIED, GRADE_COVERT, GRADE_STAR, GRADE_END
+};
+
 float wearToMinFloat(__private int wear)
 {
     switch (wear) {

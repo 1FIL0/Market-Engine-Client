@@ -181,14 +181,14 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
             }
 
             outputs.push_back(collectionItemCopy);
-            for (size_t oci = 0; oci < collectionItemCopy.outcomeCollectionsSize; ++oci) {
+            for (int oci = 0; oci < collectionItemCopy.outcomeCollectionsSize; ++oci) {
                 ++distinctCollectionItems[collectionItemCopy.outcomeCollections[oci]];
             }
         }
     }
 
     for (auto &output : outputs) {
-        for (size_t oci = 0; oci < output.outcomeCollectionsSize; ++oci) {
+        for (int oci = 0; oci < output.outcomeCollectionsSize; ++oci) {
             int outcomeCollection = output.outcomeCollections[oci];
             output.tradeUpChance = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
         }

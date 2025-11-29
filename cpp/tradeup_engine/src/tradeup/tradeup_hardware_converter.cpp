@@ -27,7 +27,7 @@ TRADEUP::TradeupCPU TRADEUP::GPU2CPU(const TRADEUP::TradeupGPU &tradeupGPU)
 {
    TRADEUP::TradeupCPU tradeupCPU;
 
-   for (int i = 0; i < MAX_GPU_TRADEUP_INPUTS; ++i) {
+   for (int i = 0; i < tradeupGPU.totalInputSize; ++i) {
       tradeupCPU.inputs.push_back(tradeupGPU.inputs[i]);
    }
    for (int i = 0; i < tradeupGPU.totalOutputSize; ++i) {

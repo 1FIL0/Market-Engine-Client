@@ -24,13 +24,14 @@
 // ! MUST BE ALIGNED WITH CPU STRUCT
 
 #define MAX_GPU_TRADEUP_INPUTS 10
-#define MAX_GPU_TRADEUP_OUTPUTS 100
+#define MAX_GPU_TRADEUP_OUTPUTS 300
 
 #pragma pack(push, 1)
 typedef struct TradeupGPU {
     bool processed;
     MarketItem inputs[MAX_GPU_TRADEUP_INPUTS];
     MarketItem outputs[MAX_GPU_TRADEUP_OUTPUTS];
+    int totalInputSize;
     int totalOutputSize;
     float avgInputFloat;
     float normalizedAvgInputFloat;
