@@ -19,12 +19,6 @@
 
 #pragma once
 
-__constant const int WEAR_FACTORY_NEW = 0;
-__constant const int WEAR_MINIMAL_WEAR = 1;
-__constant const int WEAR_FIELD_TESTED = 2;
-__constant const int WEAR_WELL_WORN = 3;
-__constant const int WEAR_BATTLE_SCARRED = 4;
-
 __constant const float FLOAT_MIN_FACTORY_NEW = 0.00;
 __constant const float FLOAT_MIN_MINIMAL_WEAR = 0.071;
 __constant const float FLOAT_MIN_FIELD_TESTED = 0.151;
@@ -65,6 +59,11 @@ enum {
 
 enum {
     GRADE_CONSUMER = 0, GRADE_INDUSTRIAL, GRADE_MILSPEC, GRADE_RESTRICTED, GRADE_CLASSIFIED, GRADE_COVERT, GRADE_STAR, GRADE_END
+};
+
+enum {
+    WEAR_FACTORY_NEW = 0, WEAR_MINIMAL_WEAR = 1, WEAR_FIELD_TESTED = 2, 
+    WEAR_WELL_WORN = 3, WEAR_BATTLE_SCARRED = 4, WEAR_NO_WEAR = 5, WEAR_END
 };
 
 float wearToMinFloat(__private int wear)

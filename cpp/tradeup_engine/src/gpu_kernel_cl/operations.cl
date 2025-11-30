@@ -25,8 +25,9 @@
 
 void pushNormalizedFloat(__private MarketItem *item, __private const float itemFloatVal)
 {
-    float normalizedFloat = (itemFloatVal - item->minFloat) / (item->maxFloat - item->minFloat);
-    item->normalizedFloatVal = normalizedFloat;
+    float denom = item->maxFloat - item->minFloat;
+    denom = (denom == 0.0f) ? FLT_EPSILON : denom;
+    item->normalizedFloatVal = (itemFloatVal - item->minFloat) / denom;
 }
 
 void pushTotalInputPrice(__private TradeupGPU *tradeup)
@@ -64,6 +65,7 @@ float calculateOutputItemFloat(__private const MarketItem *outputItem,
     return ((outputItem->maxFloat - outputItem->minFloat) * avgFloat + outputItem->minFloat);
 }
 
+// THE PROBLEMATIC FUNCTION THAT FUCKS UP PERFORMANCE
 void pushOutputItems(__private TradeupGPU *tradeup,
                 __global MarketItem *outputItemsPool,
                 __global int *collectionIndicesStart,
@@ -84,7 +86,7 @@ void pushOutputItems(__private TradeupGPU *tradeup,
             float itemFloatVal = calculateOutputItemFloat(&possibleOutput, tradeup->avgInputFloat);
 
             // Ignore incorrect wears
-            if (possibleOutput.wear != itemFloatValToInt(itemFloatVal)) {
+            if (possibleOutput.wear != WEAR_NO_WEAR && possibleOutput.wear != itemFloatValToInt(itemFloatVal)) {
                 continue;
             }
             // Ignore duplicates
@@ -107,6 +109,7 @@ void pushOutputItems(__private TradeupGPU *tradeup,
         }
     }
     
+    // Makes no sense - change later
     for (int i = 0; i < currentOutputItem; ++i) {
         MarketItem *output = &tradeup->outputs[i];
         for (int oci = 0; oci < output->outcomeCollectionsSize; ++oci) {
