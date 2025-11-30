@@ -74,7 +74,7 @@ void COMPGPU::ComputeContext::buildKernel(void)
         std::string fullSource = "";
         fullSource += std::string(reinterpret_cast<const char *>(kernel_cl_hpp_kernel), kernel_cl_hpp_kernel_len);
         m_program = cl::Program(m_context, fullSource);
-        std::string options = "-cl-fast-relaxed-math -cl-mad-enable -cl-single-precision-constant -cl-denorms-are-zero";
+        std::string options = "";
         m_program.build(options.c_str());
         m_kernel = cl::Kernel(m_program, "combinationKernel");
     }

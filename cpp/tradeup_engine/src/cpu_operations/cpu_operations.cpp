@@ -156,6 +156,7 @@ void CPUOP::pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU)
     tradeupCPU.totalInputPrice = totalPrice;
 }
 
+// THE PROBLEMATIC FUNCTION THAT FUCKS UP PERFORMANCE
 void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
 {
     std::vector<ITEM::MarketItem> outputs;
@@ -187,6 +188,7 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
         }
     }
 
+    // Makes no sense - change later
     for (auto &output : outputs) {
         for (int oci = 0; oci < output.outcomeCollectionsSize; ++oci) {
             int outcomeCollection = output.outcomeCollections[oci];
