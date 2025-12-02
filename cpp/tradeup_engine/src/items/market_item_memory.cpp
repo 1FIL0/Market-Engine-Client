@@ -26,7 +26,6 @@
 #include "namespace.hpp"
 #include <array>
 #include <cstdlib>
-#include <iostream>
 #include <rapidjson/document.h>
 #include <string>
 #include <unordered_map>
@@ -90,7 +89,9 @@ void ITEM::loadMarketItems(void)
             marketItem.price = (modifiedJsonItem["Use Modified State"].GetBool()) ? modifiedJsonItem["Modified Price"].GetFloat() : readyJsonItem["Market Price"].GetFloat();
             break;
         }
-        if (marketItem.price == -1) LOGGER::sendMessage("Item " + coldData.weaponName + " " + coldData.skinName + " Has a corrupted price!");
+        if (marketItem.price == -1 || marketItem.price == 0) {
+            LOGGER::sendMessage("Item " + coldData.weaponName + " " + coldData.skinName + " " + DEFINITIONS::categoryToString(marketItem.category) + " " + DEFINITIONS::wearToString(marketItem.wear) + " Has a corrupted price!");
+        }
         marketItem.priceSteamTax = marketItem.price * 0.87;
 
         marketItem.tradeupable = readyJsonItem["Tradeupable"].GetBool();
@@ -120,7 +121,7 @@ void ITEM::loadMarketItems(void)
 
         // Outputs
         for (auto &outputEntry : readyJsonItem["Possible Outputs"].GetArray()) {
-            TempAccessID outputTempAccessID = outputEntry["Temp Access ID"].GetInt();
+            TempAccessID outputTempAccessID = outputEntry["Output Temp Access ID"].GetInt();
             marketItem.outputTempAccessIDS[marketItem.outputTempAccessIDSSize++] = outputTempAccessID;
         }
 

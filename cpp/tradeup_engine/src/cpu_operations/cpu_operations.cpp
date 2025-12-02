@@ -236,8 +236,8 @@ void CPUOP::pushChanceToProfit(TRADEUP::TradeupCPU &tradeupCPU)
 
 void CPUOP::pushProfitability(TRADEUP::TradeupCPU &tradeupCPU)
 {
-    float profitability = (getExpectedPrice(tradeupCPU.outputs) / tradeupCPU.totalInputPrice) * 100;
-    float profitabilitySteamTax = (getExpectedPriceSteamTax(tradeupCPU.outputs) / tradeupCPU.totalInputPrice) * 100;
+    float profitability = (getExpectedPrice(tradeupCPU.outputs) / (tradeupCPU.totalInputPrice + std::numeric_limits<float>::epsilon())) * 100;
+    float profitabilitySteamTax = (getExpectedPriceSteamTax(tradeupCPU.outputs) / (tradeupCPU.totalInputPrice + std::numeric_limits<float>::epsilon())) * 100;
     tradeupCPU.profitability = profitability;
     tradeupCPU.profitabilitySteamTax = profitabilitySteamTax;
 }
