@@ -20,12 +20,9 @@
 #pragma once
 
 #include "namespace.hpp"
-#include <array>
 #include <cstdint>
-#include "definitions.hpp"
 
 START_ENGINE_NAMESPACE_MULTI(ITEM)
-USE_NAMESPACE_SHARE
 
 using TempAccessID = int;
 using PermID = uint64_t;
@@ -46,9 +43,6 @@ struct MarketItem {
     short collection;
     float floatVal, normalizedFloatVal, minFloat, maxFloat;
     float tradeUpChance;
-
-    std::array<short, MAX_MARKET_ITEM_COLLECTIONS> outcomeCollections;
-    int outcomeCollectionsSize;
 
     MarketItem();
 

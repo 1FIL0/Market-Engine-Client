@@ -34,7 +34,11 @@ START_ENGINE_NAMESPACE_MULTI(TRADEUP)
 struct TradeupGPU {
     bool processed;
     ITEM::MarketItem inputs[MAX_GPU_TRADEUP_INPUTS];
-    ITEM::MarketItem outputs[MAX_GPU_TRADEUP_OUTPUTS];
+    
+    ITEM::TempAccessID outputIDS[MAX_GPU_TRADEUP_OUTPUTS];
+    float outputFloats[MAX_GPU_TRADEUP_OUTPUTS];
+    short outputWears[MAX_GPU_TRADEUP_OUTPUTS];
+
     int totalInputSize;
     int totalOutputSize;
     float avgInputFloat;

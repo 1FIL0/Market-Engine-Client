@@ -81,7 +81,7 @@ void pushOutputItems(__private TradeupGPU *tradeup,
         MarketItem *input = &tradeup->inputs[i];
         collectionChances[input->collection] += (100.0 / tradeup->totalInputSize); 
 
-        for (int oid = 0; oid < input->)
+        for (int oid = 0; oid < outputIDS)
         for (int j = collectionIndexStart; j < collectionIndexEnd; ++j) {
             MarketItem possibleOutput = outputItemsPool[j];
             float itemFloatVal = calculateOutputItemFloat(&possibleOutput, tradeup->avgInputFloat);

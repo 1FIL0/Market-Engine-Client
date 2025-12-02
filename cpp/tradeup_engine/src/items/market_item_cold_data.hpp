@@ -30,6 +30,7 @@ struct MarketItemColdData {
     std::string weaponName;
     std::string skinName;
     std::vector<TempAccessID> outputTempAccessIDS;
+    std::vector<short> outcomeCollections;
     
     MarketItemColdData();
 };

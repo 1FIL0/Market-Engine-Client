@@ -23,9 +23,11 @@
 #include "logger.hpp"
 #include "market_item.hpp"
 #include "market_item_cold_data.hpp"
+#include "market_item_memory_flat_data.hpp"
 #include "namespace.hpp"
 #include <array>
 #include <cstdlib>
+#include <iostream>
 #include <rapidjson/document.h>
 #include <string>
 #include <unordered_map>
@@ -40,10 +42,7 @@ std::unordered_map<TempAccessID, MarketItemColdData> g_itemsColdData;
 ARR_TRADEUPABLE(ARR_CATEGORY(ARR_GRADE(std::vector<MarketItem>)))                   g_itemsTradeCategoryGrade;
 ARR_TRADEUPABLE(ARR_CATEGORY(ARR_GRADE(ARR_COLLECTION(std::vector<MarketItem>))))   g_itemsTradeCategoryGradeCollection;
 ARR_CATEGORY(ARR_GRADE(ARR_COLLECTION(std::vector<MarketItem>)))                    g_itemsCategoryGradeCollection;
-
-std::vector<std::vector<TempAccessID>> g_outputItemIDS;
-std::vector<float> g_minFloats;
-std::vector<float> g_maxFloats;
+MarketItemMemoryFlatData g_flatData;
 
 void ITEM::loadEverything(void)
 {
@@ -102,11 +101,11 @@ void ITEM::loadMarketItems(void)
             for (auto &outcomeCollectionEntry : readyJsonItem["Crates"].GetArray()) {
                 int crate = DEFINITIONS::crateToInt(outcomeCollectionEntry.GetString());
                 int outcomeCollection = DEFINITIONS::crateToCollection(crate);
-                marketItem.outcomeCollections[marketItem.outcomeCollectionsSize++] = outcomeCollection;
+                coldData.outcomeCollections.push_back(outcomeCollection);
             }
         }
         else {
-            marketItem.outcomeCollections[marketItem.outcomeCollectionsSize++] = marketItem.collection;
+            coldData.outcomeCollections.push_back(marketItem.collection);
         }
 
         // Star / Contraband items aren't in any collections. rather in crates.
@@ -148,8 +147,7 @@ void ITEM::sortMarketItems(void)
             g_itemsTradeCategoryGrade[item.tradeupable][item.category][item.grade].push_back(item);
         }
         
-        for (int oci = 0; oci < item.outcomeCollectionsSize; ++oci) {
-            int outcomeCollection = item.outcomeCollections[oci];
+        for (auto &outcomeCollection : coldData.outcomeCollections) {
             g_itemsTradeCategoryGradeCollection[item.tradeupable][item.category][item.grade][outcomeCollection].push_back(item);
             g_itemsCategoryGradeCollection[item.category][item.grade][outcomeCollection].push_back(item);
         }
@@ -159,20 +157,28 @@ void ITEM::sortMarketItems(void)
 }
 
 void ITEM::createFlattenedData(void)
-{
-    size_t marketItemsSize = g_marketItems.size();
-    g_outputItemIDS.resize(marketItemsSize);
-    g_minFloats.resize(marketItemsSize);
-    g_maxFloats.resize(marketItemsSize);
-
-    
+{   
     for (auto &item : g_marketItems) {
         ITEM::MarketItemColdData coldData = getColdData(item);
+
+        static int outputItemIdIndex = 0;
+        g_flatData.outputItemIdsStartIndices.push_back(outputItemIdIndex);
         for (auto &outputTempID : coldData.outputTempAccessIDS) {
-            g_outputItemIDS[item.tempAccessID].push_back(outputTempID);
+            g_flatData.outputItemIds.push_back(outputTempID);
+            ++outputItemIdIndex;
         }
-        g_minFloats[item.tempAccessID] = item.minFloat;
-        g_maxFloats[item.tempAccessID] = item.maxFloat;
+        g_flatData.outputItemIdsEndIndices.push_back(outputItemIdIndex);
+
+        static int outcomeCollectionIndex = 0;
+        g_flatData.outcomeCollectionsStartIndices.push_back(outcomeCollectionIndex);
+        for (auto &outcomeCollection : coldData.outcomeCollections) {
+            g_flatData.outcomeCollections.push_back(outcomeCollection);
+            ++outcomeCollectionIndex;
+        }
+        g_flatData.outcomeCollectionsEndIndices.push_back(outcomeCollectionIndex);
+
+        g_flatData.minFloats.push_back(item.minFloat);
+        g_flatData.maxFloats.push_back(item.maxFloat);
     }
 }
 
@@ -216,37 +222,7 @@ const std::vector<ITEM::MarketItem> &ITEM::getItemsTradeupableCategoryGradeColle
     return g_itemsTradeCategoryGradeCollection[tradeupable][category][grade][collection];
 }
 
-const std::vector<TempAccessID> &ITEM::getOutputsTempIDS(const TempAccessID ID)
+const ITEM::MarketItemMemoryFlatData &ITEM::getFlatData(void)
 {
-    return g_outputItemIDS[ID];
-}
-
-const std::vector<float> &ITEM::getMinFloats(void)
-{
-    return g_minFloats;
-}
-
-const std::vector<float> &ITEM::getMaxFloats(void)
-{
-    return g_maxFloats;
-}
-
-ITEM::MarketItemMemoryFlatCollections ITEM::getItemsTradeupableCategoryGradeCollectionsFlattened(const int category, const int grade)
-{
-    int itemCounter = 0;
-    MarketItemMemoryFlatCollections flatCols;
-    ARR_COLLECTION(std::vector<MarketItem>) &colVectorsArr = g_itemsCategoryGradeCollection[category][grade];
-
-    for (int collection = 0; collection < DEFINITIONS::COLLECTION_END; ++collection) {
-        flatCols.collectionsIndicesStart[collection] = itemCounter;
-        auto &colVec = colVectorsArr[collection];
-        for (auto &item : colVec) {
-            flatCols.collectionItemsFlat.push_back(item);
-            ++itemCounter;
-        }
-        flatCols.collectionsIndicesEnd[collection] = itemCounter;
-    }
-
-    return flatCols;
-
+    return g_flatData;
 }

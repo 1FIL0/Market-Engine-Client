@@ -18,6 +18,8 @@
 */
 
 #include "tradeup_hardware_converter.hpp"
+#include "market_item.hpp"
+#include "market_item_memory.hpp"
 #include "namespace.hpp"
 #include "tradeup.hpp"
 
@@ -31,7 +33,10 @@ TRADEUP::TradeupCPU TRADEUP::GPU2CPU(const TRADEUP::TradeupGPU &tradeupGPU)
       tradeupCPU.inputs.push_back(tradeupGPU.inputs[i]);
    }
    for (int i = 0; i < tradeupGPU.totalOutputSize; ++i) {
-      tradeupCPU.outputs.push_back(tradeupGPU.outputs[i]);
+      ITEM::MarketItem makeshiftOutput = ITEM::getItem(tradeupGPU.outputIDS[i]);
+      makeshiftOutput.floatVal = tradeupGPU.outputFloats[i];
+      makeshiftOutput.wear = tradeupGPU.outputFloats[i];
+      tradeupCPU.outputs.push_back(makeshiftOutput);
    }
    
    tradeupCPU.avgInputFloat = tradeupGPU.avgInputFloat;

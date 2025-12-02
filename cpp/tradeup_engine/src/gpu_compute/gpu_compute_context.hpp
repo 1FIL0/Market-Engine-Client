@@ -48,9 +48,15 @@ class ComputeContext {
 
         cl::Buffer m_tradeupsBuffer;
         cl::Buffer m_batchBuffer;
-        cl::Buffer m_flatCollectionOutputsBuffer;
-        cl::Buffer m_collectionIndicesStartBuffer;
-        cl::Buffer m_collectionIndicesEndBuffer;
+        cl::Buffer m_minFloatsBuffer;
+        cl::Buffer m_maxFloatsBuffer;
+        cl::Buffer m_pricesBuffer;
+        cl::Buffer m_flatOutcomeCollectionsBuffer;
+        cl::Buffer m_flatOutcomeCollectionsIndicesStartBuffer;
+        cl::Buffer m_flatOutcomeCollectionsIndicesEndBuffer;
+        cl::Buffer m_flatOutputIdsBuffer;
+        cl::Buffer m_flatOutputIdsIndicesStartBuffer;
+        cl::Buffer m_flatOutputIdsIndicesEndBuffer;
 
         uint64_t m_combinationsAmount;
         uint64_t m_tradeupsSize;
@@ -63,7 +69,7 @@ class ComputeContext {
         void logComputeDiagnostics(const int category, const int grade, const uint64_t currentBatch);
         void sendInfo(void);
         void initData(void);
-        void createStaticBuffers(void);
+        void createInitialBuffers(void);
         void prepareBatch(const int category, const int grade);
         void prepareBuffers(const int category, const int grade);
         void cleanTradeups(void);

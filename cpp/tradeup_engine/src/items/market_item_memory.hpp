@@ -24,9 +24,8 @@
 #include "namespace.hpp"
 #include <rapidjson/document.h>
 #include <vector>
-#include "market_item_flat_collections.hpp"
+#include "market_item_memory_flat_data.hpp"
 
-USE_NAMESPACE_SHARE
 START_ENGINE_NAMESPACE_MULTI(ITEM)
 
 #define ARR_TRADEUPABLE(DATA) std::array<DATA, 2>
@@ -56,11 +55,6 @@ MarketItemColdData getColdData(const MarketItem &item);
 const std::vector<MarketItem> &getItemsCategoryGradeCollection (const int category, const int grade, const int collection);
 const std::vector<MarketItem> &getItemsTradeupableCategoryGrade(const bool tradeupable, const int category, const int grade);
 const std::vector<MarketItem> &getItemsTradeupableCategoryGradeCollection(const bool tradeupable, const int category, const int grade, const int collection);
-const std::vector<TempAccessID> &getOutputsTempIDS(const TempAccessID ID);
-const std::vector<float> &getMinFloats(void);
-const std::vector<float> &getMaxFloats(void);
-
-// Only used for GPU engine
-MarketItemMemoryFlatCollections getItemsTradeupableCategoryGradeCollectionsFlattened(const int category, const int grade);
+const MarketItemMemoryFlatData &getFlatData(void);
 
 END_ENGINE_NAMESPACE

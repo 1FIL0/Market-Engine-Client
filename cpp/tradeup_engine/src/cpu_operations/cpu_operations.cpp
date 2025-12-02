@@ -28,10 +28,12 @@
 #include <cstddef>
 #include <cstdlib>
 #include <emmintrin.h>
+#include <iostream>
 #include <vector>
 #include <omp.h>
 #include "cpu_operations.hpp"
 #include <cmath>
+#include <array>
 
 USE_NAMESPACE_SHARE
 USE_NAMESPACE_TRADEUP_ENGINE
@@ -163,11 +165,12 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     std::array<float, DEFINITIONS::COLLECTION_END> collectionChances{};
     std::array<int, DEFINITIONS::COLLECTION_END> distinctCollectionItems{};
 
+    const auto &flatData = ITEM::getFlatData();
+    
     for (auto &input : tradeupCPU.inputs) {
-        auto outputTempIDS = ITEM::getOutputsTempIDS(input.tempAccessID);
         collectionChances[input.collection] += (100.0 / tradeupCPU.inputs.size());
-        
-        for (auto lowestWearOutputID : outputTempIDS) {
+        for (int oid = flatData.outputItemIdsStartIndices[input.tempAccessID]; oid < flatData.outputItemIdsEndIndices[input.tempAccessID]; ++oid) {
+            int lowestWearOutputID = flatData.outputItemIds[oid];
             const auto &lowestWearOutput = ITEM::getItem(lowestWearOutputID);
             float outputFloat = calculateOutputItemFloat(lowestWearOutput.minFloat, lowestWearOutput.maxFloat, tradeupCPU.normalizedAvgInputFloat);
             int wear = DEFINITIONS::itemFloatValToInt(outputFloat);
@@ -179,17 +182,18 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
             if (std::find(outputs.begin(), outputs.end(), realOutput) != outputs.end()) {
                 continue;
             }
-
+            
             outputs.push_back(realOutput);
-            for (int oci = 0; oci < realOutput.outcomeCollectionsSize; ++oci) {
-                ++distinctCollectionItems[realOutput.outcomeCollections[oci]];
+            for (int oci = flatData.outcomeCollectionsStartIndices[realOutput.tempAccessID]; oci < flatData.outcomeCollectionsEndIndices[realOutput.tempAccessID]; ++oci) {
+                int outcomeCollection = flatData.outcomeCollections[oci];
+                ++distinctCollectionItems[outcomeCollection];
             }
         }
     }
 
     for (auto &output : outputs) {
-        int outcomeCollection = output.outcomeCollections[0];
-        output.tradeUpChance = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
+        int outcomeCollection = flatData.outcomeCollections[flatData.outcomeCollectionsStartIndices[output.tempAccessID]];
+        output.tradeUpChance = collectionChances[outcomeCollection] / (distinctCollectionItems[outcomeCollection]);
     }
 
     tradeupCPU.outputs = outputs;
