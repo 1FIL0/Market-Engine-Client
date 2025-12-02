@@ -38,9 +38,6 @@ ITEM::MarketItem::MarketItem()
     outcomeCollections.fill(0);
     outcomeCollectionsSize = 0;
 
-    outputTempAccessIDS.fill(0);
-    outputTempAccessIDSSize = 0;
-
     floatVal = -1.0;
     minFloat = -1.0;
     maxFloat = -1.0;

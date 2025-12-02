@@ -56,6 +56,7 @@ MarketItemColdData getColdData(const MarketItem &item);
 const std::vector<MarketItem> &getItemsCategoryGradeCollection (const int category, const int grade, const int collection);
 const std::vector<MarketItem> &getItemsTradeupableCategoryGrade(const bool tradeupable, const int category, const int grade);
 const std::vector<MarketItem> &getItemsTradeupableCategoryGradeCollection(const bool tradeupable, const int category, const int grade, const int collection);
+const std::vector<TempAccessID> &getOutputsTempIDS(const TempAccessID ID);
 const std::vector<float> &getMinFloats(void);
 const std::vector<float> &getMaxFloats(void);
 

@@ -164,10 +164,10 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     std::array<int, DEFINITIONS::COLLECTION_END> distinctCollectionItems{};
 
     for (auto &input : tradeupCPU.inputs) {
+        auto outputTempIDS = ITEM::getOutputsTempIDS(input.tempAccessID);
         collectionChances[input.collection] += (100.0 / tradeupCPU.inputs.size());
         
-        for (auto oid = 0; oid < input.outputTempAccessIDSSize; ++oid) {
-            ITEM::TempAccessID lowestWearOutputID = input.outputTempAccessIDS[oid];
+        for (auto lowestWearOutputID : outputTempIDS) {
             const auto &lowestWearOutput = ITEM::getItem(lowestWearOutputID);
             float outputFloat = calculateOutputItemFloat(lowestWearOutput.minFloat, lowestWearOutput.maxFloat, tradeupCPU.normalizedAvgInputFloat);
             int wear = DEFINITIONS::itemFloatValToInt(outputFloat);

@@ -19,14 +19,17 @@
 
 #pragma once
 
+#include "market_item.hpp"
 #include "namespace.hpp"
 #include <string>
+#include <vector>
 
 START_ENGINE_NAMESPACE_MULTI(ITEM)
 
 struct MarketItemColdData {
     std::string weaponName;
     std::string skinName;
+    std::vector<TempAccessID> outputTempAccessIDS;
     
     MarketItemColdData();
 };

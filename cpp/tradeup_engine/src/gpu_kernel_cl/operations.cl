@@ -67,9 +67,10 @@ float calculateOutputItemFloat(__private const MarketItem *outputItem,
 
 // THE PROBLEMATIC FUNCTION THAT FUCKS UP PERFORMANCE
 void pushOutputItems(__private TradeupGPU *tradeup,
-                __global MarketItem *outputItemsPool,
-                __global int *collectionIndicesStart,
-                __global int *collectionIndiciesEnd)
+                    __global float *minFloats,
+                    __global float *maxFloats,
+                    __global TempAccessID *outcomeCollections,
+                    __global TempAccessID *outputIDS)
 {
     __private float collectionChances[COLLECTION_END] = {0.0};
     __private int distinctCollectionItems[COLLECTION_END] = {0};
@@ -77,10 +78,10 @@ void pushOutputItems(__private TradeupGPU *tradeup,
     __private int currentOutputItem = 0;
 
     for (int i = 0; i < tradeup->totalInputSize; ++i) {
-        collectionChances[tradeup->inputs[i].collection] += (100.0 / tradeup->totalInputSize); 
-        int collectionIndexStart = collectionIndicesStart[tradeup->inputs[i].collection];
-        int collectionIndexEnd = collectionIndiciesEnd[tradeup->inputs[i].collection];
+        MarketItem *input = &tradeup->inputs[i];
+        collectionChances[input->collection] += (100.0 / tradeup->totalInputSize); 
 
+        for (int oid = 0; oid < input->)
         for (int j = collectionIndexStart; j < collectionIndexEnd; ++j) {
             MarketItem possibleOutput = outputItemsPool[j];
             float itemFloatVal = calculateOutputItemFloat(&possibleOutput, tradeup->avgInputFloat);
@@ -119,6 +120,44 @@ void pushOutputItems(__private TradeupGPU *tradeup,
     }
 
     tradeup->totalOutputSize = currentOutputItem;
+}
+
+void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
+{
+    std::vector<ITEM::MarketItem> outputs;
+    std::array<float, DEFINITIONS::COLLECTION_END> collectionChances{};
+    std::array<int, DEFINITIONS::COLLECTION_END> distinctCollectionItems{};
+
+    for (auto &input : tradeupCPU.inputs) {
+        collectionChances[input.collection] += (100.0 / tradeupCPU.inputs.size());
+        
+        for (auto oid = 0; oid < input.outputTempAccessIDSSize; ++oid) {
+            ITEM::TempAccessID lowestWearOutputID = input.outputTempAccessIDS[oid];
+            const auto &lowestWearOutput = ITEM::getItem(lowestWearOutputID);
+            float outputFloat = calculateOutputItemFloat(lowestWearOutput.minFloat, lowestWearOutput.maxFloat, tradeupCPU.normalizedAvgInputFloat);
+            int wear = DEFINITIONS::itemFloatValToInt(outputFloat);
+            ITEM::MarketItem realOutput = ITEM::getItem(lowestWearOutputID + wear);
+            realOutput.floatVal = outputFloat;
+            pushNormalizedFloat(realOutput, realOutput.floatVal);
+            
+            // no duplicates allowed
+            if (std::find(outputs.begin(), outputs.end(), realOutput) != outputs.end()) {
+                continue;
+            }
+
+            outputs.push_back(realOutput);
+            for (int oci = 0; oci < realOutput.outcomeCollectionsSize; ++oci) {
+                ++distinctCollectionItems[realOutput.outcomeCollections[oci]];
+            }
+        }
+    }
+
+    for (auto &output : outputs) {
+        int outcomeCollection = output.outcomeCollections[0];
+        output.tradeUpChance = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
+    }
+
+    tradeupCPU.outputs = outputs;
 }
 
 float getExpectedPrice(__private TradeupGPU *tradeup)

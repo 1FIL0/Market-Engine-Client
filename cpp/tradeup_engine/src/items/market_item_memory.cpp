@@ -122,7 +122,7 @@ void ITEM::loadMarketItems(void)
         // Outputs
         for (auto &outputEntry : readyJsonItem["Possible Outputs"].GetArray()) {
             TempAccessID outputTempAccessID = outputEntry["Output Temp Access ID"].GetInt();
-            marketItem.outputTempAccessIDS[marketItem.outputTempAccessIDSSize++] = outputTempAccessID;
+            coldData.outputTempAccessIDS.push_back(outputTempAccessID);
         }
 
         pushMarketItem(marketItem, coldData);
@@ -164,11 +164,12 @@ void ITEM::createFlattenedData(void)
     g_outputItemIDS.resize(marketItemsSize);
     g_minFloats.resize(marketItemsSize);
     g_maxFloats.resize(marketItemsSize);
+
     
     for (auto &item : g_marketItems) {
-        for (int i = 0; i < item.outputTempAccessIDSSize; ++i) {
-            TempAccessID outputTempAccessID = item.outputTempAccessIDS[i];
-            g_outputItemIDS[item.tempAccessID].push_back(outputTempAccessID);
+        ITEM::MarketItemColdData coldData = getColdData(item);
+        for (auto &outputTempID : coldData.outputTempAccessIDS) {
+            g_outputItemIDS[item.tempAccessID].push_back(outputTempID);
         }
         g_minFloats[item.tempAccessID] = item.minFloat;
         g_maxFloats[item.tempAccessID] = item.maxFloat;
@@ -215,12 +216,17 @@ const std::vector<ITEM::MarketItem> &ITEM::getItemsTradeupableCategoryGradeColle
     return g_itemsTradeCategoryGradeCollection[tradeupable][category][grade][collection];
 }
 
-const std::vector<float> &getMinFloats(void)
+const std::vector<TempAccessID> &ITEM::getOutputsTempIDS(const TempAccessID ID)
+{
+    return g_outputItemIDS[ID];
+}
+
+const std::vector<float> &ITEM::getMinFloats(void)
 {
     return g_minFloats;
 }
 
-const std::vector<float> &getMaxFloats(void)
+const std::vector<float> &ITEM::getMaxFloats(void)
 {
     return g_maxFloats;
 }

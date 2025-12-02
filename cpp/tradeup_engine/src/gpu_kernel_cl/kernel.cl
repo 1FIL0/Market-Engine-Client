@@ -23,9 +23,11 @@
 
 #define MAX_COMBINATION_SIZE 10
 
-TradeupGPU processCombination(__global MarketItem *flatCollectionOutputsPool,
-                        __global int *collectionIndicesStart,
-                        __global int *collectionIndiciesEnd,
+TradeupGPU processCombination(__global float *minFloats,
+                        __global float *maxFloats,
+                        __global float *prices,
+                        __global TempAccessID *outcomeCollections,
+                        __global TempAccessID *outputIDS,
                         __private MarketItem *combination,
                         __private int combinationSize)
 {
@@ -48,9 +50,11 @@ TradeupGPU processCombination(__global MarketItem *flatCollectionOutputsPool,
 
 __kernel void combinationKernel(__global TradeupGPU *tradeups,
                                 __global MarketItem *batch,
-                                __global MarketItem *flatCollectionOutputsPool,
-                                __global int *collectionIndicesStart,
-                                __global int *collectionIndicesEnd,
+                                __global float *minFloats,
+                                __global float *maxFloats,
+                                __global float *prices,
+                                __global TempAccessID *outcomeCollections,
+                                __global TempAccessID *outputIDS,
                                 __private short grade,
                                 __private uint batchSize,
                                 __private ulong combinationsAmount,
@@ -76,7 +80,7 @@ __kernel void combinationKernel(__global TradeupGPU *tradeups,
         combination[i] = batch[localIndices[i]];
     }
 
-    __private TradeupGPU tradeup = processCombination(flatCollectionOutputsPool, collectionIndicesStart, collectionIndicesEnd, combination, combinationSize);
+    __private TradeupGPU tradeup = processCombination(minFloats, maxFloats, prices, outcomeCollections, outputIDS, combination, combinationSize);
     if (tradeup.profitability > profitabilityMargin) {
         tradeup.processed = true; // tradeup is replaced by new value and "processed". later set to false when "clearing" tradeups in the host
         tradeups[gid] = tradeup;

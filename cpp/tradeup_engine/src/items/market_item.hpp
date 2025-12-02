@@ -32,7 +32,6 @@ using PermID = uint64_t;
 
 //! MUST BE ALIGNED WITH OPENCL STRUCT
 #define MAX_MARKET_ITEM_COLLECTIONS DEFINITIONS::COLLECTION_END
-#define MAX_MARKET_ITEM_OUTPUTS 200
 
 #pragma pack(push, 1)
 struct MarketItem {
@@ -50,9 +49,6 @@ struct MarketItem {
 
     std::array<short, MAX_MARKET_ITEM_COLLECTIONS> outcomeCollections;
     int outcomeCollectionsSize;
-
-    std::array<TempAccessID, MAX_MARKET_ITEM_OUTPUTS> outputTempAccessIDS;
-    int outputTempAccessIDSSize;
 
     MarketItem();
 
