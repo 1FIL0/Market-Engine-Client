@@ -187,12 +187,9 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
         }
     }
 
-    // Makes no sense - change later
     for (auto &output : outputs) {
-        for (int oci = 0; oci < output.outcomeCollectionsSize; ++oci) {
-            int outcomeCollection = output.outcomeCollections[oci];
-            output.tradeUpChance = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
-        }
+        int outcomeCollection = output.outcomeCollections[0];
+        output.tradeUpChance = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
     }
 
     tradeupCPU.outputs = outputs;
