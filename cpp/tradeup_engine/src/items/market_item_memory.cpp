@@ -36,15 +36,20 @@ USE_NAMESPACE_TRADEUP_ENGINE
 USE_NAMESPACE_TRADEUP_ENGINE_MULTI(ITEM)
 
 std::vector<MarketItem> g_marketItems;
-std::unordered_map<int, MarketItemColdData> g_itemsColdData;
+std::unordered_map<TempAccessID, MarketItemColdData> g_itemsColdData;
 ARR_TRADEUPABLE(ARR_CATEGORY(ARR_GRADE(std::vector<MarketItem>)))                   g_itemsTradeCategoryGrade;
 ARR_TRADEUPABLE(ARR_CATEGORY(ARR_GRADE(ARR_COLLECTION(std::vector<MarketItem>))))   g_itemsTradeCategoryGradeCollection;
 ARR_CATEGORY(ARR_GRADE(ARR_COLLECTION(std::vector<MarketItem>)))                    g_itemsCategoryGradeCollection;
+
+std::vector<std::vector<TempAccessID>> g_outputItemIDS;
+std::vector<float> g_minFloats;
+std::vector<float> g_maxFloats;
 
 void ITEM::loadEverything(void)
 {
     loadMarketItems();
     sortMarketItems();
+    createFlattenedData();
 }
 
 void ITEM::loadMarketItems(void)
@@ -73,7 +78,9 @@ void ITEM::loadMarketItems(void)
         marketItem.category = DEFINITIONS::categoryToInt(readyJsonItem["Category"].GetString());
         marketItem.grade = DEFINITIONS::gradeToInt(readyJsonItem["Grade"].GetString());
         marketItem.wear = DEFINITIONS::wearToInt(readyJsonItem["Wear"].GetString());
-        
+        marketItem.minFloat = readyJsonItem["Min Float"].GetFloat();
+        marketItem.maxFloat = readyJsonItem["Max Float"].GetFloat();
+
         // skip item cuz getting float on price member crashes cause these skins have null prices and shit.
         if (marketItem.category == DEFINITIONS::CATEGORY_SOUVENIR || marketItem.grade == DEFINITIONS::GRADE_CONTRABAND) {
             continue;
@@ -99,7 +106,7 @@ void ITEM::loadMarketItems(void)
                 int crate = DEFINITIONS::crateToInt(outcomeCollectionEntry.GetString());
                 int outcomeCollection = DEFINITIONS::crateToCollection(crate);
                 marketItem.outcomeCollections[marketItem.outcomeCollectionsSize++] = outcomeCollection;
-            }            
+            }
         }
         else {
             marketItem.outcomeCollections[marketItem.outcomeCollectionsSize++] = marketItem.collection;
@@ -114,8 +121,13 @@ void ITEM::loadMarketItems(void)
             LOGGER::sendMessage("Item has no suitable grades " + coldData.weaponName + " " + coldData.skinName);
             continue;
         }
-        marketItem.minFloat = readyJsonItem["Min Float"].GetFloat();
-        marketItem.maxFloat = readyJsonItem["Max Float"].GetFloat();
+
+        // Outputs
+        for (auto &outputEntry : readyJsonItem["Outputs"].GetArray()) {
+            TempAccessID outputTempAccessID = outputEntry["Temp Access ID"].GetInt();
+            marketItem.outputTempAccessIDS[marketItem.outcomeCollectionsSize++] = outputTempAccessID;
+        }
+
         pushMarketItem(marketItem, coldData);
     }
 }
@@ -147,6 +159,23 @@ void ITEM::sortMarketItems(void)
     }
 
     LOGGER::sendMessage("Items loaded: " + std::to_string(g_marketItems.size()));
+}
+
+void ITEM::createFlattenedData(void)
+{
+    size_t marketItemsSize = g_marketItems.size();
+    g_outputItemIDS.resize(marketItemsSize);
+    g_minFloats.resize(marketItemsSize);
+    g_maxFloats.resize(marketItemsSize);
+
+    for (auto &item : g_marketItems) {
+        auto coldData = getColdData(item);
+        for (auto &outputTempAccessID : item.outputTempAccessIDS) {
+            g_outputItemIDS[item.tempAccessID].push_back(outputTempAccessID);
+        }
+        g_minFloats[item.tempAccessID] = item.minFloat;
+        g_maxFloats[item.tempAccessID] = item.maxFloat;
+    }
 }
 
 void ITEM::sendCorruptedItemError(const ITEM::MarketItem &item)

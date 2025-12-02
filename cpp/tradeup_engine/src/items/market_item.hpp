@@ -32,23 +32,27 @@ using PermID = uint64_t;
 
 //! MUST BE ALIGNED WITH OPENCL STRUCT
 #define MAX_MARKET_ITEM_COLLECTIONS DEFINITIONS::COLLECTION_END
+#define MAX_MARKET_ITEM_OUTPUTS 200
 
 #pragma pack(push, 1)
 struct MarketItem {
     TempAccessID tempAccessID;
     PermID permID;
-    int grade;
-    int category;
-    int wear;
+    short grade;
+    short category;
+    short wear;
     float price;
     float priceSteamTax;
     bool tradeupable;
-    int collection;
+    short collection;
     float floatVal, normalizedFloatVal, minFloat, maxFloat;
     float tradeUpChance;
 
-    std::array<int, MAX_MARKET_ITEM_COLLECTIONS> outcomeCollections;
+    std::array<short, MAX_MARKET_ITEM_COLLECTIONS> outcomeCollections;
     int outcomeCollectionsSize;
+
+    std::array<TempAccessID, MAX_MARKET_ITEM_OUTPUTS> outputTempAccessIDS;
+    int outputTempAccessIDSSize;
 
     MarketItem();
 

@@ -20,6 +20,7 @@
 #pragma once
 
 #include "definitions.cl"
+#include "item_id.cl"
 
 // ! MUST BE ALIGNED WITH CPU STRUCT
 
@@ -28,20 +29,20 @@
 #pragma pack(push, 1)
 typedef struct MarketItem 
 {
-    int tempAccessID;
-    ulong permID;
-    int grade;
-    int category;
-    int wear;
+    TempAccessID tempAccessID;
+    PermID permID;
+    short grade;
+    short category;
+    short wear;
     float price;
     float priceSteamTax;
 
     bool tradeupable;
-    int collection;
+    short collection;
     float floatVal, normalizedFloatVal, minFloat, maxFloat;
     float tradeUpChance;
 
-    int outcomeCollections[MAX_MARKET_ITEM_COLLECTIONS];
+    short outcomeCollections[MAX_MARKET_ITEM_COLLECTIONS];
     int outcomeCollectionsSize;
 } MarketItem;
 #pragma pack(pop)

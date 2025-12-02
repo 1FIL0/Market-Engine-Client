@@ -51,7 +51,7 @@ __kernel void combinationKernel(__global TradeupGPU *tradeups,
                                 __global MarketItem *flatCollectionOutputsPool,
                                 __global int *collectionIndicesStart,
                                 __global int *collectionIndicesEnd,
-                                __private int grade,
+                                __private short grade,
                                 __private uint batchSize,
                                 __private ulong combinationsAmount,
                                 __private float profitabilityMargin)
