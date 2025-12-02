@@ -166,24 +166,23 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     for (auto &input : tradeupCPU.inputs) {
         collectionChances[input.collection] += (100.0 / tradeupCPU.inputs.size());
         
-        const std::vector<ITEM::MarketItem> &collectionItemsRef = ITEM::getItemsCategoryGradeCollection(input.category, input.grade + 1, input.collection);
-        std::vector<ITEM::MarketItem> collectionItemsCopy = collectionItemsRef;
-
-        for (auto &collectionItemCopy : collectionItemsCopy) {
-            float outputFloat = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.normalizedAvgInputFloat);
-            // Ignore incorrect wears
-            if (collectionItemCopy.wear != DEFINITIONS::WEAR_NO_WEAR && DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) continue;
-            collectionItemCopy.floatVal = outputFloat;
-            pushNormalizedFloat(collectionItemCopy, collectionItemCopy.floatVal);
+        for (auto oid = 0; oid < input.outputTempAccessIDSSize; ++oid) {
+            ITEM::TempAccessID lowestWearOutputID = input.outputTempAccessIDS[oid];
+            const auto &lowestWearOutput = ITEM::getItem(lowestWearOutputID);
+            float outputFloat = calculateOutputItemFloat(lowestWearOutput.minFloat, lowestWearOutput.maxFloat, tradeupCPU.normalizedAvgInputFloat);
+            int wear = DEFINITIONS::itemFloatValToInt(outputFloat);
+            ITEM::MarketItem realOutput = ITEM::getItem(lowestWearOutputID + wear);
+            realOutput.floatVal = outputFloat;
+            pushNormalizedFloat(realOutput, realOutput.floatVal);
             
             // no duplicates allowed
-            if (std::find(outputs.begin(), outputs.end(), collectionItemCopy) != outputs.end()) {
+            if (std::find(outputs.begin(), outputs.end(), realOutput) != outputs.end()) {
                 continue;
             }
 
-            outputs.push_back(collectionItemCopy);
-            for (int oci = 0; oci < collectionItemCopy.outcomeCollectionsSize; ++oci) {
-                ++distinctCollectionItems[collectionItemCopy.outcomeCollections[oci]];
+            outputs.push_back(realOutput);
+            for (int oci = 0; oci < realOutput.outcomeCollectionsSize; ++oci) {
+                ++distinctCollectionItems[realOutput.outcomeCollections[oci]];
             }
         }
     }
@@ -199,9 +198,9 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     tradeupCPU.outputs = outputs;
 }
 
-float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float normalizedAvgInputFloat)
+float CPUOP::calculateOutputItemFloat(const float outputMinFloat, const float outputMaxFloat, const float normalizedAvgInputFloat)
 {
-    float outputFloat = (outputItem.maxFloat - outputItem.minFloat) * normalizedAvgInputFloat + outputItem.minFloat;
+    float outputFloat = (outputMaxFloat - outputMinFloat) * normalizedAvgInputFloat + outputMinFloat;
     return outputFloat;
 }
 

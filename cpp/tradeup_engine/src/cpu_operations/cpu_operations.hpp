@@ -46,7 +46,7 @@ void pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU);
 void pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU);
 
 std::array<float, DEFINITIONS::COLLECTION_END> getOutputCollectionChances(const TRADEUP::TradeupCPU &tradeupCPU);
-float calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float normalizedAvgInputFloat);
+float calculateOutputItemFloat(const float outputMinFloat, const float outputMaxFloat, const float normalizedAvgInputFloat);
 float calculateNormalizedOutputItemFloat(const ITEM::MarketItem &outputItem, const float realOutputFloat);
 
 void pushChanceToProfit(TRADEUP::TradeupCPU &tradeupCPU);

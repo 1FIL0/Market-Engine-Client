@@ -35,9 +35,10 @@ ITEM::MarketItem::MarketItem()
     tradeupable = false;
     
     collection = -1;
-    outcomeCollections.fill(-1);
+    outcomeCollections.fill(0);
+    outcomeCollectionsSize = 0;
 
-    outputTempAccessIDS.fill(-1);
+    outputTempAccessIDS.fill(0);
     outputTempAccessIDSSize = 0;
 
     floatVal = -1.0;

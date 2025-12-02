@@ -26,6 +26,7 @@
 #include "namespace.hpp"
 #include <array>
 #include <cstdlib>
+#include <iostream>
 #include <rapidjson/document.h>
 #include <string>
 #include <unordered_map>
@@ -81,11 +82,6 @@ void ITEM::loadMarketItems(void)
         marketItem.minFloat = readyJsonItem["Min Float"].GetFloat();
         marketItem.maxFloat = readyJsonItem["Max Float"].GetFloat();
 
-        // skip item cuz getting float on price member crashes cause these skins have null prices and shit.
-        if (marketItem.category == DEFINITIONS::CATEGORY_SOUVENIR || marketItem.grade == DEFINITIONS::GRADE_CONTRABAND) {
-            continue;
-        }
-
         // get modified items and set price accordingly
         marketItem.price = readyJsonItem["Market Price"].GetFloat();
         for (rapidjson::SizeType mi = 0; mi < modifiedDataDoc.Size(); ++mi) {
@@ -123,9 +119,9 @@ void ITEM::loadMarketItems(void)
         }
 
         // Outputs
-        for (auto &outputEntry : readyJsonItem["Outputs"].GetArray()) {
+        for (auto &outputEntry : readyJsonItem["Possible Outputs"].GetArray()) {
             TempAccessID outputTempAccessID = outputEntry["Temp Access ID"].GetInt();
-            marketItem.outputTempAccessIDS[marketItem.outcomeCollectionsSize++] = outputTempAccessID;
+            marketItem.outputTempAccessIDS[marketItem.outputTempAccessIDSSize++] = outputTempAccessID;
         }
 
         pushMarketItem(marketItem, coldData);
@@ -167,10 +163,10 @@ void ITEM::createFlattenedData(void)
     g_outputItemIDS.resize(marketItemsSize);
     g_minFloats.resize(marketItemsSize);
     g_maxFloats.resize(marketItemsSize);
-
+    
     for (auto &item : g_marketItems) {
-        auto coldData = getColdData(item);
-        for (auto &outputTempAccessID : item.outputTempAccessIDS) {
+        for (int i = 0; i < item.outputTempAccessIDSSize; ++i) {
+            TempAccessID outputTempAccessID = item.outputTempAccessIDS[i];
             g_outputItemIDS[item.tempAccessID].push_back(outputTempAccessID);
         }
         g_minFloats[item.tempAccessID] = item.minFloat;
@@ -182,6 +178,11 @@ void ITEM::sendCorruptedItemError(const ITEM::MarketItem &item)
 {
     auto data = getColdData(item);
     LOGGER::sendMessage("ERROR, CORRUPTED ITEM: " + data.weaponName + " " + data.skinName);
+}
+
+const ITEM::MarketItem &ITEM::getItem(const ITEM::TempAccessID ID)
+{
+    return g_marketItems[ID];
 }
 
 const std::vector<ITEM::MarketItem> &ITEM::getItems(void)
@@ -211,6 +212,16 @@ const std::vector<ITEM::MarketItem> &ITEM::getItemsTradeupableCategoryGrade(cons
 const std::vector<ITEM::MarketItem> &ITEM::getItemsTradeupableCategoryGradeCollection(const bool tradeupable, const int category, const int grade, const int collection)
 {
     return g_itemsTradeCategoryGradeCollection[tradeupable][category][grade][collection];
+}
+
+const std::vector<float> &getMinFloats(void)
+{
+    return g_minFloats;
+}
+
+const std::vector<float> &getMaxFloats(void)
+{
+    return g_maxFloats;
 }
 
 ITEM::MarketItemMemoryFlatCollections ITEM::getItemsTradeupableCategoryGradeCollectionsFlattened(const int category, const int grade)
