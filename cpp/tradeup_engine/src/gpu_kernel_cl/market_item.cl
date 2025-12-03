@@ -43,6 +43,5 @@ typedef struct MarketItem
     short wear;           
     short collection;     
     bool tradeupable;     
-    short outcomeCollections[MAX_MARKET_ITEM_COLLECTIONS]; 
 } MarketItem;
 #pragma pack(pop)

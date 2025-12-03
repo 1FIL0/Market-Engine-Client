@@ -86,36 +86,35 @@ void pushOutputItems(__global TradeupGPU *tradeup,
     __private int currentOutputSize = 0;
 
     for (int i = 0; i < tradeup->totalInputSize; ++i) {
-        MarketItem input = tradeup->inputs[i];
-        collectionChances[input.collection] += (100.0 / tradeup->totalInputSize); 
+        collectionChances[tradeup->inputs[i].collection] += (100.0 / tradeup->totalInputSize); 
 
-        for (int oidx = flatOutputIdsIndicesStart[input.tempAccessID]; oidx < flatOutputIdsIndicesEnd[input.tempAccessID]; ++oidx) {
+        for (int oidx = flatOutputIdsIndicesStart[tradeup->inputs[i].tempAccessID]; oidx < flatOutputIdsIndicesEnd[tradeup->inputs[i].tempAccessID]; ++oidx) {
             int lowestWearOutputID = flatOutputIds[oidx];
             float outputFloat = calculateOutputItemFloat(minFloats[lowestWearOutputID], maxFloats[lowestWearOutputID], tradeup->normalizedAvgInputFloat);
             int outputWear = itemFloatValToInt(outputFloat);
-            int realOutputID = flatOutputIds[lowestWearOutputID + outputWear];
+            int realOutputID = lowestWearOutputID + outputWear;
             
             int v = realOutputID;
-
-            int found = 0;
+                    
+            int dupMask = 0;
             for (int j = 0; j < currentOutputSize; j++) {
-                found |= (tradeup->outputTempIDS[j] == v);
+                dupMask |= (tradeup->outputTempIDS[j] == v);
             }
-            int isNew = 1 - found;
-            tradeup->outputTempIDS[currentOutputSize] = v * isNew + tradeup->outputTempIDS[currentOutputSize] * (1 - isNew);
-            tradeup->outputFloats[currentOutputSize] = outputFloat * isNew + tradeup->outputFloats[currentOutputSize] * (1 - isNew);
-            tradeup->outputWears[currentOutputSize] = outputWear * isNew + tradeup->outputFloats[currentOutputSize] * (1 - isNew);
-            
+
+            tradeup->outputTempIDS[currentOutputSize] = (dupMask == 0) ? v : tradeup->outputTempIDS[currentOutputSize];
+            tradeup->outputFloats[currentOutputSize] = (dupMask == 0) ? outputFloat : tradeup->outputFloats[currentOutputSize];
+            tradeup->outputWears[currentOutputSize] = (dupMask == 0) ? outputWear : tradeup->outputFloats[currentOutputSize];
+
             for (int ocidx = flatOutcomeCollectionsIndicesStart[v]; ocidx < flatOutcomeCollectionsIndicesEnd[v]; ++ocidx) {
                 int outcomeCollection = flatOutcomeCollections[ocidx];
-                distinctCollectionItems[outcomeCollection] += isNew;
+                distinctCollectionItems[outcomeCollection] += (dupMask == 0) ? 1 : 0;
             }
 
-            currentOutputSize += isNew;
+            currentOutputSize += (dupMask == 0) ? 1 : 0;
         }
     }
 
-    for (int i = 0; i < tradeup->totalOutputSize; ++i) {
+    for (int i = 0; i < currentOutputSize; ++i) {
         int outputID = tradeup->outputTempIDS[i];
         int outcomeCollection = flatOutcomeCollections[flatOutcomeCollectionsIndicesStart[outputID]];
         tradeup->outputTradeupChances[i] = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);

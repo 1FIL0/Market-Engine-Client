@@ -42,7 +42,7 @@ USE_NAMESPACE_SHARE
 std::vector<cl::Platform> g_platforms;
 std::vector<COMPGPU::ComputeContext> g_computeContexts;
 std::vector<std::thread> g_computeThreads;
-bool g_debug = false;
+bool g_debug = true;
 
 void COMPGPU::init()
 {

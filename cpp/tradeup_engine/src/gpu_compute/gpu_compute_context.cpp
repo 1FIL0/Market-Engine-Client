@@ -28,6 +28,7 @@
 #include <CL/cl_platform.h>
 #include <CL/opencl.hpp>
 #include <cstdint>
+#include <iostream>
 #include <rapidjson/document.h>
 #include <rapidjson/prettywriter.h>
 #include <rapidjson/stringbuffer.h>

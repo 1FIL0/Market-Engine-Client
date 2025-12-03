@@ -27,6 +27,7 @@
 #include "namespace.hpp"
 #include <array>
 #include <cstdlib>
+#include <iostream>
 #include <rapidjson/document.h>
 #include <string>
 #include <unordered_map>
