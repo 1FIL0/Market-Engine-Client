@@ -26,8 +26,15 @@
 TradeupGPU processCombination(__global float *minFloats,
                         __global float *maxFloats,
                         __global float *prices,
-                        __global TempAccessID *flatOutcomeCollections,
-                        __global TempAccessID *outputIDS,
+
+                        __global int *flatOutcomeCollections,
+                        __global int *flatOutcomeCollectionsIndicesStart,
+                        __global int *flatOutcomeCollectionsIndicesEnd,
+
+                        __global TempAccessID *flatOutputIds,
+                        __global int *flatOutputIdsIndicesStart,
+                        __global int *flatOutputIdsIndicesEnd,
+
                         __private MarketItem *combination,
                         __private int combinationSize)
 {
@@ -41,9 +48,10 @@ TradeupGPU processCombination(__global float *minFloats,
     pushAvgInputFloat(&tradeup);
     pushNormalizedAvgInputFloat(&tradeup);
     pushTotalInputPrice(&tradeup);
-    pushOutputItems(&tradeup, flatCollectionOutputsPool, collectionIndicesStart, collectionIndiciesEnd);
-    pushChanceToProfit(&tradeup);
-    pushProfitability(&tradeup);
+    pushOutputItems(&tradeup, minFloats, maxFloats, flatOutcomeCollections, flatOutcomeCollectionsIndicesStart, flatOutcomeCollectionsIndicesEnd,
+                    flatOutputIds, flatOutputIdsIndicesStart, flatOutputIdsIndicesEnd);
+    pushChanceToProfit(&tradeup, prices);
+    pushProfitability(&tradeup, prices);
 
     return tradeup;
 }
@@ -54,13 +62,13 @@ __kernel void combinationKernel(__global TradeupGPU *tradeups,
                                 __global float *maxFloats,
                                 __global float *prices,
 
-                                __global TempAccessID *flatOutcomeCollections,
+                                __global int *flatOutcomeCollections,
                                 __global int *flatOutcomeCollectionsIndicesStart,
                                 __global int *flatOutcomeCollectionsIndicesEnd,
                                 
                                 __global TempAccessID *flatOutputIds,
-                                __global TempAccessID *flatOutputIdsIndicesStart,
-                                __global TempAccessID *flatOutputIdsIndicesEnd,
+                                __global int *flatOutputIdsIndicesStart,
+                                __global int *flatOutputIdsIndicesEnd,
 
                                 __private short grade,
                                 __private uint batchSize,
@@ -87,7 +95,11 @@ __kernel void combinationKernel(__global TradeupGPU *tradeups,
         combination[i] = batch[localIndices[i]];
     }
 
-    __private TradeupGPU tradeup = processCombination(minFloats, maxFloats, prices, flatOutcomeCollections, outputIDS, combination, combinationSize);
+    __private TradeupGPU tradeup = processCombination(minFloats, maxFloats, prices, flatOutcomeCollections, 
+                                                        flatOutcomeCollectionsIndicesStart, flatOutcomeCollectionsIndicesEnd, 
+                                                        flatOutputIds, flatOutputIdsIndicesStart, flatOutputIdsIndicesEnd, 
+                                                        combination, combinationSize);
+
     if (tradeup.profitability > profitabilityMargin) {
         tradeup.processed = true; // tradeup is replaced by new value and "processed". later set to false when "clearing" tradeups in the host
         tradeups[gid] = tradeup;

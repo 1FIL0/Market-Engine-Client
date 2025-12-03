@@ -36,6 +36,7 @@ TRADEUP::TradeupCPU TRADEUP::GPU2CPU(const TRADEUP::TradeupGPU &tradeupGPU)
       ITEM::MarketItem makeshiftOutput = ITEM::getItem(tradeupGPU.outputIDS[i]);
       makeshiftOutput.floatVal = tradeupGPU.outputFloats[i];
       makeshiftOutput.wear = tradeupGPU.outputFloats[i];
+      makeshiftOutput.tradeUpChance = tradeupGPU.outputTradeupChances[i];
       tradeupCPU.outputs.push_back(makeshiftOutput);
    }
    

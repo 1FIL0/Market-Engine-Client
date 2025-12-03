@@ -19,6 +19,7 @@
 
 #include "gpu_compute_context.hpp"
 #include "compute_config.hpp"
+#include "debug.hpp"
 #include "definitions.hpp"
 #include "gpu_compute_error.hpp"
 #include "logger.hpp"
@@ -46,9 +47,9 @@
 USE_NAMESPACE_TRADEUP_ENGINE
 USE_NAMESPACE_SHARE
 
-COMPGPU::ComputeContext::ComputeContext(const cl::Device &a_device, const bool debug)
+COMPGPU::ComputeContext::ComputeContext(const cl::Device &a_device)
 {
-    m_debugMode = debug;
+    m_debugMode = MARKET_ENGINE_DEBUG_STATUS;
 
     m_device = a_device;
     m_platform = m_device.getInfo<CL_DEVICE_PLATFORM>();

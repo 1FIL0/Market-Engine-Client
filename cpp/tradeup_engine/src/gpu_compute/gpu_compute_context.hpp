@@ -77,7 +77,7 @@ class ComputeContext {
         void processTradeups(void);
 
     public:
-        ComputeContext(const cl::Device &a_device, const bool debug = false);
+        ComputeContext(const cl::Device &a_device);
 
         void startCompute(void);
         void execKernel(void);

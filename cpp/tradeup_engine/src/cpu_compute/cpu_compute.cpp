@@ -33,13 +33,14 @@
 #include "hasher.hpp"
 #include "tradeup_handler.hpp"
 #include "tradeup.hpp"
+#include "debug.hpp"
 
 USE_NAMESPACE_TRADEUP_ENGINE
 USE_NAMESPACE_SHARE
 
 void COMPCPU::init(void)
 {
-    //omp_set_num_threads(1);
+    if (MARKET_ENGINE_DEBUG_STATUS) omp_set_num_threads(1);
 }
 
 void COMPCPU::startCompute(void)

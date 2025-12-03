@@ -34,7 +34,8 @@ typedef struct TradeupGPU {
     TempAccessID outputIDS[MAX_GPU_TRADEUP_OUTPUTS];
     float outputFloats[MAX_GPU_TRADEUP_OUTPUTS];
     short outputWears[MAX_GPU_TRADEUP_OUTPUTS];
-    
+    float outputTradeupChances[MAX_GPU_TRADEUP_OUTPUTS];
+
     int totalInputSize;
     int totalOutputSize;
     float avgInputFloat;

@@ -1,0 +1,97 @@
+(Market Engine): Loaded configs: /home/fil/.config/market_engine_client/tradeup_engine.json
+(Market Engine): Loading Items
+(Market Engine): Item Bayonet Night StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Bowie Knife Boreal Forest StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Bowie Knife Urban Masked StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Butterfly Knife Autotronic StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Butterfly Knife Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Butterfly Knife Lore StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Butterfly Knife Ultraviolet StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Falchion Knife Forest DDPAT StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Falchion Knife Night StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Flip Knife Night StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Gut Knife Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Gut Knife Night StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Huntsman Knife Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Huntsman Knife Night StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Huntsman Knife Urban Masked StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Karambit Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Karambit Forest DDPAT StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Karambit Ultraviolet StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Kukri Knife Night Stripe StatTrak Factory New Has a corrupted price!
+(Market Engine): Item M9 Bayonet Safari Mesh StatTrak Factory New Has a corrupted price!
+(Market Engine): Item M9 Bayonet Ultraviolet StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Navaja Knife Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Navaja Knife Scorched StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Nomad Knife Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Nomad Knife Safari Mesh StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Nomad Knife Scorched StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Nomad Knife Ultraviolet StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Nomad Knife Urban Masked StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Paracord Knife Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Paracord Knife Ultraviolet StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Shadow Daggers Night StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Shadow Daggers Scorched StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Skeleton Knife Crimson Web Normal Factory New Has a corrupted price!
+(Market Engine): Item Skeleton Knife Doppler StatTrak Minimal Wear Has a corrupted price!
+(Market Engine): Item Skeleton Knife Safari Mesh StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Skeleton Knife Ultraviolet StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Sport Gloves Pandora's Box Normal Factory New Has a corrupted price!
+(Market Engine): Item Stiletto Knife Night Stripe StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Stiletto Knife Urban Masked StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Survival Knife Boreal Forest StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Survival Knife Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Survival Knife Night Stripe StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Survival Knife Safari Mesh StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Talon Knife Crimson Web Normal Factory New Has a corrupted price!
+(Market Engine): Item Talon Knife Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Talon Knife Forest DDPAT StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Talon Knife Night Stripe StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Talon Knife Ultraviolet StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Ursus Knife Boreal Forest StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Ursus Knife Crimson Web StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Ursus Knife Night Stripe StatTrak Factory New Has a corrupted price!
+(Market Engine): Item Ursus Knife Urban Masked StatTrak Factory New Has a corrupted price!
+(Market Engine): Item M4A4 Eye of Horus Souvenir Factory New Has a corrupted price!
+(Market Engine): Item M4A1-S Imminent Danger Souvenir Factory New Has a corrupted price!
+(Market Engine): Item M4A1-S Imminent Danger Souvenir Well Worn Has a corrupted price!
+(Market Engine): Item M4A1-S Welcome to the Jungle Souvenir Factory New Has a corrupted price!
+(Market Engine): Item AWP Dragon Lore Souvenir Factory New Has a corrupted price!
+(Market Engine): Item AWP Dragon Lore Souvenir Minimal Wear Has a corrupted price!
+(Market Engine): Item AWP Dragon Lore Souvenir Battle Scarred Has a corrupted price!
+(Market Engine): Item MP9 Orange Peel Souvenir Factory New Has a corrupted price!
+(Market Engine): Item M4A1-S Nitro Souvenir Factory New Has a corrupted price!
+(Market Engine): Item FAMAS Cyanospatter Souvenir Factory New Has a corrupted price!
+(Market Engine): Item P250 Nuclear Threat Souvenir Factory New Has a corrupted price!
+(Market Engine): Item Tec-9 Nuclear Threat Souvenir Factory New Has a corrupted price!
+(Market Engine): Item AWP LongDog Souvenir Factory New Has a corrupted price!
+(Market Engine): Items loaded: 14649
+(Market Engine): Getting Known Tradeup Hashes
+(Market Engine): Total Tradeups: 39
+(Market Engine): Total Hashes: 39
+(Market Engine): Getting platforms
+(Market Engine): Getting devices from Oclgrind
+(Market Engine): Compute Context Info
+[Using Platform] Oclgrind / Oclgrind
+[Using Device] Oclgrind Simulator
+[Compute Units] 1
+[Max Global Memory] 128MB
+[Debug]: 1
+
+(Market Engine): Building Program
+(Market Engine): /home/fil/Projects/MarketEngine/market_engine_client/cpp/tradeup_engine/build/../../../../market_engine_share/cpp/share/src/definitions/../../../../../market_engine_client/cpp/calculator/src/gpu_kernel_embedded
+(Market Engine): Initializing data
+(Market Engine): Creating Initial Buffers
+(Market Engine): Preparing Batch [15]
+(Market Engine): Preparing buffers
+(Market Engine): Setting kernel args
+(Market Engine): Processing Combinations 
+[Category = 0] 
+[Grade = 4] 
+[Combinations = 3003] 
+[Current Batch = 0]
+[Batch Size = 15] 
+[Batch = UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory, UMP-45 K.O. Factory]
+
+(Market Engine): Executing Kernel
+434343434343434343434343434343434343
