@@ -143,6 +143,9 @@ void COMPGPU::ComputeContext::createInitialBuffers(void)
     m_minFloatsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
                                     sizeof(float) * flatData.minFloats.size(), flatData.minFloats.data());
 
+    m_pricesBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                sizeof(float) * flatData.prices.size(), flatData.prices.data());
+
     m_maxFloatsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
                                     sizeof(float) * flatData.maxFloats.size(), flatData.maxFloats.data());
 

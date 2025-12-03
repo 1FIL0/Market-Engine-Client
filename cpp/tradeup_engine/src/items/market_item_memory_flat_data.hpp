@@ -17,6 +17,8 @@ struct MarketItemMemoryFlatData {
     
     std::vector<float> minFloats;
     std::vector<float> maxFloats;
+
+    std::vector<float> prices;
 };
 
 END_ENGINE_NAMESPACE

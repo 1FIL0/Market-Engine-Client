@@ -83,7 +83,7 @@ void pushOutputItems(__global TradeupGPU *tradeup,
 {
     __private float collectionChances[COLLECTION_END] = {0.0};
     __private int distinctCollectionItems[COLLECTION_END] = {0};
-    __private int currentOutputItem = 0;
+    __private int currentOutputSize = 0;
 
     for (int i = 0; i < tradeup->totalInputSize; ++i) {
         MarketItem input = tradeup->inputs[i];
@@ -98,20 +98,20 @@ void pushOutputItems(__global TradeupGPU *tradeup,
             int v = realOutputID;
 
             int found = 0;
-            for (int j = 0; j < tradeup->totalOutputSize; j++) {
+            for (int j = 0; j < currentOutputSize; j++) {
                 found |= (tradeup->outputTempIDS[j] == v);
             }
             int isNew = 1 - found;
-            tradeup->outputTempIDS[tradeup->totalOutputSize] = v * isNew + tradeup->outputTempIDS[tradeup->totalOutputSize] * (1 - isNew);
-            tradeup->outputFloats[tradeup->totalOutputSize] = outputFloat * isNew + tradeup->outputFloats[tradeup->totalOutputSize] * (1 - isNew);
-            tradeup->outputWears[tradeup->totalOutputSize] = outputWear * isNew + tradeup->outputFloats[tradeup->totalOutputSize] * (1 - isNew);
+            tradeup->outputTempIDS[currentOutputSize] = v * isNew + tradeup->outputTempIDS[currentOutputSize] * (1 - isNew);
+            tradeup->outputFloats[currentOutputSize] = outputFloat * isNew + tradeup->outputFloats[currentOutputSize] * (1 - isNew);
+            tradeup->outputWears[currentOutputSize] = outputWear * isNew + tradeup->outputFloats[currentOutputSize] * (1 - isNew);
             
             for (int ocidx = flatOutcomeCollectionsIndicesStart[v]; ocidx < flatOutcomeCollectionsIndicesEnd[v]; ++ocidx) {
                 int outcomeCollection = flatOutcomeCollections[ocidx];
                 distinctCollectionItems[outcomeCollection] += isNew;
             }
 
-            tradeup->totalOutputSize += isNew;
+            currentOutputSize += isNew;
         }
     }
 
@@ -121,7 +121,7 @@ void pushOutputItems(__global TradeupGPU *tradeup,
         tradeup->outputTradeupChances[i] = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
     }
 
-    tradeup->totalOutputSize = currentOutputItem;
+    tradeup->totalOutputSize = currentOutputSize;
 }
 
 float getExpectedPrice(__global TradeupGPU *tradeup, __global float *prices)

@@ -178,6 +178,7 @@ void ITEM::createFlattenedData(void)
 
         g_flatData.minFloats.push_back(item.minFloat);
         g_flatData.maxFloats.push_back(item.maxFloat);
+        g_flatData.prices.push_back(item.price);
     }
 }
 
