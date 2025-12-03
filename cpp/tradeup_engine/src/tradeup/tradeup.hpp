@@ -35,7 +35,7 @@ struct TradeupGPU {
     bool processed;
     ITEM::MarketItem inputs[MAX_GPU_TRADEUP_INPUTS];
     
-    ITEM::TempAccessID outputIDS[MAX_GPU_TRADEUP_OUTPUTS];
+    int outputTempIDS[MAX_GPU_TRADEUP_OUTPUTS];
     float outputFloats[MAX_GPU_TRADEUP_OUTPUTS];
     short outputWears[MAX_GPU_TRADEUP_OUTPUTS];
     float outputTradeupChances[MAX_GPU_TRADEUP_OUTPUTS];

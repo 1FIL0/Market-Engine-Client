@@ -20,6 +20,7 @@
 #pragma once
 
 #include "market_item.cl"
+#include <sys/types.h>
 
 // ! MUST BE ALIGNED WITH CPU STRUCT
 
@@ -31,7 +32,7 @@ typedef struct TradeupGPU {
     bool processed;
     MarketItem inputs[MAX_GPU_TRADEUP_INPUTS];
 
-    TempAccessID outputIDS[MAX_GPU_TRADEUP_OUTPUTS];
+    int outputTempIDS[MAX_GPU_TRADEUP_OUTPUTS];
     float outputFloats[MAX_GPU_TRADEUP_OUTPUTS];
     short outputWears[MAX_GPU_TRADEUP_OUTPUTS];
     float outputTradeupChances[MAX_GPU_TRADEUP_OUTPUTS];

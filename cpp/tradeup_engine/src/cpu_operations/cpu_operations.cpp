@@ -28,7 +28,6 @@
 #include <cstddef>
 #include <cstdlib>
 #include <emmintrin.h>
-#include <iostream>
 #include <vector>
 #include <omp.h>
 #include "cpu_operations.hpp"

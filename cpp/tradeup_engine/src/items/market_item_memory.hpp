@@ -49,10 +49,10 @@ void sortMarketItems(void);
 void createFlattenedData(void);
 void sendCorruptedItemError(const MarketItem &item);
 
-const MarketItem &getItem(const TempAccessID ID);
+const MarketItem &getItem(const int tempID);
 const std::vector<MarketItem> &getItems(void);
 MarketItemColdData getColdData(const MarketItem &item);
-const std::vector<MarketItem> &getItemsCategoryGradeCollection (const int category, const int grade, const int collection);
+const std::vector<MarketItem> &getItemsCategoryGradeCollection(const int category, const int grade, const int collection);
 const std::vector<MarketItem> &getItemsTradeupableCategoryGrade(const bool tradeupable, const int category, const int grade);
 const std::vector<MarketItem> &getItemsTradeupableCategoryGradeCollection(const bool tradeupable, const int category, const int grade, const int collection);
 const MarketItemMemoryFlatData &getFlatData(void);

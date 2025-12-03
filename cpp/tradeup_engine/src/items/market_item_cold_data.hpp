@@ -29,7 +29,7 @@ START_ENGINE_NAMESPACE_MULTI(ITEM)
 struct MarketItemColdData {
     std::string weaponName;
     std::string skinName;
-    std::vector<TempAccessID> outputTempAccessIDS;
+    std::vector<int> outputTempIds;
     std::vector<short> outcomeCollections;
     
     MarketItemColdData();

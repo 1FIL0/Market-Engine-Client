@@ -19,7 +19,6 @@
 
 #include "gpu_compute_context.hpp"
 #include "compute_config.hpp"
-#include "debug.hpp"
 #include "definitions.hpp"
 #include "gpu_compute_error.hpp"
 #include "logger.hpp"
@@ -47,11 +46,11 @@
 USE_NAMESPACE_TRADEUP_ENGINE
 USE_NAMESPACE_SHARE
 
-COMPGPU::ComputeContext::ComputeContext(const cl::Device &a_device)
+COMPGPU::ComputeContext::ComputeContext(const cl::Device &device, const bool debug)
 {
-    m_debugMode = MARKET_ENGINE_DEBUG_STATUS;
+    m_debugMode = debug;
 
-    m_device = a_device;
+    m_device = device;
     m_platform = m_device.getInfo<CL_DEVICE_PLATFORM>();
     m_context = cl::Context(m_device);
     m_queue = cl::CommandQueue(m_context, m_device);
@@ -82,8 +81,6 @@ void COMPGPU::ComputeContext::buildKernel(void)
     }
     catch (cl::Error &err) {
         LOGGER::sendMessage(getCLError(err));
-        std::string buildLog = m_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(m_device);
-        LOGGER::sendMessage("Build Log: " + buildLog);
     }
 }
 
@@ -159,12 +156,12 @@ void COMPGPU::ComputeContext::createInitialBuffers(void)
                                                     sizeof(int) * flatData.outcomeCollectionsEndIndices.size(), flatData.outcomeCollectionsEndIndices.data());
 
     m_flatOutputIdsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
-                                    sizeof(ITEM::TempAccessID) * flatData.outputItemIds.size(), flatData.outputItemIds.data());
+                                    sizeof(int) * flatData.outputItemIds.size(), flatData.outputItemIds.data());
 
     m_flatOutputIdsIndicesStartBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
                                                 sizeof(int) * flatData.outputItemIdsStartIndices.size(), flatData.outputItemIdsStartIndices.data());
 
-    m_flatOutcomeCollectionsIndicesEndBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+    m_flatOutputIdsIndicesEndBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
                                                         sizeof(int) * flatData.outputItemIdsEndIndices.size(), flatData.outputItemIdsEndIndices.data());
 }
 
@@ -226,7 +223,7 @@ void COMPGPU::ComputeContext::setKernelArgs(void)
     m_kernel.setArg(7, sizeof(cl_mem), &m_flatOutcomeCollectionsIndicesEndBuffer);
     m_kernel.setArg(8, sizeof(cl_mem), &m_flatOutputIdsBuffer);
     m_kernel.setArg(9, sizeof(cl_mem), &m_flatOutputIdsIndicesStartBuffer);
-    m_kernel.setArg(10, sizeof(cl_mem), &m_flatOutputIdsIndicesEndBuffer) ;
+    m_kernel.setArg(10, sizeof(cl_mem), &m_flatOutputIdsIndicesEndBuffer);
     m_kernel.setArg(11, sizeof(short), &m_batch[0].grade);
     m_kernel.setArg(12, sizeof(uint32_t), &batchSize);
     m_kernel.setArg(13, sizeof(uint64_t), &m_combinationsAmount);
@@ -254,9 +251,9 @@ void COMPGPU::ComputeContext::startCompute(void)
         ++currentBatch;
 
         // Only one batch 4 debug
-        if (m_debugMode) {
-            return;
-        }
+        //if (m_debugMode) {
+        //    return;
+        //}
     }
 }
 

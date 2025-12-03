@@ -37,7 +37,7 @@ USE_NAMESPACE_TRADEUP_ENGINE
 USE_NAMESPACE_TRADEUP_ENGINE_MULTI(ITEM)
 
 std::vector<MarketItem> g_marketItems;
-std::unordered_map<TempAccessID, MarketItemColdData> g_itemsColdData;
+std::unordered_map<int, MarketItemColdData> g_itemsColdData;
 ARR_TRADEUPABLE(ARR_CATEGORY(ARR_GRADE(std::vector<MarketItem>)))                   g_itemsTradeCategoryGrade;
 ARR_TRADEUPABLE(ARR_CATEGORY(ARR_GRADE(ARR_COLLECTION(std::vector<MarketItem>))))   g_itemsTradeCategoryGradeCollection;
 ARR_CATEGORY(ARR_GRADE(ARR_COLLECTION(std::vector<MarketItem>)))                    g_itemsCategoryGradeCollection;
@@ -119,8 +119,8 @@ void ITEM::loadMarketItems(void)
 
         // Outputs
         for (auto &outputEntry : readyJsonItem["Possible Outputs"].GetArray()) {
-            TempAccessID outputTempAccessID = outputEntry["Output Temp Access ID"].GetInt();
-            coldData.outputTempAccessIDS.push_back(outputTempAccessID);
+            int outputTempID = outputEntry["Output Temp Access ID"].GetInt();
+            coldData.outputTempIds.push_back(outputTempID);
         }
 
         pushMarketItem(marketItem, coldData);
@@ -162,7 +162,7 @@ void ITEM::createFlattenedData(void)
 
         static int outputItemIdIndex = 0;
         g_flatData.outputItemIdsStartIndices.push_back(outputItemIdIndex);
-        for (auto &outputTempID : coldData.outputTempAccessIDS) {
+        for (auto &outputTempID : coldData.outputTempIds) {
             g_flatData.outputItemIds.push_back(outputTempID);
             ++outputItemIdIndex;
         }
@@ -187,9 +187,9 @@ void ITEM::sendCorruptedItemError(const ITEM::MarketItem &item)
     LOGGER::sendMessage("ERROR, CORRUPTED ITEM: " + data.weaponName + " " + data.skinName);
 }
 
-const ITEM::MarketItem &ITEM::getItem(const ITEM::TempAccessID ID)
+const ITEM::MarketItem &ITEM::getItem(const int tempID)
 {
-    return g_marketItems[ID];
+    return g_marketItems[tempID];
 }
 
 const std::vector<ITEM::MarketItem> &ITEM::getItems(void)

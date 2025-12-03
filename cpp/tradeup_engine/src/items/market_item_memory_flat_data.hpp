@@ -11,7 +11,7 @@ struct MarketItemMemoryFlatData {
     std::vector<int> outcomeCollectionsStartIndices;
     std::vector<int> outcomeCollectionsEndIndices;
     
-    std::vector<TempAccessID> outputItemIds;
+    std::vector<uint64_t> outputItemIds;
     std::vector<int> outputItemIdsStartIndices;
     std::vector<int> outputItemIdsEndIndices;
     

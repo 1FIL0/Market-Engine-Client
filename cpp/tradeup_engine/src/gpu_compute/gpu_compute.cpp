@@ -42,6 +42,7 @@ USE_NAMESPACE_SHARE
 std::vector<cl::Platform> g_platforms;
 std::vector<COMPGPU::ComputeContext> g_computeContexts;
 std::vector<std::thread> g_computeThreads;
+bool g_debug = false;
 
 void COMPGPU::init()
 {
@@ -69,7 +70,7 @@ void COMPGPU::loadContexts(void)
 
             for (auto &device : devices) {
                 if (device.getInfo<CL_DEVICE_NAME>() == configDevice) {
-                    g_computeContexts.push_back(ComputeContext(device));
+                    g_computeContexts.push_back(ComputeContext(device, g_debug));
                 }
             }
         }
