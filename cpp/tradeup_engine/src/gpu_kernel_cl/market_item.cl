@@ -19,8 +19,6 @@
 
 #pragma once
 
-#include "definitions.cl"
-
 // ! MUST BE ALIGNED WITH CPU STRUCT
 
 #define MAX_MARKET_ITEM_COLLECTIONS COLLECTION_END

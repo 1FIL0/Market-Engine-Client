@@ -28,6 +28,7 @@
 #include <cstddef>
 #include <cstdlib>
 #include <emmintrin.h>
+#include <iostream>
 #include <vector>
 #include <omp.h>
 #include "cpu_operations.hpp"
@@ -173,7 +174,8 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
             const auto &lowestWearOutput = ITEM::getItem(lowestWearOutputID);
             float outputFloat = calculateOutputItemFloat(lowestWearOutput.minFloat, lowestWearOutput.maxFloat, tradeupCPU.normalizedAvgInputFloat);
             int wear = DEFINITIONS::itemFloatValToInt(outputFloat);
-            ITEM::MarketItem realOutput = ITEM::getItem(lowestWearOutputID + wear);
+
+            ITEM::MarketItem realOutput = ITEM::getItem(lowestWearOutputID + (wear - lowestWearOutput.wear));
             realOutput.floatVal = outputFloat;
             pushNormalizedFloat(realOutput, realOutput.floatVal);
             

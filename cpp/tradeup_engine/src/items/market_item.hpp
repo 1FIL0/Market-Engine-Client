@@ -21,10 +21,8 @@
 
 #include "namespace.hpp"
 #include <cstdint>
-#include "definitions.hpp"
 
 START_ENGINE_NAMESPACE_MULTI(ITEM)
-USE_NAMESPACE_SHARE
 
 //! MUST BE ALIGNED WITH OPENCL STRUCT
 #define MAX_MARKET_ITEM_COLLECTIONS DEFINITIONS::COLLECTION_END
