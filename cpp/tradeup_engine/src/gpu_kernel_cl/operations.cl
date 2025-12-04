@@ -91,8 +91,9 @@ void pushOutputItems(__global TradeupGPU *tradeup,
         for (int oidx = flatOutputIdsIndicesStart[tradeup->inputs[i].tempAccessID]; oidx < flatOutputIdsIndicesEnd[tradeup->inputs[i].tempAccessID]; ++oidx) {
             int lowestWearOutputID = flatOutputIds[oidx];
             float outputFloat = calculateOutputItemFloat(minFloats[lowestWearOutputID], maxFloats[lowestWearOutputID], tradeup->normalizedAvgInputFloat);
-            int outputWear = itemFloatValToInt(outputFloat);
-            int realOutputID = lowestWearOutputID + outputWear;
+            int lowestWear = itemFloatValToInt(minFloats[lowestWearOutputID]);
+            int realOutputWear = itemFloatValToInt(outputFloat);
+            int realOutputID = lowestWearOutputID + (realOutputWear - lowestWear);
             
             int v = realOutputID;
                     
@@ -103,7 +104,7 @@ void pushOutputItems(__global TradeupGPU *tradeup,
 
             tradeup->outputTempIDS[currentOutputSize] = (dupMask == 0) ? v : tradeup->outputTempIDS[currentOutputSize];
             tradeup->outputFloats[currentOutputSize] = (dupMask == 0) ? outputFloat : tradeup->outputFloats[currentOutputSize];
-            tradeup->outputWears[currentOutputSize] = (dupMask == 0) ? outputWear : tradeup->outputFloats[currentOutputSize];
+            tradeup->outputWears[currentOutputSize] = (dupMask == 0) ? realOutputWear : tradeup->outputFloats[currentOutputSize];
 
             for (int ocidx = flatOutcomeCollectionsIndicesStart[v]; ocidx < flatOutcomeCollectionsIndicesEnd[v]; ++ocidx) {
                 int outcomeCollection = flatOutcomeCollections[ocidx];
