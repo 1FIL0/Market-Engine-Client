@@ -45,6 +45,7 @@ void processCombination(__global TradeupGPU *tradeup,
         tradeup->inputs[i] = combination[i];
     }
 
+    pushInputsNormalizedFloats(tradeup);
     pushAvgInputFloat(tradeup);
     pushNormalizedAvgInputFloat(tradeup);
     pushTotalInputPrice(tradeup);

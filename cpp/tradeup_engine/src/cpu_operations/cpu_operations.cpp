@@ -173,9 +173,16 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
             int lowestWearOutputID = flatData.outputItemIds[oid];
             const auto &lowestWearOutput = ITEM::getItem(lowestWearOutputID);
             float outputFloat = calculateOutputItemFloat(lowestWearOutput.minFloat, lowestWearOutput.maxFloat, tradeupCPU.normalizedAvgInputFloat);
-            int wear = DEFINITIONS::itemFloatValToInt(outputFloat);
+            int realOutputWear = DEFINITIONS::itemFloatValToInt(outputFloat);
 
-            ITEM::MarketItem realOutput = ITEM::getItem(lowestWearOutputID + (wear - lowestWearOutput.wear));
+            ITEM::MarketItem realOutput = ITEM::getItem(lowestWearOutputID + (realOutputWear - lowestWearOutput.wear));
+            // some debug crap just in case
+            //if (realOutput.grade != input.grade + 1) {
+            //    std::cout << "OUTFLOAT " << outputFloat << " AVG" << tradeupCPU.normalizedAvgInputFloat << std::endl;
+            //    std::cout << "LOWEST OUTID " << lowestWearOutputID << std::endl;
+            //    std::cout << "REAL OUTID " << realOutput.tempAccessID << std::endl;
+            //    exit(0);
+            //}
             realOutput.floatVal = outputFloat;
             pushNormalizedFloat(realOutput, realOutput.floatVal);
             

@@ -24,11 +24,19 @@
 #include "definitions.cl"
 #include "tradeup.cl"
 
-void pushNormalizedFloat(__private MarketItem *item, __private const float itemFloatVal)
+float calculateNormalizedFloat(__private const float minFloat, __private const float maxFloat, __private const float itemFloatVal)
 {
-    float denom = item->maxFloat - item->minFloat;
+    float denom = maxFloat - minFloat;
     denom = (denom == 0.0f) ? FLT_EPSILON : denom;
-    item->normalizedFloatVal = (itemFloatVal - item->minFloat) / denom;
+    float normalizedFloatVal = (itemFloatVal - minFloat) / denom;
+    return normalizedFloatVal;
+}
+
+void pushInputsNormalizedFloats(__global TradeupGPU *tradeup)
+{
+    for (int i = 0; i < tradeup->totalInputSize; ++i) {
+        tradeup->inputs[i].normalizedFloatVal = calculateNormalizedFloat(tradeup->inputs[i].minFloat, tradeup->inputs[i].maxFloat, tradeup->inputs[i].floatVal);
+    }
 }
 
 void pushTotalInputPrice(__global TradeupGPU *tradeup)
@@ -102,9 +110,11 @@ void pushOutputItems(__global TradeupGPU *tradeup,
                 dupMask |= (tradeup->outputTempIDS[j] == v);
             }
 
+            float normalizedOutputFloat = calculateNormalizedFloat(minFloats[realOutputID], maxFloats[realOutputID], outputFloat);
+
+            tradeup->normalizedOutputFloats[currentOutputSize] = (dupMask == 0) ? normalizedOutputFloat : tradeup->normalizedOutputFloats[currentOutputSize];
             tradeup->outputTempIDS[currentOutputSize] = (dupMask == 0) ? v : tradeup->outputTempIDS[currentOutputSize];
             tradeup->outputFloats[currentOutputSize] = (dupMask == 0) ? outputFloat : tradeup->outputFloats[currentOutputSize];
-            tradeup->outputWears[currentOutputSize] = (dupMask == 0) ? realOutputWear : tradeup->outputFloats[currentOutputSize];
 
             for (int ocidx = flatOutcomeCollectionsIndicesStart[v]; ocidx < flatOutcomeCollectionsIndicesEnd[v]; ++ocidx) {
                 int outcomeCollection = flatOutcomeCollections[ocidx];

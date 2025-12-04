@@ -39,7 +39,7 @@ USE_NAMESPACE_SHARE
 
 void COMPCPU::init(void)
 {
-    //omp_set_num_threads(1);
+    omp_set_num_threads(1);
 }
 
 void COMPCPU::startCompute(void)
