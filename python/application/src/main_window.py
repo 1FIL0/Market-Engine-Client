@@ -823,7 +823,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def defaultTradeupEngineSettings(self):
         config = {
-            "Compute Rarities": [0, 1, 2, 3, 4, 5],
+            "Compute Rarities": [0, 1, 2, 3, 4],
             "Compute Categories": [0, 1],
             "Single Item Batch": False,
             "Batch Size": 15,
