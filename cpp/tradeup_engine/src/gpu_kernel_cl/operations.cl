@@ -75,7 +75,6 @@ float calculateOutputItemFloat(__private const float minFloat,
     return ((maxFloat - minFloat) * avgFloat + minFloat);
 }
 
-// THE PROBLEMATIC FUNCTION THAT FUCKS UP PERFORMANCE
 void pushOutputItems(__global TradeupGPU *tradeup,
                     __global float *minFloats,
                     __global float *maxFloats,

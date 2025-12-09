@@ -156,8 +156,7 @@ void CPUOP::pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU)
     }
     tradeupCPU.totalInputPrice = totalPrice;
 }
-#include <iostream>
-// THE PROBLEMATIC FUNCTION THAT FUCKS UP PERFORMANCE
+
 void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
 {
     std::vector<ITEM::MarketItem> outputs;
@@ -176,12 +175,12 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
 
             ITEM::MarketItem realOutput = ITEM::getItem(lowestWearOutputID + (realOutputWear - lowestWearOutput.wear));
             // some debug crap just in case
-            if (realOutput.grade != input.grade + 1) {
-                std::cout << "OUTFLOAT " << outputFloat << " AVG" << tradeupCPU.normalizedAvgInputFloat << std::endl;
-                std::cout << "LOWEST OUTID " << lowestWearOutputID << std::endl;
-                std::cout << "REAL OUTID " << realOutput.tempAccessID << std::endl;
-                exit(0);
-            }
+            //if (realOutput.grade != input.grade + 1) {
+            //    std::cout << "OUTFLOAT " << outputFloat << " AVG" << tradeupCPU.normalizedAvgInputFloat << std::endl;
+            //    std::cout << "LOWEST OUTID " << lowestWearOutputID << std::endl;
+            //    std::cout << "REAL OUTID " << realOutput.tempAccessID << std::endl;
+            //    exit(0);
+            //}
             realOutput.floatVal = outputFloat;
             pushNormalizedFloat(realOutput, realOutput.floatVal);
             
