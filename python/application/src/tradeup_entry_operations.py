@@ -53,10 +53,10 @@ def getExpectedPrice(outputEntries: list[dict[str, Any]]) -> float:
 
 def getProfitability(totalCost: float, outputEntries: list[dict[str, Any]]) -> float:
     expectedPrice = getExpectedPrice(outputEntries)
-    profitability = (expectedPrice / totalCost) * 100
+    profitability = (expectedPrice / (totalCost + sys.float_info.epsilon)) * 100
     return profitability
 
 def getProfitabilitySteamTax(totalCost: float, outputEntries: list[dict[str, Any]]) -> float:
     expectedPrice = getExpectedPrice(outputEntries) * 0.85
-    profitability = (expectedPrice / totalCost) * 100
+    profitability = (expectedPrice / (totalCost + sys.float_info.epsilon)) * 100
     return profitability

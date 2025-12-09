@@ -23,6 +23,7 @@
 #include "logger.hpp"
 #include "market_item.hpp"
 #include "market_item_cold_data.hpp"
+#include "market_item_memory_flat_data.hpp"
 #include "namespace.hpp"
 #include <array>
 #include <cstdlib>
@@ -40,11 +41,13 @@ std::unordered_map<int, MarketItemColdData> g_itemsColdData;
 ARR_TRADEUPABLE(ARR_CATEGORY(ARR_GRADE(std::vector<MarketItem>)))                   g_itemsTradeCategoryGrade;
 ARR_TRADEUPABLE(ARR_CATEGORY(ARR_GRADE(ARR_COLLECTION(std::vector<MarketItem>))))   g_itemsTradeCategoryGradeCollection;
 ARR_CATEGORY(ARR_GRADE(ARR_COLLECTION(std::vector<MarketItem>)))                    g_itemsCategoryGradeCollection;
+MarketItemMemoryFlatData g_flatData;
 
 void ITEM::loadEverything(void)
 {
     loadMarketItems();
     sortMarketItems();
+    createFlattenedData();
 }
 
 void ITEM::loadMarketItems(void)
@@ -73,11 +76,8 @@ void ITEM::loadMarketItems(void)
         marketItem.category = DEFINITIONS::categoryToInt(readyJsonItem["Category"].GetString());
         marketItem.grade = DEFINITIONS::gradeToInt(readyJsonItem["Grade"].GetString());
         marketItem.wear = DEFINITIONS::wearToInt(readyJsonItem["Wear"].GetString());
-        
-        // skip item cuz getting float on price member crashes cause these skins have null prices and shit.
-        if (marketItem.category == DEFINITIONS::CATEGORY_SOUVENIR || marketItem.grade == DEFINITIONS::GRADE_CONTRABAND) {
-            continue;
-        }
+        marketItem.minFloat = readyJsonItem["Min Float"].GetFloat();
+        marketItem.maxFloat = readyJsonItem["Max Float"].GetFloat();
 
         // get modified items and set price accordingly
         marketItem.price = readyJsonItem["Market Price"].GetFloat();
@@ -87,7 +87,9 @@ void ITEM::loadMarketItems(void)
             marketItem.price = (modifiedJsonItem["Use Modified State"].GetBool()) ? modifiedJsonItem["Modified Price"].GetFloat() : readyJsonItem["Market Price"].GetFloat();
             break;
         }
-        if (marketItem.price == -1) LOGGER::sendMessage("Item " + coldData.weaponName + " " + coldData.skinName + " Has a corrupted price!");
+        if (marketItem.price == -1 || marketItem.price == 0) {
+            LOGGER::sendMessage("Item " + coldData.weaponName + " " + coldData.skinName + " " + DEFINITIONS::categoryToString(marketItem.category) + " " + DEFINITIONS::wearToString(marketItem.wear) + " Has a corrupted price!");
+        }
         marketItem.priceSteamTax = marketItem.price * 0.87;
 
         marketItem.tradeupable = readyJsonItem["Tradeupable"].GetBool();
@@ -98,11 +100,11 @@ void ITEM::loadMarketItems(void)
             for (auto &outcomeCollectionEntry : readyJsonItem["Crates"].GetArray()) {
                 int crate = DEFINITIONS::crateToInt(outcomeCollectionEntry.GetString());
                 int outcomeCollection = DEFINITIONS::crateToCollection(crate);
-                marketItem.outcomeCollections[marketItem.outcomeCollectionsSize++] = outcomeCollection;
-            }            
+                coldData.outcomeCollections.push_back(outcomeCollection);
+            }
         }
         else {
-            marketItem.outcomeCollections[marketItem.outcomeCollectionsSize++] = marketItem.collection;
+            coldData.outcomeCollections.push_back(marketItem.collection);
         }
 
         // Star / Contraband items aren't in any collections. rather in crates.
@@ -114,8 +116,13 @@ void ITEM::loadMarketItems(void)
             LOGGER::sendMessage("Item has no suitable grades " + coldData.weaponName + " " + coldData.skinName);
             continue;
         }
-        marketItem.minFloat = readyJsonItem["Min Float"].GetFloat();
-        marketItem.maxFloat = readyJsonItem["Max Float"].GetFloat();
+
+        // Outputs
+        for (auto &outputEntry : readyJsonItem["Possible Outputs"].GetArray()) {
+            int outputTempID = outputEntry["Output Temp Access ID"].GetInt();
+            coldData.outputTempIds.push_back(outputTempID);
+        }
+
         pushMarketItem(marketItem, coldData);
     }
 }
@@ -139,8 +146,7 @@ void ITEM::sortMarketItems(void)
             g_itemsTradeCategoryGrade[item.tradeupable][item.category][item.grade].push_back(item);
         }
         
-        for (int oci = 0; oci < item.outcomeCollectionsSize; ++oci) {
-            int outcomeCollection = item.outcomeCollections[oci];
+        for (auto &outcomeCollection : coldData.outcomeCollections) {
             g_itemsTradeCategoryGradeCollection[item.tradeupable][item.category][item.grade][outcomeCollection].push_back(item);
             g_itemsCategoryGradeCollection[item.category][item.grade][outcomeCollection].push_back(item);
         }
@@ -149,10 +155,42 @@ void ITEM::sortMarketItems(void)
     LOGGER::sendMessage("Items loaded: " + std::to_string(g_marketItems.size()));
 }
 
+void ITEM::createFlattenedData(void)
+{   
+    for (auto &item : g_marketItems) {
+        ITEM::MarketItemColdData coldData = getColdData(item);
+
+        static int outputItemIdIndex = 0;
+        g_flatData.outputItemIdsStartIndices.push_back(outputItemIdIndex);
+        for (auto &outputTempID : coldData.outputTempIds) {
+            g_flatData.outputItemIds.push_back(outputTempID);
+            ++outputItemIdIndex;
+        }
+        g_flatData.outputItemIdsEndIndices.push_back(outputItemIdIndex);
+
+        static int outcomeCollectionIndex = 0;
+        g_flatData.outcomeCollectionsStartIndices.push_back(outcomeCollectionIndex);
+        for (auto &outcomeCollection : coldData.outcomeCollections) {
+            g_flatData.outcomeCollections.push_back(outcomeCollection);
+            ++outcomeCollectionIndex;
+        }
+        g_flatData.outcomeCollectionsEndIndices.push_back(outcomeCollectionIndex);
+
+        g_flatData.minFloats.push_back(item.minFloat);
+        g_flatData.maxFloats.push_back(item.maxFloat);
+        g_flatData.prices.push_back(item.price);
+    }
+}
+
 void ITEM::sendCorruptedItemError(const ITEM::MarketItem &item)
 {
     auto data = getColdData(item);
     LOGGER::sendMessage("ERROR, CORRUPTED ITEM: " + data.weaponName + " " + data.skinName);
+}
+
+const ITEM::MarketItem &ITEM::getItem(const int tempID)
+{
+    return g_marketItems[tempID];
 }
 
 const std::vector<ITEM::MarketItem> &ITEM::getItems(void)
@@ -184,22 +222,7 @@ const std::vector<ITEM::MarketItem> &ITEM::getItemsTradeupableCategoryGradeColle
     return g_itemsTradeCategoryGradeCollection[tradeupable][category][grade][collection];
 }
 
-ITEM::MarketItemMemoryFlatCollections ITEM::getItemsTradeupableCategoryGradeCollectionsFlattened(const int category, const int grade)
+const ITEM::MarketItemMemoryFlatData &ITEM::getFlatData(void)
 {
-    int itemCounter = 0;
-    MarketItemMemoryFlatCollections flatCols;
-    ARR_COLLECTION(std::vector<MarketItem>) &colVectorsArr = g_itemsCategoryGradeCollection[category][grade];
-
-    for (int collection = 0; collection < DEFINITIONS::COLLECTION_END; ++collection) {
-        flatCols.collectionsIndicesStart[collection] = itemCounter;
-        auto &colVec = colVectorsArr[collection];
-        for (auto &item : colVec) {
-            flatCols.collectionItemsFlat.push_back(item);
-            ++itemCounter;
-        }
-        flatCols.collectionsIndicesEnd[collection] = itemCounter;
-    }
-
-    return flatCols;
-
+    return g_flatData;
 }

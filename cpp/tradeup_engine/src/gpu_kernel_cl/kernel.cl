@@ -23,35 +23,53 @@
 
 #define MAX_COMBINATION_SIZE 10
 
-TradeupGPU processCombination(__global MarketItem *flatCollectionOutputsPool,
-                        __global int *collectionIndicesStart,
-                        __global int *collectionIndiciesEnd,
+void processCombination(__global TradeupGPU *tradeup,
+                        __global float *minFloats,
+                        __global float *maxFloats,
+                        __global float *prices,
+
+                        __global int *flatOutcomeCollections,
+                        __global int *flatOutcomeCollectionsIndicesStart,
+                        __global int *flatOutcomeCollectionsIndicesEnd,
+
+                        __global int *flatOutputIds,
+                        __global int *flatOutputIdsIndicesStart,
+                        __global int *flatOutputIdsIndicesEnd,
+
                         __private MarketItem *combination,
                         __private int combinationSize)
 {
-    __private TradeupGPU tradeup;
-    tradeup.totalInputSize = combinationSize;
+    tradeup->totalInputSize = combinationSize;
 
-    for (int i = 0; i < tradeup.totalInputSize; ++i) {
-        tradeup.inputs[i] = combination[i];
+    for (int i = 0; i < tradeup->totalInputSize; ++i) {
+        tradeup->inputs[i] = combination[i];
     }
 
-    pushAvgInputFloat(&tradeup);
-    pushNormalizedAvgInputFloat(&tradeup);
-    pushTotalInputPrice(&tradeup);
-    pushOutputItems(&tradeup, flatCollectionOutputsPool, collectionIndicesStart, collectionIndiciesEnd);
-    pushChanceToProfit(&tradeup);
-    pushProfitability(&tradeup);
-
-    return tradeup;
+    pushInputsNormalizedFloats(tradeup);
+    pushAvgInputFloat(tradeup);
+    pushNormalizedAvgInputFloat(tradeup);
+    pushTotalInputPrice(tradeup);
+    pushOutputItems(tradeup, minFloats, maxFloats, flatOutcomeCollections, flatOutcomeCollectionsIndicesStart, flatOutcomeCollectionsIndicesEnd,
+                    flatOutputIds, flatOutputIdsIndicesStart, flatOutputIdsIndicesEnd);
+    pushChanceToProfit(tradeup, prices);
+    pushProfitability(tradeup, prices);
 }
 
 __kernel void combinationKernel(__global TradeupGPU *tradeups,
                                 __global MarketItem *batch,
-                                __global MarketItem *flatCollectionOutputsPool,
-                                __global int *collectionIndicesStart,
-                                __global int *collectionIndicesEnd,
-                                __private int grade,
+                                __global float *minFloats,
+                                __global float *maxFloats,
+                                __global float *prices,
+
+                                __global int *flatOutcomeCollections,
+                                __global int *flatOutcomeCollectionsIndicesStart,
+                                __global int *flatOutcomeCollectionsIndicesEnd,
+                                
+                                __global int *flatOutputIds,
+                                __global int *flatOutputIdsIndicesStart,
+                                __global int *flatOutputIdsIndicesEnd,
+
+                                __private short grade,
                                 __private uint batchSize,
                                 __private ulong combinationsAmount,
                                 __private float profitabilityMargin)
@@ -64,7 +82,7 @@ __kernel void combinationKernel(__global TradeupGPU *tradeups,
     int combinationSize = (grade == GRADE_COVERT) ? 5 : 10;
 
     int localIndices[MAX_COMBINATION_SIZE];
-    int combTemp = combStart;
+    ulong combTemp = combStart;
     
     for (int i = 0; i < combinationSize; ++i) {
         localIndices[i] = combTemp % (n - i) + i;
@@ -76,9 +94,12 @@ __kernel void combinationKernel(__global TradeupGPU *tradeups,
         combination[i] = batch[localIndices[i]];
     }
 
-    __private TradeupGPU tradeup = processCombination(flatCollectionOutputsPool, collectionIndicesStart, collectionIndicesEnd, combination, combinationSize);
-    if (tradeup.profitability > profitabilityMargin) {
-        tradeup.processed = true; // tradeup is replaced by new value and "processed". later set to false when "clearing" tradeups in the host
-        tradeups[gid] = tradeup;
+    processCombination(&tradeups[gid], minFloats, maxFloats, prices, flatOutcomeCollections, 
+                        flatOutcomeCollectionsIndicesStart, flatOutcomeCollectionsIndicesEnd, 
+                        flatOutputIds, flatOutputIdsIndicesStart, flatOutputIdsIndicesEnd, 
+                        combination, combinationSize);
+
+    if (tradeups[gid].profitability > profitabilityMargin) {
+        tradeups[gid].processed = true; // tradeup is replaced by new value and "processed". later set to false when "clearing" tradeups in the host
     }
 }

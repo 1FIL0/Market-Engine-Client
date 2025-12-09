@@ -44,7 +44,7 @@ import hardware
 import item_memory
 import logger
 
-MARKET_ENGINE_VER = "1.0.1"
+MARKET_ENGINE_VER = "2.0.0"
 
 class MainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -766,8 +766,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.gpuLabels: list[QLabel] = list()
         for i in range(len(gpus)):
             gpu = gpus[i]
-            gpuWidget = qt_resource.createWidget("gpuWidget" + str(i), QHBoxLayout(), Qt.AlignLeft)
-            gpuLabel = qt_resource.createLabel("gpuLabel" + str(i), gpu.name, qt_resource.fontSystemHudNormal, Qt.AlignLeft)
+            gpuWidget = qt_resource.createWidget("gpuWidget" + str(i), QHBoxLayout(), Qt.AlignLeft | Qt.AlignTop, "padding: 0")
+            gpuLabel = qt_resource.createLabel("gpuLabel" + str(i), gpu.name, qt_resource.fontSystemHudNormal, Qt.AlignLeft, "padding-left: 10; padding-top: 2")
             gpuEnableBox: QCheckBox = qt_resource.createCheckbox("gpuCheckbox" + str(i), "Enabled", qt_resource.fontSystemHudNormal, False)
             gpuWidget.layout().addWidget(gpuEnableBox)
             gpuWidget.layout().addWidget(gpuLabel)
@@ -823,7 +823,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def defaultTradeupEngineSettings(self):
         config = {
-            "Compute Rarities": [0, 1, 2, 3, 4, 5],
+            "Compute Rarities": [0, 1, 2, 3, 4],
             "Compute Categories": [0, 1],
             "Single Item Batch": False,
             "Batch Size": 15,

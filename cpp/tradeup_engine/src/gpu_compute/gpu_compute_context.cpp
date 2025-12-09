@@ -35,6 +35,7 @@
 #include <vector>
 #include "cpu_operations.hpp"
 #include "definitions.hpp"
+#include "market_item_memory_flat_data.hpp"
 #include "time.hpp"
 #include "tradeup.hpp"
 #include "tradeup_handler.hpp"
@@ -45,11 +46,11 @@
 USE_NAMESPACE_TRADEUP_ENGINE
 USE_NAMESPACE_SHARE
 
-COMPGPU::ComputeContext::ComputeContext(const cl::Device &a_device, const bool debug)
+COMPGPU::ComputeContext::ComputeContext(const cl::Device &device, const bool debug)
 {
     m_debugMode = debug;
 
-    m_device = a_device;
+    m_device = device;
     m_platform = m_device.getInfo<CL_DEVICE_PLATFORM>();
     m_context = cl::Context(m_device);
     m_queue = cl::CommandQueue(m_context, m_device);
@@ -63,7 +64,7 @@ COMPGPU::ComputeContext::ComputeContext(const cl::Device &a_device, const bool d
     sendInfo();
     buildKernel();
     initData();
-    createStaticBuffers();
+    createInitialBuffers();
 }
 
 void COMPGPU::ComputeContext::buildKernel(void)
@@ -80,8 +81,6 @@ void COMPGPU::ComputeContext::buildKernel(void)
     }
     catch (cl::Error &err) {
         LOGGER::sendMessage(getCLError(err));
-        std::string buildLog = m_program.getBuildInfo<CL_PROGRAM_BUILD_LOG>(m_device);
-        LOGGER::sendMessage("Build Log: " + buildLog);
     }
 }
 
@@ -131,12 +130,42 @@ void COMPGPU::ComputeContext::initData(void)
     m_profitabilityMargin = COMP::computeConfig.profitMargin;
 }
 
-void COMPGPU::ComputeContext::createStaticBuffers(void)
+void COMPGPU::ComputeContext::createInitialBuffers(void)
 {
-    if (COMP::computeConfig.outputVerbose) LOGGER::sendMessage("Creating Static Buffers");
+    ITEM::MarketItemMemoryFlatData flatData = ITEM::getFlatData();
+
+    if (COMP::computeConfig.outputVerbose) LOGGER::sendMessage("Creating Initial Buffers");
     m_tradeupsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR,
                                     sizeof(TRADEUP::TradeupGPU) * m_tradeupsGPU.size(), m_tradeupsGPU.data());
+
     m_batchBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, sizeof(ITEM::MarketItem) * m_batch.size(), m_batch.data());
+
+    m_minFloatsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                    sizeof(float) * flatData.minFloats.size(), flatData.minFloats.data());
+
+    m_pricesBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                sizeof(float) * flatData.prices.size(), flatData.prices.data());
+
+    m_maxFloatsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                    sizeof(float) * flatData.maxFloats.size(), flatData.maxFloats.data());
+
+    m_flatOutcomeCollectionsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                        sizeof(int) * flatData.outcomeCollections.size(), flatData.outcomeCollections.data());
+
+    m_flatOutcomeCollectionsIndicesStartBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 
+                                                    sizeof(int) * flatData.outcomeCollectionsStartIndices.size(), flatData.outcomeCollectionsStartIndices.data());
+    
+    m_flatOutcomeCollectionsIndicesEndBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                                    sizeof(int) * flatData.outcomeCollectionsEndIndices.size(), flatData.outcomeCollectionsEndIndices.data());
+
+    m_flatOutputIdsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                    sizeof(int) * flatData.outputItemIds.size(), flatData.outputItemIds.data());
+
+    m_flatOutputIdsIndicesStartBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                                sizeof(int) * flatData.outputItemIdsStartIndices.size(), flatData.outputItemIdsStartIndices.data());
+
+    m_flatOutputIdsIndicesEndBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR,
+                                                        sizeof(int) * flatData.outputItemIdsEndIndices.size(), flatData.outputItemIdsEndIndices.data());
 }
 
 void COMPGPU::ComputeContext::prepareBatch(const int category, const int grade)
@@ -151,18 +180,9 @@ void COMPGPU::ComputeContext::prepareBuffers(const int category, const int grade
     cleanTradeups();
     prepareBatch(category, grade);
 
-    // Create entirely new buffers - REDO THIS LATER TO IMPROVE PERFORMANCE
     if (COMP::computeConfig.outputVerbose) LOGGER::sendMessage("Preparing buffers");
-    ITEM::MarketItemMemoryFlatCollections collectionOutputsFlat = ITEM::getItemsTradeupableCategoryGradeCollectionsFlattened(category, grade + 1);
-    
-    m_flatCollectionOutputsBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 
-                                                sizeof(ITEM::MarketItem) * collectionOutputsFlat.collectionItemsFlat.size(), collectionOutputsFlat.collectionItemsFlat.data());
-    m_collectionIndicesStartBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 
-                                            sizeof(int) * collectionOutputsFlat.collectionsIndicesStart.size(), collectionOutputsFlat.collectionsIndicesStart.data());
-    m_collectionIndicesEndBuffer = cl::Buffer(m_context, CL_MEM_READ_WRITE | CL_MEM_COPY_HOST_PTR, 
-                                                sizeof(int) * collectionOutputsFlat.collectionsIndicesEnd.size(), collectionOutputsFlat.collectionsIndicesEnd.data());
-    
-    // Modify the static buffers
+
+    // Modify some buffers
     size_t tradeupsDataSize = sizeof(TRADEUP::TradeupGPU) * m_tradeupsGPU.size();
     TRADEUP::TradeupGPU *tradeupsMappedPtr = (TRADEUP::TradeupGPU *)m_queue.enqueueMapBuffer(m_tradeupsBuffer, CL_TRUE, CL_MAP_WRITE, 0, tradeupsDataSize);
     std::memcpy(tradeupsMappedPtr, m_tradeupsGPU.data(), tradeupsDataSize);
@@ -198,13 +218,19 @@ void COMPGPU::ComputeContext::setKernelArgs(void)
     uint32_t batchSize = (uint32_t)m_batch.size();
     m_kernel.setArg(0, sizeof(cl_mem), &m_tradeupsBuffer);
     m_kernel.setArg(1, sizeof(cl_mem), &m_batchBuffer);
-    m_kernel.setArg(2, sizeof(cl_mem), &m_flatCollectionOutputsBuffer);
-    m_kernel.setArg(3, sizeof(cl_mem), &m_collectionIndicesStartBuffer);
-    m_kernel.setArg(4, sizeof(cl_mem), &m_collectionIndicesEndBuffer); 
-    m_kernel.setArg(5, sizeof(int), &m_batch[0].grade);
-    m_kernel.setArg(6, sizeof(uint32_t), &batchSize);
-    m_kernel.setArg(7, sizeof(uint64_t), &m_combinationsAmount);
-    m_kernel.setArg(8, sizeof(float), &m_profitabilityMargin);
+    m_kernel.setArg(2, sizeof(cl_mem), &m_minFloatsBuffer);
+    m_kernel.setArg(3, sizeof(cl_mem), &m_maxFloatsBuffer);
+    m_kernel.setArg(4, sizeof(cl_mem), &m_pricesBuffer);
+    m_kernel.setArg(5, sizeof(cl_mem), &m_flatOutcomeCollectionsBuffer);
+    m_kernel.setArg(6, sizeof(cl_mem), &m_flatOutcomeCollectionsIndicesStartBuffer);
+    m_kernel.setArg(7, sizeof(cl_mem), &m_flatOutcomeCollectionsIndicesEndBuffer);
+    m_kernel.setArg(8, sizeof(cl_mem), &m_flatOutputIdsBuffer);
+    m_kernel.setArg(9, sizeof(cl_mem), &m_flatOutputIdsIndicesStartBuffer);
+    m_kernel.setArg(10, sizeof(cl_mem), &m_flatOutputIdsIndicesEndBuffer);
+    m_kernel.setArg(11, sizeof(short), &m_batch[0].grade);
+    m_kernel.setArg(12, sizeof(uint32_t), &batchSize);
+    m_kernel.setArg(13, sizeof(uint64_t), &m_combinationsAmount);
+    m_kernel.setArg(14, sizeof(float), &m_profitabilityMargin);
 }
 
 void COMPGPU::ComputeContext::startCompute(void)
@@ -228,9 +254,9 @@ void COMPGPU::ComputeContext::startCompute(void)
         ++currentBatch;
 
         // Only one batch 4 debug
-        if (m_debugMode) {
-            return;
-        }
+        //if (m_debugMode) {
+        //    return;
+        //}
     }
 }
 

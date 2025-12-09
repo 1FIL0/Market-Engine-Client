@@ -20,35 +20,30 @@
 #pragma once
 
 #include "namespace.hpp"
-#include <array>
 #include <cstdint>
-#include "definitions.hpp"
 
 START_ENGINE_NAMESPACE_MULTI(ITEM)
-USE_NAMESPACE_SHARE
-
-using TempAccessID = int;
-using PermID = uint64_t;
 
 //! MUST BE ALIGNED WITH OPENCL STRUCT
 #define MAX_MARKET_ITEM_COLLECTIONS DEFINITIONS::COLLECTION_END
 
 #pragma pack(push, 1)
 struct MarketItem {
-    TempAccessID tempAccessID;
-    PermID permID;
-    int grade;
-    int category;
-    int wear;
-    float price;
-    float priceSteamTax;
-    bool tradeupable;
-    int collection;
-    float floatVal, normalizedFloatVal, minFloat, maxFloat;
-    float tradeUpChance;
-
-    std::array<int, MAX_MARKET_ITEM_COLLECTIONS> outcomeCollections;
+    uint64_t permID;          
+    float price;           
+    float priceSteamTax;   
+    float floatVal;        
+    float normalizedFloatVal;
+    float minFloat;       
+    float maxFloat;       
+    float tradeUpChance;  
+    int tempAccessID;     
     int outcomeCollectionsSize;
+    short grade;          
+    short category;       
+    short wear;           
+    short collection;     
+    bool tradeupable;     
 
     MarketItem();
 

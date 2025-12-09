@@ -19,18 +19,27 @@
 
 #pragma once
 
+#include "definitions.cl"
 #include "market_item.cl"
 #include "definitions.cl"
 #include "tradeup.cl"
 
-void pushNormalizedFloat(__private MarketItem *item, __private const float itemFloatVal)
+float calculateNormalizedFloat(__private const float minFloat, __private const float maxFloat, __private const float itemFloatVal)
 {
-    float denom = item->maxFloat - item->minFloat;
+    float denom = maxFloat - minFloat;
     denom = (denom == 0.0f) ? FLT_EPSILON : denom;
-    item->normalizedFloatVal = (itemFloatVal - item->minFloat) / denom;
+    float normalizedFloatVal = (itemFloatVal - minFloat) / denom;
+    return normalizedFloatVal;
 }
 
-void pushTotalInputPrice(__private TradeupGPU *tradeup)
+void pushInputsNormalizedFloats(__global TradeupGPU *tradeup)
+{
+    for (int i = 0; i < tradeup->totalInputSize; ++i) {
+        tradeup->inputs[i].normalizedFloatVal = calculateNormalizedFloat(tradeup->inputs[i].minFloat, tradeup->inputs[i].maxFloat, tradeup->inputs[i].floatVal);
+    }
+}
+
+void pushTotalInputPrice(__global TradeupGPU *tradeup)
 {
     float totalPrice = 0.0;
     for (int i = 0; i < tradeup->totalInputSize; ++i) {
@@ -39,7 +48,7 @@ void pushTotalInputPrice(__private TradeupGPU *tradeup)
     }
 }
 
-void pushAvgInputFloat(__private TradeupGPU *tradeup)
+void pushAvgInputFloat(__global TradeupGPU *tradeup)
 {
     float avgFloat = 0.0;
     for (int i = 0; i < tradeup->totalInputSize; ++i) {
@@ -49,7 +58,7 @@ void pushAvgInputFloat(__private TradeupGPU *tradeup)
     tradeup->avgInputFloat = avgFloat;
 }
 
-void pushNormalizedAvgInputFloat(__private TradeupGPU *tradeup)
+void pushNormalizedAvgInputFloat(__global TradeupGPU *tradeup)
 {
     float normalizedAvgFloat = 0.0;
     for (int i = 0; i < tradeup->totalInputSize; ++i) {
@@ -59,100 +68,100 @@ void pushNormalizedAvgInputFloat(__private TradeupGPU *tradeup)
     tradeup->normalizedAvgInputFloat = normalizedAvgFloat;
 }
 
-float calculateOutputItemFloat(__private const MarketItem *outputItem, 
-                                __private float avgFloat)
+float calculateOutputItemFloat(__private const float minFloat,
+                                __private const float maxFloat, 
+                                __private const float avgFloat)
 {
-    return ((outputItem->maxFloat - outputItem->minFloat) * avgFloat + outputItem->minFloat);
+    return ((maxFloat - minFloat) * avgFloat + minFloat);
 }
 
 // THE PROBLEMATIC FUNCTION THAT FUCKS UP PERFORMANCE
-void pushOutputItems(__private TradeupGPU *tradeup,
-                __global MarketItem *outputItemsPool,
-                __global int *collectionIndicesStart,
-                __global int *collectionIndiciesEnd)
+void pushOutputItems(__global TradeupGPU *tradeup,
+                    __global float *minFloats,
+                    __global float *maxFloats,
+
+                    __global int *flatOutcomeCollections,
+                    __global int *flatOutcomeCollectionsIndicesStart,
+                    __global int *flatOutcomeCollectionsIndicesEnd,
+
+                    __global int *flatOutputIds,
+                    __global int *flatOutputIdsIndicesStart,
+                    __global int *flatOutputIdsIndicesEnd
+                )
 {
     __private float collectionChances[COLLECTION_END] = {0.0};
     __private int distinctCollectionItems[COLLECTION_END] = {0};
-
-    __private int currentOutputItem = 0;
+    __private int currentOutputSize = 0;
 
     for (int i = 0; i < tradeup->totalInputSize; ++i) {
         collectionChances[tradeup->inputs[i].collection] += (100.0 / tradeup->totalInputSize); 
-        int collectionIndexStart = collectionIndicesStart[tradeup->inputs[i].collection];
-        int collectionIndexEnd = collectionIndiciesEnd[tradeup->inputs[i].collection];
 
-        for (int j = collectionIndexStart; j < collectionIndexEnd; ++j) {
-            MarketItem possibleOutput = outputItemsPool[j];
-            float itemFloatVal = calculateOutputItemFloat(&possibleOutput, tradeup->avgInputFloat);
-
-            // Ignore incorrect wears
-            if (possibleOutput.wear != WEAR_NO_WEAR && possibleOutput.wear != itemFloatValToInt(itemFloatVal)) {
-                continue;
+        for (int oidx = flatOutputIdsIndicesStart[tradeup->inputs[i].tempAccessID]; oidx < flatOutputIdsIndicesEnd[tradeup->inputs[i].tempAccessID]; ++oidx) {
+            int lowestWearOutputID = flatOutputIds[oidx];
+            float outputFloat = calculateOutputItemFloat(minFloats[lowestWearOutputID], maxFloats[lowestWearOutputID], tradeup->normalizedAvgInputFloat);
+            int lowestWear = itemFloatValToInt(minFloats[lowestWearOutputID]);
+            int realOutputWear = itemFloatValToInt(outputFloat);
+            int realOutputID = lowestWearOutputID + (realOutputWear - lowestWear);
+            
+            int v = realOutputID;
+                    
+            int dupMask = 0;
+            for (int j = 0; j < currentOutputSize; j++) {
+                dupMask |= (tradeup->outputTempIDS[j] == v);
             }
-            // Ignore duplicates
-            bool dup = false;
-            for (int i = 0; i < currentOutputItem; ++i) {
-                if (tradeup->outputs[i].permID == possibleOutput.permID) {
-                    dup = true;
-                    break;
-                }
-            }
-            if (dup) continue;
 
-            possibleOutput.floatVal = itemFloatVal;
-            pushNormalizedFloat(&possibleOutput, possibleOutput.floatVal);
-            tradeup->outputs[currentOutputItem++] = possibleOutput;
+            float normalizedOutputFloat = calculateNormalizedFloat(minFloats[realOutputID], maxFloats[realOutputID], outputFloat);
 
-            for (int oci = 0; oci < possibleOutput.outcomeCollectionsSize; ++oci) {
-                ++distinctCollectionItems[possibleOutput.outcomeCollections[oci]];
+            tradeup->normalizedOutputFloats[currentOutputSize] = (dupMask == 0) ? normalizedOutputFloat : tradeup->normalizedOutputFloats[currentOutputSize];
+            tradeup->outputTempIDS[currentOutputSize] = (dupMask == 0) ? v : tradeup->outputTempIDS[currentOutputSize];
+            tradeup->outputFloats[currentOutputSize] = (dupMask == 0) ? outputFloat : tradeup->outputFloats[currentOutputSize];
+
+            for (int ocidx = flatOutcomeCollectionsIndicesStart[v]; ocidx < flatOutcomeCollectionsIndicesEnd[v]; ++ocidx) {
+                int outcomeCollection = flatOutcomeCollections[ocidx];
+                distinctCollectionItems[outcomeCollection] += (dupMask == 0) ? 1 : 0;
             }
-        }
-    }
-    
-    // Makes no sense - change later
-    for (int i = 0; i < currentOutputItem; ++i) {
-        MarketItem *output = &tradeup->outputs[i];
-        for (int oci = 0; oci < output->outcomeCollectionsSize; ++oci) {
-            int outcomeCollection = output->outcomeCollections[oci];
-            output->tradeUpChance = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
+
+            currentOutputSize += (dupMask == 0) ? 1 : 0;
         }
     }
 
-    tradeup->totalOutputSize = currentOutputItem;
+    for (int i = 0; i < currentOutputSize; ++i) {
+        int outputID = tradeup->outputTempIDS[i];
+        int outcomeCollection = flatOutcomeCollections[flatOutcomeCollectionsIndicesStart[outputID]];
+        tradeup->outputTradeupChances[i] = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
+    }
+
+    tradeup->totalOutputSize = currentOutputSize;
 }
 
-float getExpectedPrice(__private TradeupGPU *tradeup)
+float getExpectedPrice(__global TradeupGPU *tradeup, __global float *prices)
 {
     float expectedPrice = 0.0;
 
     for (int i = 0; i < tradeup->totalOutputSize; ++i) {
-        expectedPrice += (tradeup->outputs[i].tradeUpChance / 100.0) * tradeup->outputs[i].price;
+        expectedPrice += (tradeup->outputTradeupChances[i] / 100.0) * prices[tradeup->outputTempIDS[i]];
     }
     return expectedPrice;
 }
 
-void pushProfitability(__private TradeupGPU *tradeup)
+void pushProfitability(__global TradeupGPU *tradeup, __global float *prices)
 {
-    float expectedPrice = getExpectedPrice(tradeup);
+    float expectedPrice = getExpectedPrice(tradeup, prices);
     float profitability = (expectedPrice / tradeup->totalInputPrice) * 100;
     float profitabilitySteamTax = ((expectedPrice * 0.85) / tradeup->totalInputPrice) * 100;
     tradeup->profitability = profitability;
     tradeup->profitabilitySteamTax = profitabilitySteamTax;
 }
 
-void pushChanceToProfit(__private TradeupGPU *tradeup)
+void pushChanceToProfit(__global TradeupGPU *tradeup, __global float *prices)
 {
     float chanceToProfit = 0.0;
-    float chanceToProfitSteamTax = 0.0;
     for (int i = 0; i < tradeup->totalOutputSize; ++i) {
-        if (tradeup->outputs[i].price > tradeup->totalInputPrice) {
-            chanceToProfit += tradeup->outputs[i].tradeUpChance;
-        }
-        if (tradeup->outputs[i].priceSteamTax > tradeup->totalInputPrice) {
-            chanceToProfitSteamTax += tradeup->outputs[i].tradeUpChance;
+        if (prices[tradeup->outputTempIDS[i]] > tradeup->totalInputPrice) {
+            chanceToProfit += tradeup->outputTradeupChances[i];
         }
     }
 
     tradeup->chanceToProfit = chanceToProfit;
-    tradeup->chanceToProfitSteamTax = chanceToProfitSteamTax;
+    tradeup->chanceToProfitSteamTax = chanceToProfit;
 }

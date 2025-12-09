@@ -24,9 +24,8 @@
 #include "namespace.hpp"
 #include <rapidjson/document.h>
 #include <vector>
-#include "market_item_flat_collections.hpp"
+#include "market_item_memory_flat_data.hpp"
 
-USE_NAMESPACE_SHARE
 START_ENGINE_NAMESPACE_MULTI(ITEM)
 
 #define ARR_TRADEUPABLE(DATA) std::array<DATA, 2>
@@ -42,19 +41,20 @@ enum {
 void loadEverything(void);
 rapidjson::Document getReadyItemsDoc(void);
 rapidjson::Document getModifiedItemsDoc(void);
+
 void loadMarketItems(void);
 
 void pushMarketItem(const MarketItem &item, const MarketItemColdData &coldData);
 void sortMarketItems(void);
-void sendCorruptedItemError(const ITEM::MarketItem &item);
+void createFlattenedData(void);
+void sendCorruptedItemError(const MarketItem &item);
 
+const MarketItem &getItem(const int tempID);
 const std::vector<MarketItem> &getItems(void);
 MarketItemColdData getColdData(const MarketItem &item);
-const std::vector<MarketItem> &getItemsCategoryGradeCollection (const int category, const int grade, const int collection);
+const std::vector<MarketItem> &getItemsCategoryGradeCollection(const int category, const int grade, const int collection);
 const std::vector<MarketItem> &getItemsTradeupableCategoryGrade(const bool tradeupable, const int category, const int grade);
 const std::vector<MarketItem> &getItemsTradeupableCategoryGradeCollection(const bool tradeupable, const int category, const int grade, const int collection);
-
-// Only used for GPU engine
-MarketItemMemoryFlatCollections getItemsTradeupableCategoryGradeCollectionsFlattened(const int category, const int grade);
+const MarketItemMemoryFlatData &getFlatData(void);
 
 END_ENGINE_NAMESPACE

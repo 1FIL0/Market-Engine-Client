@@ -32,6 +32,7 @@
 #include <omp.h>
 #include "cpu_operations.hpp"
 #include <cmath>
+#include <array>
 
 USE_NAMESPACE_SHARE
 USE_NAMESPACE_TRADEUP_ENGINE
@@ -155,7 +156,7 @@ void CPUOP::pushInputsCombinedPrice(TRADEUP::TradeupCPU &tradeupCPU)
     }
     tradeupCPU.totalInputPrice = totalPrice;
 }
-
+#include <iostream>
 // THE PROBLEMATIC FUNCTION THAT FUCKS UP PERFORMANCE
 void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
 {
@@ -163,45 +164,51 @@ void CPUOP::pushOutputItems(TRADEUP::TradeupCPU &tradeupCPU)
     std::array<float, DEFINITIONS::COLLECTION_END> collectionChances{};
     std::array<int, DEFINITIONS::COLLECTION_END> distinctCollectionItems{};
 
+    const auto &flatData = ITEM::getFlatData();
+    
     for (auto &input : tradeupCPU.inputs) {
         collectionChances[input.collection] += (100.0 / tradeupCPU.inputs.size());
-        
-        const std::vector<ITEM::MarketItem> &collectionItemsRef = ITEM::getItemsCategoryGradeCollection(input.category, input.grade + 1, input.collection);
-        std::vector<ITEM::MarketItem> collectionItemsCopy = collectionItemsRef;
+        for (int oid = flatData.outputItemIdsStartIndices[input.tempAccessID]; oid < flatData.outputItemIdsEndIndices[input.tempAccessID]; ++oid) {
+            int lowestWearOutputID = flatData.outputItemIds[oid];
+            const auto &lowestWearOutput = ITEM::getItem(lowestWearOutputID);
+            float outputFloat = calculateOutputItemFloat(lowestWearOutput.minFloat, lowestWearOutput.maxFloat, tradeupCPU.normalizedAvgInputFloat);
+            int realOutputWear = DEFINITIONS::itemFloatValToInt(outputFloat);
 
-        for (auto &collectionItemCopy : collectionItemsCopy) {
-            float outputFloat = calculateOutputItemFloat(collectionItemCopy, tradeupCPU.normalizedAvgInputFloat);
-            // Ignore incorrect wears
-            if (collectionItemCopy.wear != DEFINITIONS::WEAR_NO_WEAR && DEFINITIONS::itemFloatValToInt(outputFloat) != collectionItemCopy.wear) continue;
-            collectionItemCopy.floatVal = outputFloat;
-            pushNormalizedFloat(collectionItemCopy, collectionItemCopy.floatVal);
+            ITEM::MarketItem realOutput = ITEM::getItem(lowestWearOutputID + (realOutputWear - lowestWearOutput.wear));
+            // some debug crap just in case
+            if (realOutput.grade != input.grade + 1) {
+                std::cout << "OUTFLOAT " << outputFloat << " AVG" << tradeupCPU.normalizedAvgInputFloat << std::endl;
+                std::cout << "LOWEST OUTID " << lowestWearOutputID << std::endl;
+                std::cout << "REAL OUTID " << realOutput.tempAccessID << std::endl;
+                exit(0);
+            }
+            realOutput.floatVal = outputFloat;
+            pushNormalizedFloat(realOutput, realOutput.floatVal);
             
             // no duplicates allowed
-            if (std::find(outputs.begin(), outputs.end(), collectionItemCopy) != outputs.end()) {
+            if (std::find(outputs.begin(), outputs.end(), realOutput) != outputs.end()) {
                 continue;
             }
-
-            outputs.push_back(collectionItemCopy);
-            for (int oci = 0; oci < collectionItemCopy.outcomeCollectionsSize; ++oci) {
-                ++distinctCollectionItems[collectionItemCopy.outcomeCollections[oci]];
+            
+            outputs.push_back(realOutput);
+            for (int oci = flatData.outcomeCollectionsStartIndices[realOutput.tempAccessID]; oci < flatData.outcomeCollectionsEndIndices[realOutput.tempAccessID]; ++oci) {
+                int outcomeCollection = flatData.outcomeCollections[oci];
+                ++distinctCollectionItems[outcomeCollection];
             }
         }
     }
 
-    // Makes no sense - change later
     for (auto &output : outputs) {
-        for (int oci = 0; oci < output.outcomeCollectionsSize; ++oci) {
-            int outcomeCollection = output.outcomeCollections[oci];
-            output.tradeUpChance = collectionChances[outcomeCollection] / (1 * distinctCollectionItems[outcomeCollection]);
-        }
+        int outcomeCollection = flatData.outcomeCollections[flatData.outcomeCollectionsStartIndices[output.tempAccessID]];
+        output.tradeUpChance = collectionChances[outcomeCollection] / (distinctCollectionItems[outcomeCollection]);
     }
 
     tradeupCPU.outputs = outputs;
 }
 
-float CPUOP::calculateOutputItemFloat(const ITEM::MarketItem &outputItem, const float normalizedAvgInputFloat)
+float CPUOP::calculateOutputItemFloat(const float outputMinFloat, const float outputMaxFloat, const float normalizedAvgInputFloat)
 {
-    float outputFloat = (outputItem.maxFloat - outputItem.minFloat) * normalizedAvgInputFloat + outputItem.minFloat;
+    float outputFloat = (outputMaxFloat - outputMinFloat) * normalizedAvgInputFloat + outputMinFloat;
     return outputFloat;
 }
 
@@ -237,8 +244,8 @@ void CPUOP::pushChanceToProfit(TRADEUP::TradeupCPU &tradeupCPU)
 
 void CPUOP::pushProfitability(TRADEUP::TradeupCPU &tradeupCPU)
 {
-    float profitability = (getExpectedPrice(tradeupCPU.outputs) / tradeupCPU.totalInputPrice) * 100;
-    float profitabilitySteamTax = (getExpectedPriceSteamTax(tradeupCPU.outputs) / tradeupCPU.totalInputPrice) * 100;
+    float profitability = (getExpectedPrice(tradeupCPU.outputs) / (tradeupCPU.totalInputPrice + std::numeric_limits<float>::epsilon())) * 100;
+    float profitabilitySteamTax = (getExpectedPriceSteamTax(tradeupCPU.outputs) / (tradeupCPU.totalInputPrice + std::numeric_limits<float>::epsilon())) * 100;
     tradeupCPU.profitability = profitability;
     tradeupCPU.profitabilitySteamTax = profitabilitySteamTax;
 }
